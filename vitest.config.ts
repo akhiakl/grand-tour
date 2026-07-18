@@ -24,7 +24,7 @@ export default defineConfig({
       // are covered by Playwright e2e in the final build step.
       include: ["src/lib/**", "src/app/api/**"],
       exclude: ["**/*.test.*", "src/lib/utils.ts"],
-      reporter: ["text", "json", "json-summary"],
+      reporter: ["text", "json", "json-summary", "lcov"],
       thresholds: {
         lines: 90,
         functions: 90,
