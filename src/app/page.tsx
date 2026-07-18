@@ -1,26 +1,29 @@
 import { ThemeToggle } from "@/components/theme-toggle";
+import { TripExperience } from "@/components/trip/trip-experience";
+import { SAMPLE_TRIP } from "@/lib/trip";
 
 /**
- * Placeholder shell — proves tokens, fonts and theming end-to-end.
- * The full landing experience ships in build-order step 7.
+ * Interim home: the live demo map with the sample Grand Tour trip.
+ * The full landing experience (CTAs, hero) ships in build-order step 7.
  */
 export default function Home() {
   return (
-    <main className="flex flex-1 items-center justify-center p-6">
-      <section className="frost w-full max-w-lg p-10 text-center">
-        <p className="eyebrow">Field Atlas · Phase 1</p>
-        <h1 className="mt-4 font-display text-5xl font-medium tracking-tight">
-          Grand Tour
-        </h1>
-        <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-muted-foreground">
-          Craft a beautiful, interactive travel route map — drawn by{" "}
-          <em className="font-display italic text-brass">AI</em> or by hand — and
-          share it with a single link.
-        </p>
-        <div className="mt-8 flex items-center justify-center gap-3">
-          <ThemeToggle />
+    <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-5 p-4 sm:p-6">
+      <header className="flex items-end justify-between gap-4">
+        <div>
+          <p className="eyebrow">Field Atlas</p>
+          <h1 className="mt-2 font-display text-4xl font-medium tracking-tight">
+            Grand Tour
+          </h1>
+          <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
+            Five stops, one brass line across Europe — tap a city on the map or the
+            rail below to open its field notes.
+          </p>
         </div>
-      </section>
+        <ThemeToggle />
+      </header>
+
+      <TripExperience trip={SAMPLE_TRIP} className="flex-1" />
     </main>
   );
 }
