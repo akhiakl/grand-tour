@@ -18,12 +18,15 @@ drawers and a timeline rail. Share = immutable Redis snapshot at `/t/{id}`
    (403 `{ error: 'city_limit', limit: 5 }`), editor counter + upsell modal,
    AI prompt constraint with `suggestedExtra` ghost stops.
 2. Max 300 lines/file (tests exempt). Split by responsibility.
-3. All external data through Zod (`src/lib/schema.ts`). 50KB payload cap.
-4. `src/lib/trips.ts` stays plain functions; only route handlers/server
-   components touch it. UI gets data via props.
+3. All external data through Zod (`@/lib/trip` schemas). 50KB payload cap.
+4. `src/lib/trip/service.ts` stays plain functions behind the server-only
+   entry `@/lib/trip/service`; only route handlers/server components touch it. UI gets data via props.
 5. Default trip title: "Grand Tour" (`DEFAULT_TRIP_TITLE`); users may set a
    custom title (max 80 chars).
-6. Colocated unit tests written with the code, not after.
+6. Colocated unit tests written with the code, not after; reused mock
+   data comes from `src/test/fixtures/`, never inline in test files.
+7. Lib domains are consumed via their `index.ts` public API — see
+   `docs/ARCHITECTURE.md`.
 
 ## Design recipes
 
