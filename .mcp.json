@@ -7,6 +7,9 @@
     "context7": {
       "command": "npx",
       "args": ["-y", "@upstash/context7-mcp"]
+    },
+    "Sentry": {
+      "url": "https://mcp.sentry.dev/mcp/akhiakl/grand-tour"
     }
   }
 }

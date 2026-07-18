@@ -39,6 +39,15 @@ describe("CityDrawer", () => {
     expect(screen.getByText(city.days[0][2])).toBeInTheDocument();
   });
 
+  it("computes a total in the planner budget calculator", async () => {
+    renderDrawer();
+    await userEvent.click(screen.getByRole("tab", { name: "Planner" }));
+
+    // Default slider midpoint: €(90 + (160-90)/2) = €125/day × 3 nights.
+    expect(screen.getByText(/€375/)).toBeInTheDocument();
+    expect(screen.getByText("Comfortable")).toBeInTheDocument();
+  });
+
   it("tracks planner progress when items are checked", async () => {
     renderDrawer();
     await userEvent.click(screen.getByRole("tab", { name: "Planner" }));

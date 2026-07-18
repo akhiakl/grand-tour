@@ -7,15 +7,17 @@ import { cn } from "@/lib/utils";
 
 import { MODE_META } from "./mode";
 
-function LegChip({ leg }: { leg: Leg }) {
+function LegChip({ leg }: { readonly leg: Leg }) {
   const { emoji, label } = MODE_META[leg.mode];
   return (
-    <span className="flex shrink-0 flex-col items-center px-1 text-muted-foreground">
-      <span aria-hidden className="text-sm leading-none">
+    <span className="flex shrink-0 flex-col items-center self-center px-1.5 text-muted-foreground">
+      <span aria-hidden className="text-[13px] leading-none opacity-80">
         {emoji}
       </span>
       <span className="sr-only">{label}</span>
-      <span className="mt-0.5 text-[10px] whitespace-nowrap">{leg.duration}</span>
+      <span className="mt-0.5 text-[9px] tracking-wide whitespace-nowrap">
+        {leg.duration}
+      </span>
     </span>
   );
 }
@@ -24,44 +26,50 @@ export function TimelineRail({
   trip,
   selectedIndex,
   onSelect,
-  className,
 }: {
-  trip: Trip;
-  selectedIndex: number | null;
-  onSelect: (index: number) => void;
-  className?: string;
+  readonly trip: Trip;
+  readonly selectedIndex: number | null;
+  readonly onSelect: (index: number) => void;
 }) {
   return (
     <nav
       aria-label="Trip timeline"
-      className={cn(
-        "frost flex items-center gap-1 overflow-x-auto px-3 py-2.5",
-        className,
-      )}
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center px-4 pb-5"
     >
-      {trip.cities.map((city, index) => (
-        <Fragment key={`${city.name}-${index}`}>
-          {index > 0 && <LegChip leg={trip.legs[index - 1]} />}
-          <button
-            type="button"
-            onClick={() => onSelect(index)}
-            aria-current={selectedIndex === index ? "step" : undefined}
-            className={cn(
-              "flex shrink-0 items-center gap-2 rounded-full border border-transparent px-3 py-1.5 text-sm transition-colors outline-none",
-              "hover:bg-secondary focus-visible:ring-2 focus-visible:ring-ring",
-              selectedIndex === index && "border-line bg-secondary",
-            )}
-          >
-            <span className="grid size-5 shrink-0 place-items-center rounded-full bg-brass text-[11px] font-semibold text-paper dark:text-[#0e1420]">
-              {index + 1}
-            </span>
-            <span className="font-medium whitespace-nowrap">{city.name}</span>
-            <span className="text-xs whitespace-nowrap text-muted-foreground">
-              {city.nights}n
-            </span>
-          </button>
-        </Fragment>
-      ))}
+      <div className="frost pointer-events-auto flex max-w-full items-stretch overflow-x-auto rounded-[20px] px-2.5 py-3">
+        {trip.cities.map((city, index) => (
+          <Fragment key={`${city.name}-${index}`}>
+            {index > 0 && <LegChip leg={trip.legs[index - 1]} />}
+            <button
+              type="button"
+              onClick={() => onSelect(index)}
+              aria-current={selectedIndex === index ? "step" : undefined}
+              className={cn(
+                "flex min-w-[96px] shrink-0 flex-col items-center gap-1 rounded-[14px] px-4 py-1.5 transition-colors outline-none",
+                "hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring",
+                selectedIndex === index && "bg-accent",
+              )}
+            >
+              <span aria-hidden className="text-lg leading-none">
+                {city.flag}
+              </span>
+              <span className="font-display text-[15px] font-medium whitespace-nowrap">
+                {city.name}
+              </span>
+              <span
+                className={cn(
+                  "text-[10px] tracking-[0.14em] uppercase",
+                  selectedIndex === index
+                    ? "font-semibold text-brass"
+                    : "text-muted-foreground",
+                )}
+              >
+                {city.nights} night{city.nights === 1 ? "" : "s"}
+              </span>
+            </button>
+          </Fragment>
+        ))}
+      </div>
     </nav>
   );
 }

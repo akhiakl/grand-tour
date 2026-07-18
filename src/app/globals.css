@@ -7,6 +7,7 @@
  * Grand Tour — "field atlas" design tokens.
  * Brand palette (paper / ink / brass / azure) drives every shadcn token
  * so components inherit the aesthetic without per-component overrides.
+ * Visual reference: reference/grand-tour.html
  */
 :root {
   --paper: #f5f1e8;
@@ -15,10 +16,11 @@
   --brass: #b98a2f;
   --azure: #3e7cb1;
   --line: rgba(22, 35, 58, 0.12);
+  --card-solid: #ffffff;
 
   --background: var(--paper);
   --foreground: var(--ink);
-  --card: rgba(252, 250, 244, 0.66);
+  --card: rgba(255, 255, 255, 0.72);
   --card-foreground: var(--ink);
   --popover: rgba(252, 250, 244, 0.92);
   --popover-foreground: var(--ink);
@@ -28,7 +30,7 @@
   --secondary-foreground: var(--ink);
   --muted: rgba(22, 35, 58, 0.05);
   --muted-foreground: var(--ink-soft);
-  --accent: rgba(185, 138, 47, 0.12);
+  --accent: rgba(185, 138, 47, 0.1);
   --accent-foreground: var(--ink);
   --destructive: #a83a32;
   --destructive-foreground: #fdf9f2;
@@ -37,8 +39,9 @@
   --ring: var(--brass);
 
   --radius: 1rem;
-  --shadow-soft: 0 24px 60px -28px rgba(22, 35, 58, 0.35);
+  --shadow-soft: 0 20px 60px -20px rgba(22, 35, 58, 0.25);
   --ease-atlas: cubic-bezier(0.32, 0.72, 0.24, 1);
+  --map-filter: saturate(0.55) contrast(1.02) brightness(1.02);
 }
 
 .dark {
@@ -48,17 +51,20 @@
   --brass: #d4a94e;
   --azure: #6fa8d6;
   --line: rgba(237, 234, 226, 0.12);
+  --card-solid: #161f30;
 
-  --card: rgba(21, 29, 45, 0.62);
+  --card: rgba(20, 28, 44, 0.72);
   --popover: rgba(21, 29, 45, 0.94);
   --primary: var(--ink);
   --primary-foreground: #0e1420;
   --secondary: rgba(237, 234, 226, 0.07);
   --muted: rgba(237, 234, 226, 0.06);
-  --accent: rgba(212, 169, 78, 0.14);
+  --accent: rgba(212, 169, 78, 0.12);
   --destructive: #d06157;
   --destructive-foreground: #0e1420;
-  --shadow-soft: 0 24px 60px -24px rgba(0, 0, 0, 0.6);
+  --shadow-soft: 0 20px 60px -20px rgba(0, 0, 0, 0.6);
+  --map-filter: invert(1) hue-rotate(190deg) saturate(0.5) brightness(0.9)
+    contrast(0.95);
 }
 
 @theme inline {
@@ -68,6 +74,7 @@
   --color-brass: var(--brass);
   --color-azure: var(--azure);
   --color-line: var(--line);
+  --color-card-solid: var(--card-solid);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -106,16 +113,33 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  transition:
+    background 0.4s,
+    color 0.4s;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background: var(--line);
+}
+
+input[type="range"] {
+  accent-color: var(--brass);
 }
 
 @layer components {
-  /* Frosted card — the house surface for drawers, rails and modals. */
+  /* Frosted card — the house surface for rails, chips, panels. */
   .frost {
     border: 1px solid var(--line);
     border-radius: var(--radius-lg);
     background: var(--card);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px) saturate(1.4);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
     box-shadow: var(--shadow-soft);
   }
 
@@ -129,6 +153,48 @@ body {
   }
 }
 
+/* ——— Drawer hero gradients (token mixes; one per stop, cycled) ——— */
+
+.hero-grad-0 {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--brass) 80%, var(--ink)),
+    color-mix(in srgb, var(--brass) 30%, var(--ink))
+  );
+}
+
+.hero-grad-1 {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--azure) 85%, var(--ink)),
+    color-mix(in srgb, var(--azure) 35%, var(--ink))
+  );
+}
+
+.hero-grad-2 {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--brass) 60%, var(--azure)),
+    color-mix(in srgb, var(--ink) 70%, var(--azure))
+  );
+}
+
+.hero-grad-3 {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--azure) 60%, var(--brass)),
+    color-mix(in srgb, var(--ink) 80%, var(--brass))
+  );
+}
+
+.hero-grad-4 {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--ink) 55%, var(--azure)),
+    color-mix(in srgb, var(--ink) 85%, var(--paper))
+  );
+}
+
 /* ——— Map chrome (Leaflet) ——— */
 
 .atlas-map.leaflet-container {
@@ -136,19 +202,9 @@ body {
   background: var(--paper);
 }
 
-/* CartoDB Voyager tiles: desaturated on paper, inverted + hue-rotated in dark. */
 .atlas-map .leaflet-tile-pane {
-  filter: saturate(0.55) contrast(1.02);
-}
-
-.dark .atlas-map .leaflet-tile-pane {
-  filter: invert(1) hue-rotate(180deg) saturate(0.35) brightness(0.85) contrast(1.1);
-}
-
-.atlas-map .leaflet-control-zoom a {
-  border-color: var(--line);
-  background: var(--card);
-  color: var(--ink);
+  filter: var(--map-filter);
+  transition: filter 0.4s;
 }
 
 .atlas-map .leaflet-control-attribution {
@@ -161,40 +217,102 @@ body {
   color: var(--azure);
 }
 
-/* The animated brass route (stroke set here so it follows the theme).
+/* The route — brass, dashed, with a marching-ants drift.
    Pane-scoped because Leaflet doesn't reliably forward path classNames. */
 .atlas-map .leaflet-overlay-pane path {
+  animation: route-dash 1.2s linear infinite;
+  fill: none;
   stroke: var(--brass);
+  stroke-dasharray: 7 8;
   stroke-linecap: round;
 }
 
-.city-marker-anchor,
-.leg-badge-anchor {
+@keyframes route-dash {
+  to {
+    stroke-dashoffset: -15;
+  }
+}
+
+/* ——— Markers: pulse + brass dot + label pill (reference style) ——— */
+
+.marker-anchor {
   border: none;
   background: transparent;
 }
 
-.city-marker {
-  display: grid;
-  place-items: center;
-  width: 26px;
-  height: 26px;
-  border: 2px solid var(--paper);
+.marker {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateY(-4px);
+}
+
+.marker-dot {
+  width: 14px;
+  height: 14px;
+  border: 3px solid var(--paper);
   border-radius: 50%;
   background: var(--brass);
-  box-shadow: 0 6px 14px -6px rgba(0, 0, 0, 0.45);
-  color: var(--paper);
-  font-size: 12px;
+  box-shadow:
+    0 0 0 2px var(--brass),
+    0 6px 14px rgba(0, 0, 0, 0.3);
+  transition: transform 0.25s;
+}
+
+.marker-lbl {
+  margin-top: 6px;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  background: var(--card-solid);
+  box-shadow: var(--shadow-soft);
+  color: var(--ink);
+  font-family: var(--font-fraunces), ui-serif, Georgia, serif;
+  font-size: 13px;
   font-weight: 600;
+  white-space: nowrap;
+  transition: transform 0.25s;
 }
 
-.dark .city-marker {
-  color: #0e1420;
+.marker:hover .marker-dot,
+.marker-active .marker-dot {
+  transform: scale(1.35);
 }
 
-.city-marker[data-selected="true"] {
-  outline: 2px solid var(--azure);
-  outline-offset: 1px;
+.marker:hover .marker-lbl {
+  transform: translateY(-2px);
+}
+
+.marker-active .marker-lbl {
+  color: var(--brass);
+}
+
+.marker-pulse {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  width: 30px;
+  height: 30px;
+  margin-left: -15px;
+  border-radius: 50%;
+  background: var(--brass);
+  opacity: 0;
+  animation: marker-pulse 2.6s ease-out infinite;
+}
+
+@keyframes marker-pulse {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.45;
+  }
+  80% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 .leg-badge {
@@ -207,23 +325,6 @@ body {
   backdrop-filter: blur(8px);
   font-size: 12px;
   line-height: 1.4;
-}
-
-.atlas-map .city-label {
-  padding: 2px 8px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--card);
-  box-shadow: none;
-  backdrop-filter: blur(8px);
-  color: var(--ink);
-  font-family: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
-  font-size: 11px;
-  font-weight: 500;
-}
-
-.atlas-map .city-label::before {
-  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

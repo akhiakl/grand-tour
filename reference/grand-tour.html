@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Grand Tour · Rome → Vienna</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Outfit:wght@300..700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F5F1E8; --ink:#16233A; --ink-soft:#4A5568; --brass:#B98A2F; --azure:#3E7CB1;
+  --card:rgba(255,255,255,.72); --card-solid:#FFFFFF; --line:rgba(22,35,58,.12);
+  --shadow:0 20px 60px -20px rgba(22,35,58,.25); --map-filter:saturate(.55) contrast(1.02) brightness(1.02);
+  --glass:blur(18px) saturate(1.4);
+}
+[data-theme="dark"]{
+  --paper:#0E1420; --ink:#EDEAE2; --ink-soft:#9AA5B5; --brass:#D4A94E; --azure:#6FA8D6;
+  --card:rgba(20,28,44,.72); --card-solid:#161F30; --line:rgba(237,234,226,.12);
+  --shadow:0 20px 60px -20px rgba(0,0,0,.6); --map-filter:invert(1) hue-rotate(190deg) saturate(.5) brightness(.9) contrast(.95);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{font-family:'Outfit',sans-serif;background:var(--paper);color:var(--ink);overflow:hidden;transition:background .4s,color .4s}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+
+#map{position:fixed;inset:0;z-index:1}
+.leaflet-tile-pane{filter:var(--map-filter);transition:filter .4s}
+.leaflet-control-container{display:none}
+
+/* ---------- Top bar ---------- */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:18px 28px;pointer-events:none}
+.topbar>*{pointer-events:auto}
+.brand{display:flex;flex-direction:column;line-height:1.05}
+.brand .eyebrow{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--brass);font-weight:600}
+.brand h1{font-family:'Fraunces',serif;font-weight:500;font-size:26px;letter-spacing:-.01em}
+.brand h1 em{font-style:italic;color:var(--azure)}
+.tools{display:flex;gap:8px}
+.chip{display:flex;align-items:center;gap:7px;padding:9px 15px;border-radius:99px;background:var(--card);backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);border:1px solid var(--line);font-size:13px;font-weight:500;box-shadow:var(--shadow);transition:transform .2s}
+.chip:hover{transform:translateY(-1px)}
+.chip svg{width:15px;height:15px}
+
+/* ---------- Timeline rail ---------- */
+.rail{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;justify-content:center;padding:0 16px 20px;pointer-events:none}
+.rail-inner{pointer-events:auto;display:flex;align-items:stretch;gap:0;background:var(--card);backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);border:1px solid var(--line);border-radius:20px;padding:12px 10px;box-shadow:var(--shadow);max-width:100%;overflow-x:auto}
+.stop{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 16px;border-radius:14px;min-width:96px;transition:background .2s;position:relative}
+.stop:hover,.stop.active{background:rgba(185,138,47,.1)}
+.stop .flag{font-size:18px}
+.stop .name{font-family:'Fraunces',serif;font-size:15px;font-weight:500;white-space:nowrap}
+.stop .nights{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
+.stop.active .nights{color:var(--brass);font-weight:600}
+.link{align-self:center;color:var(--ink-soft);opacity:.5;font-size:12px;padding:0 2px}
+
+/* ---------- Stats strip ---------- */
+.stats{position:fixed;top:86px;left:28px;z-index:30;display:flex;flex-direction:column;gap:8px}
+.stat{background:var(--card);backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);border:1px solid var(--line);border-radius:14px;padding:10px 16px;box-shadow:var(--shadow);min-width:130px}
+.stat b{font-family:'Fraunces',serif;font-size:20px;font-weight:500;display:block}
+.stat span{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft)}
+
+/* ---------- Markers ---------- */
+.marker{position:relative;display:flex;flex-direction:column;align-items:center;transform:translateY(-4px)}
+.marker .dot{width:14px;height:14px;border-radius:50%;background:var(--brass);border:3px solid var(--paper);box-shadow:0 0 0 2px var(--brass),0 6px 14px rgba(0,0,0,.3);transition:transform .25s}
+.marker .lbl{margin-top:6px;font-family:'Fraunces',serif;font-size:13px;font-weight:600;background:var(--card-solid);color:var(--ink);padding:4px 12px;border-radius:99px;border:1px solid var(--line);box-shadow:var(--shadow);white-space:nowrap;transition:transform .25s}
+.marker:hover .dot{transform:scale(1.35)}
+.marker:hover .lbl{transform:translateY(-2px)}
+.marker .pulse{position:absolute;top:-8px;left:50%;width:30px;height:30px;margin-left:-15px;border-radius:50%;background:var(--brass);opacity:0;animation:pulse 2.6s ease-out infinite}
+@keyframes pulse{0%{transform:scale(.4);opacity:.45}80%{transform:scale(1.6);opacity:0}100%{opacity:0}}
+.route-line{stroke:var(--brass);stroke-width:2.5;fill:none;stroke-dasharray:7 8;stroke-linecap:round;animation:dash 1.2s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-15}}
+
+/* ---------- Drawer ---------- */
+.scrim{position:fixed;inset:0;z-index:60;background:rgba(10,15,26,.45);opacity:0;pointer-events:none;transition:opacity .35s;backdrop-filter:blur(2px)}
+.scrim.open{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;z-index:70;width:min(560px,100%);background:var(--paper);transform:translateX(105%);transition:transform .45s cubic-bezier(.32,.72,.24,1);display:flex;flex-direction:column;box-shadow:-30px 0 80px rgba(0,0,0,.3)}
+.drawer.open{transform:translateX(0)}
+.hero{position:relative;height:250px;flex:none;overflow:hidden}
+.hero .grad{position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,var(--paper) 100%)}
+.hero-art{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:110px;filter:drop-shadow(0 20px 30px rgba(0,0,0,.25))}
+.hero-bg{position:absolute;inset:0;opacity:.9}
+.close{position:absolute;top:16px;right:16px;z-index:2;width:36px;height:36px;border-radius:50%;background:var(--card);backdrop-filter:var(--glass);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:16px}
+.d-head{padding:0 30px 6px;flex:none}
+.d-head .eyebrow{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--brass);font-weight:600}
+.d-head h2{font-family:'Fraunces',serif;font-size:38px;font-weight:500;letter-spacing:-.02em;line-height:1.05;margin:4px 0 6px}
+.d-head .meta{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-soft)}
+.d-head .meta b{color:var(--ink)}
+.tabs{display:flex;gap:4px;padding:14px 30px 0;border-bottom:1px solid var(--line);flex:none;overflow-x:auto}
+.tab{padding:9px 14px;font-size:13px;font-weight:500;color:var(--ink-soft);border-bottom:2px solid transparent;white-space:nowrap;margin-bottom:-1px}
+.tab.active{color:var(--brass);border-color:var(--brass)}
+.d-body{flex:1;overflow-y:auto;padding:22px 30px 40px}
+.sec{margin-bottom:26px;animation:rise .4s both}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.sec h3{font-family:'Fraunces',serif;font-size:19px;font-weight:500;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.sec p{font-size:14px;line-height:1.65;color:var(--ink-soft)}
+.pills{display:flex;flex-wrap:wrap;gap:7px}
+.pill{font-size:12.5px;padding:7px 13px;border-radius:99px;background:var(--card);border:1px solid var(--line);font-weight:500}
+.pill.gem{border-color:rgba(185,138,47,.45);color:var(--brass)}
+.day{display:flex;gap:14px;padding:13px 0;border-bottom:1px dashed var(--line)}
+.day:last-child{border:none}
+.day .num{font-family:'Fraunces',serif;font-size:13px;font-weight:600;color:var(--brass);flex:none;width:52px;padding-top:2px}
+.day .body b{display:block;font-size:14px;margin-bottom:3px}
+.day .body span{font-size:13px;color:var(--ink-soft);line-height:1.55}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.info-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.info-card .k{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:5px}
+.info-card .v{font-size:14px;font-weight:500;line-height:1.4}
+.tip{display:flex;gap:10px;font-size:13.5px;line-height:1.55;color:var(--ink-soft);padding:8px 0}
+.tip::before{content:"—";color:var(--brass);flex:none}
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ph{aspect-ratio:1;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:34px;border:1px solid var(--line)}
+/* budget calc */
+.calc{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+.calc label{font-size:12px;color:var(--ink-soft);display:block;margin-bottom:6px}
+.calc input[type=range]{width:100%;accent-color:var(--brass)}
+.calc .out{font-family:'Fraunces',serif;font-size:26px;font-weight:500;margin-top:8px}
+.calc .out span{font-size:13px;font-family:'Outfit';color:var(--ink-soft);font-weight:400}
+.check{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:14px;border-bottom:1px dashed var(--line)}
+.check input{accent-color:var(--brass);width:16px;height:16px}
+.check.done label{text-decoration:line-through;opacity:.5}
+.trip-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(62,124,177,.12);color:var(--azure);border:1px solid rgba(62,124,177,.3);font-size:12px;font-weight:600;padding:5px 12px;border-radius:99px;margin-bottom:10px}
+
+/* ---------- Panels (packing / notes) ---------- */
+.panel{position:fixed;top:86px;right:28px;z-index:55;width:300px;background:var(--card);backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:18px;display:none;max-height:60vh;overflow-y:auto}
+.panel.open{display:block;animation:rise .3s both}
+.panel h4{font-family:'Fraunces',serif;font-size:17px;margin-bottom:10px}
+.panel textarea{width:100%;min-height:120px;background:transparent;border:1px solid var(--line);border-radius:10px;color:var(--ink);font-family:inherit;font-size:13px;padding:10px;resize:vertical}
+.progress{height:4px;background:var(--line);border-radius:2px;margin:8px 0 4px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--brass);border-radius:2px;transition:width .3s}
+
+/* ---------- Intro ---------- */
+.intro{position:fixed;inset:0;z-index:90;background:var(--paper);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;transition:opacity .8s,visibility .8s}
+.intro.hide{opacity:0;visibility:hidden}
+.intro .eyebrow{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:var(--brass);font-weight:600;animation:rise .8s both}
+.intro h1{font-family:'Fraunces',serif;font-weight:400;font-size:clamp(38px,7vw,72px);letter-spacing:-.02em;animation:rise .8s .15s both}
+.intro h1 em{font-style:italic;color:var(--azure)}
+.intro p{color:var(--ink-soft);font-size:15px;animation:rise .8s .3s both}
+
+@media(max-width:720px){
+  .stats{display:none}
+  .topbar{padding:14px 16px}
+  .brand h1{font-size:20px}
+  .chip .txt{display:none}
+  .chip{padding:9px 11px}
+  .panel{right:12px;left:12px;width:auto}
+  .stop{min-width:78px;padding:6px 10px}
+  .d-head h2{font-size:30px}
+  .grid2{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="intro" id="intro">
+  <div class="eyebrow">Nine days · Two seas · Three empires</div>
+  <h1>The <em>Grand</em> Tour</h1>
+  <p>Rome → Florence → Venice → Lake Bled → Vienna</p>
+</div>
+
+<div id="map"></div>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="eyebrow">Field Atlas · Europe</span>
+    <h1>The <em>Grand</em> Tour</h1>
+  </div>
+  <div class="tools">
+    <button class="chip" onclick="togglePanel('packing')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="7" width="16" height="13" rx="2"/><path d="M9 7V5a3 3 0 016 0v2"/></svg><span class="txt">Packing</span></button>
+    <button class="chip" onclick="togglePanel('notes')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg><span class="txt">Notes</span></button>
+    <button class="chip" onclick="window.print()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg><span class="txt">Export</span></button>
+    <button class="chip" onclick="toggleTheme()" id="themeBtn">◐<span class="txt" id="themeTxt">Dark</span></button>
+  </div>
+</header>
+
+<aside class="stats">
+  <div class="stat"><b>10</b><span>Days</span></div>
+  <div class="stat"><b>5</b><span>Cities · 3 Countries</span></div>
+  <div class="stat"><b>~1,240 km</b><span>Total route</span></div>
+  <div class="stat"><b id="budgetStat">€780–1,200</b><span>Est. budget / person</span></div>
+</aside>
+
+<div class="panel" id="packing">
+  <h4>Packing checklist</h4>
+  <div class="progress"><i id="packBar" style="width:0"></i></div>
+  <div id="packList"></div>
+</div>
+<div class="panel" id="notes">
+  <h4>Trip notes</h4>
+  <textarea placeholder="Booking codes, addresses, ideas…"></textarea>
+</div>
+
+<nav class="rail"><div class="rail-inner" id="rail"></div></nav>
+
+<div class="scrim" id="scrim" onclick="closeDrawer()"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true">
+  <div class="hero" id="heroBox">
+    <div class="hero-bg" id="heroBg"></div>
+    <div class="hero-art" id="heroArt"></div>
+    <div class="grad"></div>
+    <button class="close" onclick="closeDrawer()" aria-label="Close">✕</button>
+  </div>
+  <div class="d-head">
+    <span class="eyebrow" id="dCountry"></span>
+    <h2 id="dName"></h2>
+    <div class="meta" id="dMeta"></div>
+  </div>
+  <div class="tabs" id="tabs"></div>
+  <div class="d-body" id="dBody"></div>
+</aside>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+/* ============ DATA ============ */
+const CITIES=[
+{id:'rome',name:'Rome',country:'Italy · Lazio',flag:'🇮🇹',art:'🏛️',bg:'linear-gradient(135deg,#C98A4B,#8C4A2F)',ll:[41.9028,12.4964],nights:3,budget:[80,120],transport:'Walking + Metro (Line A/B)',
+why:'The best combination of history, architecture, food and atmosphere in Europe. Every street corner layers 2,700 years of empire, church and la dolce vita — nowhere else rewards slow wandering like the Eternal City.',
+must:['Colosseum','Roman Forum','Palatine Hill','Pantheon','Trevi Fountain','Piazza Navona','Vatican Museums',"St Peter's Basilica",'Sistine Chapel'],
+gems:['Trastevere at dusk','Orange Garden (Giardino degli Aranci)','Aventine Keyhole'],
+food:[['Carbonara','Guanciale, pecorino, no cream — ever'],['Cacio e Pepe','Rome in three ingredients'],['Supplì','Fried rice croquettes, street-food royalty'],['Tiramisu','Best from Pompi or Two Sizes']],
+days:[['Day 1','Historic Center','Trevi Fountain at dawn → Pantheon → coffee at Sant\u2019Eustachio → Piazza Navona → evening passeggiata'],['Day 2','Ancient Rome','Colosseum (book first entry) → Roman Forum → Palatine Hill → sunset from Capitoline terrace'],['Day 3','Vatican & Trastevere','Vatican Museums early → Sistine Chapel → St Peter\u2019s dome climb → dinner in Trastevere']],
+stay:'Base in Monti or Centro Storico — walkable to everything ancient. Trastevere if you prefer nightlife and trattorias at your doorstep.',
+walk:'Classic loop (4.5 km): Piazza del Popolo → Spanish Steps → Trevi → Pantheon → Navona → Campo de\u2019 Fiori.',
+tips:['Book Colosseum & Vatican weeks ahead — skip-the-line is non-negotiable.','Drink free from the nasoni street fountains.','Restaurants near major sights are tourist traps; walk two streets away.','Cover shoulders/knees for basilicas.']},
+
+{id:'florence',name:'Florence',country:'Italy · Tuscany',flag:'🇮🇹',art:'🎨',bg:'linear-gradient(135deg,#B0693B,#5E3A22)',ll:[43.7696,11.2558],nights:2,budget:[70,110],transport:'Walking — the whole center fits in your pocket',
+why:'The heart of Renaissance Italy. The city is essentially an open-air museum: Brunelleschi\u2019s dome, Michelangelo\u2019s David and the Uffizi within a fifteen-minute walk of each other.',
+must:['Florence Cathedral (Duomo)','Uffizi Gallery','Ponte Vecchio','Accademia Gallery','Piazzale Michelangelo'],
+gems:['Santo Spirito quarter','Rose Garden below Piazzale'],
+food:[['Bistecca alla Fiorentina','Order by the kilo, always rare'],['Lampredotto','The working-class sandwich locals swear by'],['Gelato','Artisan only — look for covered steel tins']],
+days:[['Day 1','Renaissance core','Duomo & dome climb → Baptistery → historic center lanes → Ponte Vecchio at golden hour'],['Day 2','Masterpieces','Uffizi (book 8:15 slot) → lunch in Oltrarno → Accademia for David → sunset at Piazzale Michelangelo']],
+stay:'Oltrarno (south bank) for artisan workshops and quieter nights; Duomo area for maximum convenience.',
+walk:'Oltrarno stroll (3 km): Ponte Vecchio → Palazzo Pitti → Santo Spirito → San Niccolò → up to Piazzale Michelangelo.',
+tips:['Dome climb and Uffizi both require timed reservations.','Piazzale Michelangelo sunset is crowded — the Rose Garden just below is not.','Many museums close Monday.']},
+
+{id:'venice',name:'Venice',country:'Italy · Veneto',flag:'🇮🇹',art:'🚤',bg:'linear-gradient(135deg,#3E7CB1,#1E3A55)',ll:[45.4408,12.3155],nights:2,budget:[90,140],transport:'Walking + Vaporetto (line 1 & 12)',
+why:'One of the most unique cities in the world — a car-free labyrinth of 118 islands where getting lost is the entire point.',
+must:["St Mark's Square","Doge's Palace",'Grand Canal','Rialto Bridge'],
+gems:['Burano\u2019s painted houses','Cannaregio canals','Dorsoduro art quarter'],
+food:[['Cicchetti','Venetian tapas — bar-hop with an ombra of wine'],['Seafood Risotto','Ask what came in that morning'],['Venetian Pastries','Bussolai and zaletti with espresso']],
+days:[['Day 1','Historic Venice','St Mark\u2019s & Doge\u2019s Palace early → Grand Canal on vaporetto 1 → Rialto market → cicchetti crawl in Cannaregio'],['Day 2','Islands & lagoon','Vaporetto 12 to Burano → canal walks in Dorsoduro → sunset gondola ride (share to split cost)']],
+stay:'Cannaregio or Dorsoduro — real neighborhoods, fair prices, ten minutes from the sights. Avoid Mestre if budget allows.',
+walk:'Lost-on-purpose route (4 km): Rialto → San Polo backstreets → Frari church → Dorsoduro → Zattere waterfront.',
+tips:['Visit St Mark\u2019s before 9am or after 5pm to dodge cruise crowds.','A 48h vaporetto pass pays for itself.','Sit-down coffee in St Mark\u2019s Square costs 6× the bar price.','Acqua alta platforms appear in autumn — pack light shoes.']},
+
+{id:'bled',name:'Lake Bled',country:'Slovenia · Upper Carniola',flag:'🇸🇮',art:'🏞️',bg:'linear-gradient(135deg,#4E8C6B,#1F4638)',ll:[46.3683,14.1146],nights:1,budget:[60,100],transport:'Walking + local bus (Bled ↔ Ljubljana ~1h15)',
+why:'The most scenic destination on the trip — an emerald alpine lake with a fairy-tale island church and a clifftop castle. One perfect night is enough to see it at both sunset and sunrise.',
+must:['Lake Bled shoreline','Bled Castle','Church Island (Assumption of Mary)'],
+gems:['Ojstrica viewpoint at sunrise','Traditional pletna boat ride','Full lakeside loop (6 km)'],
+food:[['Bled Cream Cake','Kremšnita — invented here, eaten lakeside'],['Slovenian Dumplings','Štruklji, sweet or savory']],
+days:[['Day 1','The lake','Arrive → lakeside walk → row boat or pletna to the island → Bled Castle for sunset → kremšnita'],['Sunrise','Golden hour','Hike Ojstrica (25 min) for the postcard view before breakfast']],
+daytrip:{title:'Recommended day trip · Ljubljana',items:['Dragon Bridge','Ljubljana Castle (funicular)','Prešeren Square','Riverside cafés along Ljubljanica'],note:'Slovenia\u2019s tiny, leafy capital pairs perfectly with Bled — direct buses run hourly, ~1h15 each way. Go in the afternoon after the sunrise hike, or en route to Vienna.'},
+stay:'Small guesthouses on the east shore put the castle view outside your window. Book early in summer.',
+walk:'Lake loop (6 km, flat, ~90 min) — clockwise from the bus station, ending at Ojstrica trailhead.',
+tips:['Sunrise beats sunset here — mist on the water, zero crowds.','Row boats are cheaper than pletna and you set the pace.','Cash is handy for small vendors.']},
+
+{id:'vienna',name:'Vienna',country:'Austria · Capital',flag:'🇦🇹',art:'🎻',bg:'linear-gradient(135deg,#8E6FA8,#3D2E55)',ll:[48.2082,16.3738],nights:2,budget:[90,130],transport:'U-Bahn + Walking (buy a 48h pass)',
+why:'Elegant imperial architecture and a famously relaxed atmosphere — the graceful finale after Italy\u2019s intensity. Palaces, coffee houses and Klimt at an unhurried pace.',
+must:['Schönbrunn Palace','St Stephen\u2019s Cathedral','Belvedere Palace','Hofburg Palace','Ringstrasse'],
+gems:['Naschmarkt on Saturday','Café Sperl or Hawelka','Prater at dusk'],
+food:[['Wiener Schnitzel','Figlmüller\u2019s is plate-sized'],['Sachertorte','With unsweetened whipped cream, as intended']],
+days:[['Day 1','Imperial core','St Stephen\u2019s & catacombs → Graben stroll → Hofburg → tram ride around the Ringstrasse → coffee-house evening'],['Day 2','Palaces','Schönbrunn early (gardens free) → Gloriette viewpoint → Belvedere for Klimt\u2019s Kiss → schnitzel farewell dinner']],
+stay:'Innere Stadt for splurge; Neubau (7th) for boutique hotels, indie shops and easy U-Bahn links.',
+walk:'Ringstrasse arc (5 km): Opera → Hofburg gates → Parliament → Rathaus → University → Votive Church.',
+tips:['A coffee house is a sit-for-hours institution — one melange buys you the afternoon.','Schönbrunn gardens are free and open from 6:30am.','Standing tickets at the State Opera cost under €15.']}
+];
+const PACK=['Passport & ID','EU power adapter','Comfortable walking shoes','Rail/bus tickets offline','Refillable water bottle','Light rain layer','Modest cover for churches','Power bank','Day pack','Swimwear (Bled)'];
+
+/* ============ MAP ============ */
+const map=L.map('map',{zoomControl:false,attributionControl:false}).setView([45.2,13.4],6);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png',{maxZoom:18}).addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png',{maxZoom:18,opacity:.85}).addTo(map);
+
+CITIES.forEach((c,i)=>{
+  const icon=L.divIcon({className:'',html:`<div class="marker"><div class="pulse"></div><div class="dot"></div><div class="lbl">${c.flag} ${c.name}</div></div>`,iconSize:[0,0],iconAnchor:[0,0]});
+  L.marker(c.ll,{icon}).addTo(map).on('click',()=>openCity(i));
+});
+
+/* animated route */
+const pts=CITIES.map(c=>c.ll);
+let drawn=[],seg=0,t=0;
+const routeLayer=L.polyline([],{className:'route-line'}).addTo(map);
+function curve(a,b,t){ // slight arc
+  const mx=(a[0]+b[0])/2+(b[1]-a[1])*.12,my=(a[1]+b[1])/2-(b[0]-a[0])*.12;
+  const u=1-t;return[u*u*a[0]+2*u*t*mx+t*t*b[0],u*u*a[1]+2*u*t*my+t*t*b[1]];
+}
+function animateRoute(){
+  if(seg>=pts.length-1)return;
+  t+=0.02;
+  if(t>=1){drawn.push(pts[seg+1]);seg++;t=0}
+  const cur=[];
+  for(let s=0;s<seg;s++)for(let k=0;k<=20;k++)cur.push(curve(pts[s],pts[s+1],k/20));
+  if(seg<pts.length-1)for(let k=0;k<=Math.floor(t*20);k++)cur.push(curve(pts[seg],pts[seg+1],k/20));
+  routeLayer.setLatLngs(cur);
+  requestAnimationFrame(animateRoute);
+}
+
+/* ============ RAIL ============ */
+const rail=document.getElementById('rail');
+CITIES.forEach((c,i)=>{
+  if(i>0)rail.insertAdjacentHTML('beforeend','<span class="link">···</span>');
+  rail.insertAdjacentHTML('beforeend',`<button class="stop" id="stop-${i}" onclick="openCity(${i})"><span class="flag">${c.flag}</span><span class="name">${c.name}</span><span class="nights">${c.nights} night${c.nights>1?'s':''}</span></button>`);
+});
+
+/* ============ DRAWER ============ */
+const drawer=document.getElementById('drawer'),scrim=document.getElementById('scrim');
+let activeCity=0,activeTab='overview';
+const TABS=[['overview','Overview'],['itinerary','Itinerary'],['food','Food'],['practical','Practical'],['planner','Planner']];
+
+function openCity(i){
+  activeCity=i;activeTab='overview';
+  const c=CITIES[i];
+  document.querySelectorAll('.stop').forEach((s,j)=>s.classList.toggle('active',j===i));
+  document.getElementById('heroBg').style.background=c.bg;
+  document.getElementById('heroArt').textContent=c.art;
+  document.getElementById('dCountry').textContent=c.country;
+  document.getElementById('dName').textContent=c.name;
+  document.getElementById('dMeta').innerHTML=`<span>🛏 <b>${c.nights} night${c.nights>1?'s':''}</b></span><span>💶 <b>€${c.budget[0]}–${c.budget[1]}</b>/day</span><span>🚶 <b>${c.transport.split(' ')[0]}${c.transport.includes('+')?' + more':''}</b></span>`;
+  renderTabs();renderBody();
+  drawer.classList.add('open');scrim.classList.add('open');
+  map.flyTo(c.ll,9,{duration:1.2});
+}
+function closeDrawer(){drawer.classList.remove('open');scrim.classList.remove('open');
+  document.querySelectorAll('.stop').forEach(s=>s.classList.remove('active'));
+  map.flyTo([45.2,13.4],6,{duration:1});}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer()});
+
+function renderTabs(){
+  document.getElementById('tabs').innerHTML=TABS.map(([id,l])=>`<button class="tab ${id===activeTab?'active':''}" onclick="setTab('${id}')">${l}</button>`).join('');
+}
+function setTab(id){activeTab=id;renderTabs();renderBody();document.getElementById('dBody').scrollTop=0}
+
+function renderBody(){
+  const c=CITIES[activeCity],b=document.getElementById('dBody');
+  if(activeTab==='overview')b.innerHTML=`
+    <div class="sec"><h3>Why visit</h3><p>${c.why}</p></div>
+    <div class="sec"><h3>Must see</h3><div class="pills">${c.must.map(m=>`<span class="pill">${m}</span>`).join('')}</div></div>
+    <div class="sec"><h3>Hidden gems</h3><div class="pills">${c.gems.map(m=>`<span class="pill gem">◆ ${m}</span>`).join('')}</div></div>
+    ${c.daytrip?`<div class="sec"><div class="trip-badge">✦ ${c.daytrip.title}</div><div class="pills">${c.daytrip.items.map(m=>`<span class="pill">${m}</span>`).join('')}</div><p style="margin-top:10px">${c.daytrip.note}</p></div>`:''}
+    <div class="sec"><h3>Gallery</h3><div class="gallery">${[c.art,'📸','🌇','🍷','🗺️','✨'].map((e,k)=>`<div class="ph" style="background:${c.bg};opacity:${1-k*.09}">${e}</div>`).join('')}</div></div>`;
+  if(activeTab==='itinerary')b.innerHTML=`
+    <div class="sec"><h3>Day by day</h3>${c.days.map(d=>`<div class="day"><div class="num">${d[0]}</div><div class="body"><b>${d[1]}</b><span>${d[2]}</span></div></div>`).join('')}</div>
+    <div class="sec"><h3>Signature walk</h3><p>${c.walk}</p></div>`;
+  if(activeTab==='food')b.innerHTML=`
+    <div class="sec"><h3>Eat like a local</h3>${c.food.map(f=>`<div class="day"><div class="num">🍽</div><div class="body"><b>${f[0]}</b><span>${f[1]}</span></div></div>`).join('')}</div>`;
+  if(activeTab==='practical')b.innerHTML=`
+    <div class="sec"><div class="grid2">
+      <div class="info-card"><div class="k">Daily budget</div><div class="v">€${c.budget[0]}–${c.budget[1]} per person</div></div>
+      <div class="info-card"><div class="k">Getting around</div><div class="v">${c.transport}</div></div>
+      <div class="info-card" style="grid-column:1/-1"><div class="k">Where to stay</div><div class="v">${c.stay}</div></div>
+    </div></div>
+    <div class="sec"><h3>Local tips</h3>${c.tips.map(t=>`<div class="tip">${t}</div>`).join('')}</div>`;
+  if(activeTab==='planner')b.innerHTML=`
+    <div class="sec"><h3>Budget calculator</h3><div class="calc">
+      <label>Spending style — <b id="styleLbl">Comfortable</b></label>
+      <input type="range" min="0" max="100" value="50" id="spend" oninput="calc()">
+      <div class="out" id="calcOut"></div>
+    </div></div>
+    <div class="sec"><h3>Attraction checklist</h3>${c.must.map((m,k)=>`<div class="check" id="chk-${c.id}-${k}"><input type="checkbox" id="cb-${c.id}-${k}" onchange="this.parentElement.classList.toggle('done',this.checked)"><label for="cb-${c.id}-${k}">${m}</label></div>`).join('')}</div>`;
+  if(activeTab==='planner')calc();
+}
+function calc(){
+  const c=CITIES[activeCity],v=+document.getElementById('spend').value/100;
+  const day=Math.round(c.budget[0]+(c.budget[1]-c.budget[0])*v);
+  document.getElementById('styleLbl').textContent=v<.33?'Backpacker':v<.67?'Comfortable':'Indulgent';
+  document.getElementById('calcOut').innerHTML=`€${day*c.nights} <span>total · €${day}/day × ${c.nights} night${c.nights>1?'s':''}</span>`;
+}
+
+/* ============ PANELS ============ */
+function togglePanel(id){['packing','notes'].forEach(p=>document.getElementById(p).classList.toggle('open',p===id&&!document.getElementById(p).classList.contains('open')))}
+const pl=document.getElementById('packList');
+PACK.forEach((p,i)=>pl.insertAdjacentHTML('beforeend',`<div class="check"><input type="checkbox" id="pk${i}" onchange="this.parentElement.classList.toggle('done',this.checked);packBar()"><label for="pk${i}">${p}</label></div>`));
+function packBar(){const n=[...pl.querySelectorAll('input')].filter(c=>c.checked).length;document.getElementById('packBar').style.width=(n/PACK.length*100)+'%'}
+
+/* ============ THEME / INTRO ============ */
+function toggleTheme(){
+  const h=document.documentElement,d=h.dataset.theme==='dark';
+  h.dataset.theme=d?'light':'dark';
+  document.getElementById('themeTxt').textContent=d?'Dark':'Light';
+}
+setTimeout(()=>{document.getElementById('intro').classList.add('hide');animateRoute()},1900);
+</script>
+</body>
+</html>

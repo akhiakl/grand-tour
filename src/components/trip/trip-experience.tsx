@@ -2,33 +2,42 @@
 
 import { useState } from "react";
 
-import type { Trip } from "@/lib/trip";
-import { cn } from "@/lib/utils";
+import { tripStats, type Trip } from "@/lib/trip";
 
 import { CityDrawer } from "./city-drawer";
+import { IntroSplash } from "./intro-splash";
+import { Panels } from "./panels";
+import { StatsStrip } from "./stats-strip";
 import { TimelineRail } from "./timeline-rail";
+import { TopBar, type PanelId } from "./top-bar";
 import { TripMap } from "./trip-map";
 
 /**
- * The core product view: map + timeline + city drawer, wired together.
- * Receives the trip via props — no data fetching happens below this line.
+ * The immersive product view: full-bleed map with floating chrome —
+ * topbar, stats, rail, panels, drawer. Receives the trip via props;
+ * no data fetching happens below this line.
  */
-export function TripExperience({
-  trip,
-  className,
-}: {
-  trip: Trip;
-  className?: string;
-}) {
+export function TripExperience({ trip }: { readonly trip: Trip }) {
   const [selected, setSelected] = useState<number | null>(null);
+  const [panel, setPanel] = useState<PanelId | null>(null);
+
+  const stats = tripStats(trip);
+  const route = trip.cities.map((city) => city.name).join(" → ");
 
   return (
-    <div className={cn("flex min-h-0 flex-col gap-4", className)}>
-      {/* `isolate` fences Leaflet's high pane z-indexes inside the frame. */}
-      <div className="relative isolate min-h-[420px] flex-1 overflow-hidden rounded-2xl border border-line shadow-soft">
+    <div className="relative isolate h-dvh w-full overflow-hidden">
+      <div className="absolute inset-0 z-0">
         <TripMap trip={trip} selectedIndex={selected} onCitySelect={setSelected} />
       </div>
 
+      <TopBar
+        title={trip.title}
+        eyebrow="Field Atlas"
+        activePanel={panel}
+        onTogglePanel={(id) => setPanel((current) => (current === id ? null : id))}
+      />
+      <StatsStrip trip={trip} />
+      <Panels active={panel} />
       <TimelineRail trip={trip} selectedIndex={selected} onSelect={setSelected} />
 
       <CityDrawer
@@ -39,6 +48,12 @@ export function TripExperience({
         onOpenChange={(open) => {
           if (!open) setSelected(null);
         }}
+      />
+
+      <IntroSplash
+        title={trip.title}
+        eyebrow={`${stats.nights} nights · ${stats.cities} cities · ${stats.countries} countries`}
+        route={route}
       />
     </div>
   );

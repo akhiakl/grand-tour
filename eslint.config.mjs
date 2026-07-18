@@ -16,6 +16,8 @@ const eslintConfig = defineConfig([
       "no-console": ["warn", { allow: ["warn", "error"] }],
       "prefer-const": "error",
       "object-shorthand": "error",
+      "no-nested-ternary": "error",
+      "react/prefer-read-only-props": "error",
       "@typescript-eslint/consistent-type-imports": [
         "error",
         { fixStyle: "inline-type-imports", disallowTypeAnnotations: false },
@@ -56,6 +58,13 @@ const eslintConfig = defineConfig([
     files: ["**/*.test.*", "e2e/**"],
     rules: {
       "max-lines": "off",
+    },
+  },
+  {
+    // Vendored shadcn primitives follow upstream shape; skip on regenerable files.
+    files: ["src/components/ui/**"],
+    rules: {
+      "react/prefer-read-only-props": "off",
     },
   },
   prettier,

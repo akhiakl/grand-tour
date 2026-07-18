@@ -45,3 +45,6 @@ next-env.d.ts
 
 # test coverage output
 coverage/
+
+# Sentry Config File
+.env.sentry-build-plugin
