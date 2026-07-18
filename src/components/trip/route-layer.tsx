@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Marker, Polyline } from "react-leaflet";
 
 import { arcPoints, routePath, type LatLng, type Leg, type Trip } from "@/lib/trip";
+import { escapeHtml } from "@/lib/utils";
 
 import { INTRO_HOLD_MS } from "./intro-splash";
 import { MODE_META } from "./mode";
@@ -16,7 +17,7 @@ function badgeIcon(leg: Leg) {
   const { emoji, label } = MODE_META[leg.mode];
   return L.divIcon({
     className: "marker-anchor",
-    html: `<span class="leg-badge" role="img" aria-label="${label}, ${leg.duration}">${emoji}</span>`,
+    html: `<span class="leg-badge" role="img" aria-label="${escapeHtml(label)}, ${escapeHtml(leg.duration)}">${emoji}</span>`,
     iconSize: [34, 22],
     iconAnchor: [17, 11],
   });

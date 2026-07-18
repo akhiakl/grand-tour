@@ -39,7 +39,7 @@ function DayRow({
   body: string;
 }) {
   return (
-    <div className="flex gap-3.5 border-b border-dashed border-line py-3 last:border-none">
+    <div className="flex gap-3.5 border-b border-dashed border-line py-3">
       <div className="w-14 shrink-0 pt-0.5 font-display text-[13px] font-semibold text-brass">
         {lead}
       </div>
@@ -221,28 +221,29 @@ export function PlannerSection({ city }: { city: City }) {
           </span>
         </div>
         <ul>
-          {items.map((item) => (
-            <li
-              key={item}
-              className="border-b border-dashed border-line last:border-none"
-            >
-              <label className="flex cursor-pointer items-center gap-3 py-2 text-sm">
-                <Checkbox
-                  checked={checked.has(item)}
-                  onCheckedChange={() => toggle(item)}
-                />
-                <span
-                  className={
-                    checked.has(item)
-                      ? "text-muted-foreground line-through"
-                      : undefined
-                  }
-                >
-                  {item}
-                </span>
-              </label>
-            </li>
-          ))}
+          {items.map((item, index) => {
+            const id = `attraction-${index}`;
+            return (
+              <li key={item} className="border-b border-dashed border-line">
+                <div className="flex items-center gap-3 py-2 text-sm">
+                  <Checkbox
+                    id={id}
+                    checked={checked.has(item)}
+                    onCheckedChange={() => toggle(item)}
+                  />
+                  <label
+                    htmlFor={id}
+                    className={cn(
+                      "cursor-pointer",
+                      checked.has(item) && "text-muted-foreground line-through",
+                    )}
+                  >
+                    {item}
+                  </label>
+                </div>
+              </li>
+            );
+          })}
         </ul>
       </div>
     </div>

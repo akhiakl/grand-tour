@@ -9,9 +9,9 @@ export default withSentryConfig(nextConfig, {
   // For all available options, see:
   // https://www.npmjs.com/package/@sentry/webpack-plugin#options
 
-  org: "akhiakl",
+  org: process.env.SENTRY_ORG ?? "akhiakl",
 
-  project: "grand-tour",
+  project: process.env.SENTRY_PROJECT ?? "grand-tour",
 
   // Upload source maps for readable stack traces
   authToken: process.env.SENTRY_AUTH_TOKEN,

@@ -7,6 +7,7 @@ import { useEffect, useMemo } from "react";
 import { MapContainer, Marker, TileLayer, useMap } from "react-leaflet";
 
 import { routeBounds, type City, type LatLng, type Trip } from "@/lib/trip";
+import { escapeHtml } from "@/lib/utils";
 
 import { RouteLayer } from "./route-layer";
 
@@ -22,10 +23,6 @@ export interface TripMapProps {
   selectedIndex: number | null;
   onCitySelect: (index: number) => void;
 }
-
-/** Marker HTML is string-built for Leaflet divIcons — escape city input. */
-const escapeHtml = (value: string) =>
-  value.replace(/[&<>"']/g, (ch) => `&#${ch.charCodeAt(0)};`);
 
 /** Fits the route, fences panning, and flies to the selected stop. */
 function MapFocus({
@@ -68,7 +65,7 @@ function CityMarker({
     () =>
       L.divIcon({
         className: "marker-anchor",
-        html: `<div class="marker${selected ? " marker-active" : ""}"><span class="marker-pulse"></span><span class="marker-dot"></span><span class="marker-lbl">${city.flag} ${escapeHtml(city.name)}</span></div>`,
+        html: `<div class="marker${selected ? " marker-active" : ""}"><span class="marker-pulse"></span><span class="marker-dot"></span><span class="marker-lbl">${escapeHtml(city.flag)} ${escapeHtml(city.name)}</span></div>`,
         iconSize: [0, 0],
         iconAnchor: [0, 0],
       }),

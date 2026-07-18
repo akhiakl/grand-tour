@@ -31,7 +31,7 @@ function PanelShell({
   return (
     <section
       className={cn(
-        "frost fixed top-24 right-4 z-[55] max-h-[60vh] w-[300px] max-w-[calc(100vw-2rem)] overflow-y-auto p-5 sm:right-7",
+        "frost fixed top-24 right-4 z-55 max-h-[60vh] w-75 max-w-[calc(100vw-2rem)] overflow-y-auto p-5 sm:right-7",
         !open && "hidden",
       )}
     >
@@ -69,25 +69,29 @@ export function Panels({ active }: { active: PanelId | null }) {
           />
         </div>
         <ul className="space-y-2.5">
-          {PACKING.map((item) => (
-            <li key={item}>
-              <label className="flex cursor-pointer items-center gap-3 text-sm">
-                <Checkbox
-                  checked={checked.has(item)}
-                  onCheckedChange={() => toggle(item)}
-                />
-                <span
-                  className={
-                    checked.has(item)
-                      ? "text-muted-foreground line-through"
-                      : undefined
-                  }
-                >
-                  {item}
-                </span>
-              </label>
-            </li>
-          ))}
+          {PACKING.map((item, index) => {
+            const id = `packing-${index}`;
+            return (
+              <li key={item}>
+                <div className="flex items-center gap-3 text-sm">
+                  <Checkbox
+                    id={id}
+                    checked={checked.has(item)}
+                    onCheckedChange={() => toggle(item)}
+                  />
+                  <label
+                    htmlFor={id}
+                    className={cn(
+                      "cursor-pointer",
+                      checked.has(item) && "text-muted-foreground line-through",
+                    )}
+                  >
+                    {item}
+                  </label>
+                </div>
+              </li>
+            );
+          })}
         </ul>
       </PanelShell>
 
@@ -96,7 +100,7 @@ export function Panels({ active }: { active: PanelId | null }) {
           value={notes}
           onChange={(event) => setNotes(event.target.value)}
           placeholder="Booking codes, addresses, ideas…"
-          className="min-h-[140px] w-full resize-y rounded-lg border border-line bg-transparent p-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="min-h-35 w-full resize-y rounded-lg border border-line bg-transparent p-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
         />
       </PanelShell>
     </>
