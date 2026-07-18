@@ -9,6 +9,7 @@ route maps — populated by AI chat or manually — shared via short links
 - `pnpm dev` — dev server (Turbopack)
 - `pnpm lint` / `pnpm typecheck` / `pnpm test` — quality gates; all must be
   green before any commit
+- `pnpm test:coverage` — coverage with enforced thresholds (lib + api)
 - `pnpm build` — production build
 - `pnpm format` — Prettier
 
@@ -54,6 +55,9 @@ route maps — populated by AI chat or manually — shared via short links
   (`trips:index`, `trips:{id}`); shared snapshots immutable in Redis with
   60-day sliding TTL (GETEX refresh). Editing after sharing = share again.
 - Trip payloads are capped at 50KB (`MAX_TRIP_PAYLOAD_BYTES`).
+- **Monitoring**: Sentry (`@sentry/nextjs`) via the instrumentation hooks;
+  fully gated on `NEXT_PUBLIC_SENTRY_DSN` — never add monitoring calls in
+  components; error boundaries and `onRequestError` cover capture.
 - Default trip title is "Grand Tour" (`DEFAULT_TRIP_TITLE`); users can set a
   custom title per trip.
 

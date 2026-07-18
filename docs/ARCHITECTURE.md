@@ -82,3 +82,18 @@ Do NOT create the workspace until a second consumer actually exists.
 - CI (`.github/workflows/ci.yml`): lint → typecheck → test → build on every
   PR and push to main.
 - Node pinned via `.nvmrc` + `engines`; pnpm via `packageManager`.
+- Coverage: `pnpm test:coverage` (v8) over `src/lib/**` + `src/app/api/**`
+  with enforced thresholds; UI components are covered by e2e instead.
+  PRs get a coverage comment via `vitest-coverage-report-action`.
+
+## Observability
+
+- Sentry via `@sentry/nextjs`, wired in `src/instrumentation.ts`
+  (server/edge + `onRequestError`), `src/instrumentation-client.ts`
+  (browser + router transitions) and `src/app/global-error.tsx`
+  (last-resort boundary, in-voice copy, inline styles only — it replaces
+  the root layout so globals.css is unavailable).
+- Everything is gated on `NEXT_PUBLIC_SENTRY_DSN`: unset → total no-op.
+  Source-map upload happens only when `SENTRY_AUTH_TOKEN` exists (CI).
+- Keep sample rates conservative (`tracesSampleRate: 0.1`) to stay inside
+  the free tier; raise deliberately, never by default.

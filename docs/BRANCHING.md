@@ -44,6 +44,19 @@ Naming: lowercase, kebab-case, scoped to one deliverable —
 - Phase gates: each build-order step lands as its own PR and gets reviewed
   before the next step starts.
 
+## GitHub settings (one-time, repo admin)
+
+Branch protection on `main` should require:
+
+- the four CI checks — Lint, Typecheck, Unit tests & coverage, Build —
+  plus the "Conventional title" check, all green before merge
+- at least one review (CODEOWNERS auto-requests @akhiakl)
+- linear history (squash or rebase merges only)
+
+Coverage appears as a PR comment and in the job summary on every PR;
+thresholds (90% lines/functions, 85% branches on lib + API routes) fail
+the test check when breached.
+
 ## Releases (Phase 1)
 
 `main` deploys continuously. Tag milestones as needed
