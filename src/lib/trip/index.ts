@@ -8,3 +8,4 @@
 export * from "./geo";
 export * from "./sample";
 export * from "./schema";
+export * from "./stats";
