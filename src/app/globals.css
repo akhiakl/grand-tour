@@ -129,6 +129,103 @@ body {
   }
 }
 
+/* ——— Map chrome (Leaflet) ——— */
+
+.atlas-map.leaflet-container {
+  font: inherit;
+  background: var(--paper);
+}
+
+/* CartoDB Voyager tiles: desaturated on paper, inverted + hue-rotated in dark. */
+.atlas-map .leaflet-tile-pane {
+  filter: saturate(0.55) contrast(1.02);
+}
+
+.dark .atlas-map .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) saturate(0.35) brightness(0.85) contrast(1.1);
+}
+
+.atlas-map .leaflet-control-zoom a {
+  border-color: var(--line);
+  background: var(--card);
+  color: var(--ink);
+}
+
+.atlas-map .leaflet-control-attribution {
+  background: color-mix(in srgb, var(--paper) 78%, transparent);
+  color: var(--ink-soft);
+  font-size: 10px;
+}
+
+.atlas-map .leaflet-control-attribution a {
+  color: var(--azure);
+}
+
+/* The animated brass route (stroke set here so it follows the theme).
+   Pane-scoped because Leaflet doesn't reliably forward path classNames. */
+.atlas-map .leaflet-overlay-pane path {
+  stroke: var(--brass);
+  stroke-linecap: round;
+}
+
+.city-marker-anchor,
+.leg-badge-anchor {
+  border: none;
+  background: transparent;
+}
+
+.city-marker {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--paper);
+  border-radius: 50%;
+  background: var(--brass);
+  box-shadow: 0 6px 14px -6px rgba(0, 0, 0, 0.45);
+  color: var(--paper);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.dark .city-marker {
+  color: #0e1420;
+}
+
+.city-marker[data-selected="true"] {
+  outline: 2px solid var(--azure);
+  outline-offset: 1px;
+}
+
+.leg-badge {
+  display: inline-grid;
+  place-items: center;
+  padding: 1px 7px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--card);
+  backdrop-filter: blur(8px);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.atlas-map .city-label {
+  padding: 2px 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+  box-shadow: none;
+  backdrop-filter: blur(8px);
+  color: var(--ink);
+  font-family: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.atlas-map .city-label::before {
+  display: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
