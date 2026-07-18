@@ -1,0 +1,141 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Grand Tour — "field atlas" design tokens.
+ * Brand palette (paper / ink / brass / azure) drives every shadcn token
+ * so components inherit the aesthetic without per-component overrides.
+ */
+:root {
+  --paper: #f5f1e8;
+  --ink: #16233a;
+  --ink-soft: #4a5568;
+  --brass: #b98a2f;
+  --azure: #3e7cb1;
+  --line: rgba(22, 35, 58, 0.12);
+
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: rgba(252, 250, 244, 0.66);
+  --card-foreground: var(--ink);
+  --popover: rgba(252, 250, 244, 0.92);
+  --popover-foreground: var(--ink);
+  --primary: var(--ink);
+  --primary-foreground: var(--paper);
+  --secondary: rgba(22, 35, 58, 0.06);
+  --secondary-foreground: var(--ink);
+  --muted: rgba(22, 35, 58, 0.05);
+  --muted-foreground: var(--ink-soft);
+  --accent: rgba(185, 138, 47, 0.12);
+  --accent-foreground: var(--ink);
+  --destructive: #a83a32;
+  --destructive-foreground: #fdf9f2;
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--brass);
+
+  --radius: 1rem;
+  --shadow-soft: 0 24px 60px -28px rgba(22, 35, 58, 0.35);
+  --ease-atlas: cubic-bezier(0.32, 0.72, 0.24, 1);
+}
+
+.dark {
+  --paper: #0e1420;
+  --ink: #edeae2;
+  --ink-soft: #9aa5b5;
+  --brass: #d4a94e;
+  --azure: #6fa8d6;
+  --line: rgba(237, 234, 226, 0.12);
+
+  --card: rgba(21, 29, 45, 0.62);
+  --popover: rgba(21, 29, 45, 0.94);
+  --primary: var(--ink);
+  --primary-foreground: #0e1420;
+  --secondary: rgba(237, 234, 226, 0.07);
+  --muted: rgba(237, 234, 226, 0.06);
+  --accent: rgba(212, 169, 78, 0.14);
+  --destructive: #d06157;
+  --destructive-foreground: #0e1420;
+  --shadow-soft: 0 24px 60px -24px rgba(0, 0, 0, 0.6);
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-brass: var(--brass);
+  --color-azure: var(--azure);
+  --color-line: var(--line);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --shadow-soft: var(--shadow-soft);
+
+  --ease-atlas: var(--ease-atlas);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer components {
+  /* Frosted card — the house surface for drawers, rails and modals. */
+  .frost {
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--card);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: var(--shadow-soft);
+  }
+
+  /* Eyebrow label — small brass wayfinding caption. */
+  .eyebrow {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--brass);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
