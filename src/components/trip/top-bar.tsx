@@ -43,10 +43,10 @@ export function TopBar({
   activePanel,
   onTogglePanel,
 }: {
-  title: string;
-  eyebrow: string;
-  activePanel: PanelId | null;
-  onTogglePanel: (panel: PanelId) => void;
+  readonly title: string;
+  readonly eyebrow: string;
+  readonly activePanel: PanelId | null;
+  readonly onTogglePanel: (panel: PanelId) => void;
 }) {
   return (
     <header className="pointer-events-none fixed inset-x-0 top-0 z-50 flex items-center justify-between gap-3 p-4 sm:px-7 sm:py-4">

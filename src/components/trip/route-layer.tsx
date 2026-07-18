@@ -27,7 +27,7 @@ function badgeIcon(leg: Leg) {
  * The curved brass route, traced point-by-point once the intro splash
  * lifts; transport badges land on each arc's midpoint after the draw.
  */
-export function RouteLayer({ trip }: { trip: Trip }) {
+export function RouteLayer({ trip }: { readonly trip: Trip }) {
   const reducedMotion = useReducedMotion();
   const stops = useMemo(
     () => trip.cities.map((city) => city.ll as LatLng),

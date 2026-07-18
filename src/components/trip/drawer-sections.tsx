@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import type { City } from "@/lib/trip";
 import { cn } from "@/lib/utils";
 
-function SectionHeading({ children }: { children: React.ReactNode }) {
+function SectionHeading({ children }: { readonly children: React.ReactNode }) {
   return <h3 className="mb-2.5 font-display text-lg font-medium">{children}</h3>;
 }
 
@@ -14,8 +14,8 @@ function Pill({
   children,
   gem = false,
 }: {
-  children: React.ReactNode;
-  gem?: boolean;
+  readonly children: React.ReactNode;
+  readonly gem?: boolean;
 }) {
   return (
     <span
@@ -34,9 +34,9 @@ function DayRow({
   title,
   body,
 }: {
-  lead: string;
-  title: string;
-  body: string;
+  readonly lead: string;
+  readonly title: string;
+  readonly body: string;
 }) {
   return (
     <div className="flex gap-3.5 border-b border-dashed border-line py-3">
@@ -53,7 +53,7 @@ function DayRow({
   );
 }
 
-export function OverviewSection({ city }: { city: City }) {
+export function OverviewSection({ city }: { readonly city: City }) {
   return (
     <div className="space-y-7">
       <div>
@@ -84,7 +84,7 @@ export function OverviewSection({ city }: { city: City }) {
   );
 }
 
-export function ItinerarySection({ city }: { city: City }) {
+export function ItinerarySection({ city }: { readonly city: City }) {
   return (
     <div>
       <SectionHeading>Day by day</SectionHeading>
@@ -95,7 +95,7 @@ export function ItinerarySection({ city }: { city: City }) {
   );
 }
 
-export function FoodSection({ city }: { city: City }) {
+export function FoodSection({ city }: { readonly city: City }) {
   return (
     <div>
       <SectionHeading>Eat like a local</SectionHeading>
@@ -111,9 +111,9 @@ function InfoCard({
   value,
   wide = false,
 }: {
-  label: string;
-  value: string;
-  wide?: boolean;
+  readonly label: string;
+  readonly value: string;
+  readonly wide?: boolean;
 }) {
   return (
     <div
@@ -130,7 +130,7 @@ function InfoCard({
   );
 }
 
-export function PracticalSection({ city }: { city: City }) {
+export function PracticalSection({ city }: { readonly city: City }) {
   const [low, high] = city.budget;
   return (
     <div className="space-y-7">
@@ -161,14 +161,20 @@ export function PracticalSection({ city }: { city: City }) {
 
 const SPEND_STYLES = ["Backpacker", "Comfortable", "Indulgent"] as const;
 
-export function PlannerSection({ city }: { city: City }) {
+function spendStyleIndex(spend: number) {
+  if (spend < 33) return 0;
+  if (spend < 67) return 1;
+  return 2;
+}
+
+export function PlannerSection({ city }: { readonly city: City }) {
   const items = [...city.must, ...city.gems];
   const [checked, setChecked] = useState<ReadonlySet<string>>(new Set());
   const [spend, setSpend] = useState(50);
 
   const [low, high] = city.budget;
   const perDay = Math.round(low + ((high - low) * spend) / 100);
-  const spendStyle = SPEND_STYLES[spend < 33 ? 0 : spend < 67 ? 1 : 2];
+  const spendStyle = SPEND_STYLES[spendStyleIndex(spend)];
 
   const toggle = (item: string) => {
     setChecked((current) => {

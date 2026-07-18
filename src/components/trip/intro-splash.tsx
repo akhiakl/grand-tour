@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 export const INTRO_HOLD_MS = 1900;
 
 /** Renders a title with the second word in italic azure — the brand mark. */
-export function TitleWithAccent({ title }: { title: string }) {
+export function TitleWithAccent({ title }: { readonly title: string }) {
   const words = title.split(" ");
   if (words.length < 2) return <>{title}</>;
   return (
@@ -28,9 +28,9 @@ export function IntroSplash({
   eyebrow,
   route,
 }: {
-  title: string;
-  eyebrow: string;
-  route: string;
+  readonly title: string;
+  readonly eyebrow: string;
+  readonly route: string;
 }) {
   const [hidden, setHidden] = useState(false);
 

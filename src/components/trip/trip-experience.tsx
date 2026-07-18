@@ -17,7 +17,7 @@ import { TripMap } from "./trip-map";
  * topbar, stats, rail, panels, drawer. Receives the trip via props;
  * no data fetching happens below this line.
  */
-export function TripExperience({ trip }: { trip: Trip }) {
+export function TripExperience({ trip }: { readonly trip: Trip }) {
   const [selected, setSelected] = useState<number | null>(null);
   const [panel, setPanel] = useState<PanelId | null>(null);
 

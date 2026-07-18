@@ -33,11 +33,11 @@ export function CityDrawer({
   open,
   onOpenChange,
 }: {
-  city: City | null;
-  index: number;
-  count: number;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  readonly city: City | null;
+  readonly index: number;
+  readonly count: number;
+  readonly open: boolean;
+  readonly onOpenChange: (open: boolean) => void;
 }) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>

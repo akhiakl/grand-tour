@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 import { MODE_META } from "./mode";
 
-function LegChip({ leg }: { leg: Leg }) {
+function LegChip({ leg }: { readonly leg: Leg }) {
   const { emoji, label } = MODE_META[leg.mode];
   return (
     <span className="flex shrink-0 flex-col items-center self-center px-1.5 text-muted-foreground">
@@ -27,9 +27,9 @@ export function TimelineRail({
   selectedIndex,
   onSelect,
 }: {
-  trip: Trip;
-  selectedIndex: number | null;
-  onSelect: (index: number) => void;
+  readonly trip: Trip;
+  readonly selectedIndex: number | null;
+  readonly onSelect: (index: number) => void;
 }) {
   return (
     <nav

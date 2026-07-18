@@ -24,9 +24,9 @@ function PanelShell({
   title,
   children,
 }: {
-  open: boolean;
-  title: string;
-  children: React.ReactNode;
+  readonly open: boolean;
+  readonly title: string;
+  readonly children: React.ReactNode;
 }) {
   return (
     <section
@@ -41,7 +41,7 @@ function PanelShell({
   );
 }
 
-export function Panels({ active }: { active: PanelId | null }) {
+export function Panels({ active }: { readonly active: PanelId | null }) {
   const [checked, setChecked] = useState<ReadonlySet<string>>(new Set());
   const [notes, setNotes] = useState("");
 

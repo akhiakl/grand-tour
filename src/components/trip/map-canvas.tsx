@@ -19,9 +19,9 @@ const ATTRIBUTION =
   '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>';
 
 export interface TripMapProps {
-  trip: Trip;
-  selectedIndex: number | null;
-  onCitySelect: (index: number) => void;
+  readonly trip: Trip;
+  readonly selectedIndex: number | null;
+  readonly onCitySelect: (index: number) => void;
 }
 
 /** Fits the route, fences panning, and flies to the selected stop. */
@@ -29,8 +29,8 @@ function MapFocus({
   cities,
   selectedIndex,
 }: {
-  cities: City[];
-  selectedIndex: number | null;
+  readonly cities: City[];
+  readonly selectedIndex: number | null;
 }) {
   const map = useMap();
   const bounds = useMemo(() => L.latLngBounds(routeBounds(cities)), [cities]);
@@ -56,10 +56,10 @@ function CityMarker({
   selected,
   onSelect,
 }: {
-  city: City;
-  index: number;
-  selected: boolean;
-  onSelect: (index: number) => void;
+  readonly city: City;
+  readonly index: number;
+  readonly selected: boolean;
+  readonly onSelect: (index: number) => void;
 }) {
   const icon = useMemo(
     () =>

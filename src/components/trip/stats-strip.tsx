@@ -1,6 +1,12 @@
 import { tripStats, type Trip } from "@/lib/trip";
 
-function StatCard({ value, caption }: { value: string | number; caption: string }) {
+function StatCard({
+  value,
+  caption,
+}: {
+  readonly value: string | number;
+  readonly caption: string;
+}) {
   return (
     <div className="frost min-w-[132px] rounded-[14px] px-4 py-2.5">
       <b className="block font-display text-xl font-medium">{value}</b>
@@ -11,7 +17,7 @@ function StatCard({ value, caption }: { value: string | number; caption: string 
   );
 }
 
-export function StatsStrip({ trip }: { trip: Trip }) {
+export function StatsStrip({ trip }: { readonly trip: Trip }) {
   const stats = tripStats(trip);
   const [low, high] = stats.budget;
 
