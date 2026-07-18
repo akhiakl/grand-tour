@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Fraunces, Outfit } from "next/font/google";
+
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
