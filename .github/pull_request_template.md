@@ -13,6 +13,8 @@
 ## Checklist
 
 - [ ] `pnpm lint`, `pnpm typecheck`, `pnpm test` green locally
+- [ ] Overall test coverage stays above 85% (`pnpm test:coverage` passes;
+      SonarQube quality gate green)
 - [ ] Unit tests colocated with new code; shared mock data in `src/test/fixtures/`
 - [ ] Design tokens only (no hardcoded colors); both themes checked
 - [ ] Keyboard accessible (ESC, focus trap) for any new overlay

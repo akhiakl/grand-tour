@@ -27,7 +27,8 @@ route maps — populated by AI chat or manually — shared via short links
 - **Server-side secrets only**: `GROQ_API_KEY` and Upstash credentials must
   never reach client bundles.
 - Unit tests are written alongside code (colocated `foo.ts` + `foo.test.ts`),
-  not deferred. Schema, service layer, and utils always have coverage.
+  not deferred. Schema, service layer, and utils always have coverage;
+  overall coverage stays above 85% (vitest thresholds fail CI below that).
 - **Reused mock data lives in `src/test/fixtures/`** (`make*` builders with
   `Partial<T>` overrides) — never defined inside an individual test file.
   Module mocks (`vi.mock`) stay per-file; the data they return comes from

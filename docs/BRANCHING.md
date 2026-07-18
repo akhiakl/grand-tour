@@ -54,9 +54,12 @@ Branch protection on `main` should require:
 - at least one review (CODEOWNERS auto-requests @akhiakl)
 - linear history (squash or rebase merges only)
 
-Coverage appears as a PR comment and in the job summary on every PR;
-thresholds (90% lines/functions, 85% branches on lib + API routes) fail
-the test check when breached.
+Coverage appears as a PR comment and in the job summary on every PR.
+Overall coverage must stay above 85%: vitest thresholds (90% lines /
+functions / statements, 85% branches over lib + API routes) fail the test
+check when breached. To have SonarQube enforce the same overall floor,
+copy "Sonar way" into a custom gate and add an overall-coverage ≥ 85%
+condition (Sonar-side setting; the built-in gate only checks new code).
 
 SonarQube Cloud one-time setup (project admin):
 
