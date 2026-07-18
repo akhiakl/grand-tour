@@ -1,6 +1,6 @@
+import { GenerateRequestSchema } from "@/lib/ai";
 import { GenerationError, generateTrip } from "@/lib/ai/generate";
-import { GenerateRequestSchema } from "@/lib/ai/schema";
-import { getClientIp, getRatelimiter } from "@/lib/ratelimit";
+import { getClientIp, getRatelimiter } from "@/lib/http";
 
 const FAILURE_RESPONSES = {
   unavailable: { status: 503, error: "generation_unavailable" },

@@ -1,4 +1,4 @@
-import type { City, Leg, Trip } from "@/lib/schema";
+import type { City, Leg, Trip } from "@/lib/trip";
 
 /** Builders for a small, always-valid trip used across unit tests. */
 

@@ -1,6 +1,6 @@
-import { GUEST_MAX_CITIES, MAX_TRIP_PAYLOAD_BYTES, TripSchema } from "@/lib/schema";
-import { getClientIp, getRatelimiter } from "@/lib/ratelimit";
-import { saveTrip } from "@/lib/trips";
+import { getClientIp, getRatelimiter } from "@/lib/http";
+import { GUEST_MAX_CITIES, MAX_TRIP_PAYLOAD_BYTES, TripSchema } from "@/lib/trip";
+import { saveTrip } from "@/lib/trip/service";
 
 export async function POST(request: Request) {
   const { success } = await getRatelimiter("trips").limit(getClientIp(request));

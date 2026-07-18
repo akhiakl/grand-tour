@@ -1,4 +1,5 @@
-import { GUEST_MAX_CITIES } from "@/lib/schema";
+import { GUEST_MAX_CITIES } from "@/lib/trip";
+
 import type { GenerateRequest } from "./schema";
 
 /** JSON shape shown to the model — kept in sync with AiTripSchema. */

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { makeTrip } from "@/test/trip-fixtures";
+import { makeTrip } from "@/test/fixtures/trip";
 
 const redisMock = vi.hoisted(() => ({
   setex: vi.fn(),
@@ -19,7 +19,7 @@ import {
   getTrip,
   incrViews,
   saveTrip,
-} from "./trips";
+} from "./service";
 
 beforeEach(() => {
   vi.clearAllMocks();

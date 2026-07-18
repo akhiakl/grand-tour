@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { makeCity, makeLeg, makeTrip } from "@/test/trip-fixtures";
+import { makeCity, makeLeg, makeTrip } from "@/test/fixtures/trip";
+
 import { CitySchema, GUEST_MAX_CITIES, LegSchema, TripSchema } from "./schema";
 
 describe("CitySchema", () => {

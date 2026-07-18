@@ -1,4 +1,7 @@
-import { TripSchema, type Trip } from "@/lib/schema";
+import "server-only";
+
+import { TripSchema, type Trip } from "@/lib/trip";
+
 import { buildRetryPrompt, buildSystemPrompt, buildUserPrompt } from "./prompt";
 import { AiTripSchema, type GenerateRequest } from "./schema";
 

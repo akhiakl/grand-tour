@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { CitySchema, GUEST_MAX_CITIES, LegSchema } from "@/lib/schema";
+import { CitySchema, GUEST_MAX_CITIES, LegSchema } from "@/lib/trip";
 
 /** The guided chat's three answers — the only input the generator takes. */
 export const VIBES = ["relaxed", "balanced", "packed"] as const;

@@ -1,19 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { GUEST_MAX_CITIES } from "@/lib/schema";
-import { makeTrip } from "@/test/trip-fixtures";
+import { GUEST_MAX_CITIES } from "@/lib/trip";
+import { makeTrip } from "@/test/fixtures/trip";
 
 const mocks = vi.hoisted(() => ({
   limit: vi.fn(),
   saveTrip: vi.fn(),
 }));
 
-vi.mock("@/lib/ratelimit", () => ({
+vi.mock("@/lib/http", () => ({
   getRatelimiter: () => ({ limit: mocks.limit }),
   getClientIp: () => "203.0.113.9",
 }));
 
-vi.mock("@/lib/trips", () => ({
+vi.mock("@/lib/trip/service", () => ({
   saveTrip: mocks.saveTrip,
 }));
 

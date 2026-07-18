@@ -1,21 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { makeCity, makeLeg } from "@/test/trip-fixtures";
+import { makeAiTrip, makeGenerateRequest } from "@/test/fixtures/ai";
+
 import { GenerationError, generateTrip } from "./generate";
-import type { GenerateRequest } from "./schema";
 
-const request: GenerateRequest = {
-  destination: "Austria",
-  days: 6,
-  vibe: "balanced",
-};
-
-const validAiOutput = {
-  title: "Alpine Arc",
-  cities: [makeCity(), makeCity({ name: "Salzburg" })],
-  legs: [makeLeg()],
-  suggestedExtra: ["Innsbruck"],
-};
+const request = makeGenerateRequest();
+const validAiOutput = makeAiTrip(2, { suggestedExtra: ["Innsbruck"] });
 
 const groqResponse = (content: string) =>
   new Response(JSON.stringify({ choices: [{ message: { content } }] }), {
@@ -62,7 +52,7 @@ describe("generateTrip", () => {
   });
 
   it("retries once, feeding validation errors back to the model", async () => {
-    const invalid = JSON.stringify({ ...validAiOutput, legs: [] });
+    const invalid = JSON.stringify(makeAiTrip(2, { legs: [] }));
     fetchMock
       .mockResolvedValueOnce(groqResponse(invalid))
       .mockResolvedValueOnce(groqResponse(JSON.stringify(validAiOutput)));
@@ -72,8 +62,7 @@ describe("generateTrip", () => {
     expect(result.trip.cities).toHaveLength(2);
     expect(fetchMock).toHaveBeenCalledTimes(2);
 
-    const retryBody = JSON.parse(fetchMock.mock.calls[1][1].body);
-    const retryMessages = retryBody.messages;
+    const retryMessages = JSON.parse(fetchMock.mock.calls[1][1].body).messages;
     expect(retryMessages.at(-2).role).toBe("assistant");
     expect(retryMessages.at(-1).content).toContain("legs");
   });

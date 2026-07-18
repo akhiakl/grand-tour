@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { GUEST_MAX_CITIES } from "@/lib/schema";
+import { GUEST_MAX_CITIES } from "@/lib/trip";
+
 import { buildRetryPrompt, buildSystemPrompt, buildUserPrompt } from "./prompt";
 
 describe("buildSystemPrompt", () => {
