@@ -63,8 +63,8 @@ SonarQube Cloud one-time setup (project admin):
 1. Project Administration → Analysis Method → turn OFF Automatic Analysis
    (CI-based analysis with coverage replaces it; the two conflict).
 2. Generate a project analysis token and save it as the `SONAR_TOKEN`
-   repository secret. Self-hosted SonarQube Server only: also set
-   `SONAR_HOST_URL` (defaults to sonarcloud.io).
+   repository secret (done). Self-hosted SonarQube Server only: add a
+   `SONAR_HOST_URL` env to the scan step.
 3. Keep the default "Sonar way" quality gate; set New Code definition to
    "Previous version" (or reference branch `main`).
 4. Verify `sonar.projectKey` / `sonar.organization` in
