@@ -48,14 +48,27 @@ Naming: lowercase, kebab-case, scoped to one deliverable —
 
 Branch protection on `main` should require:
 
-- the four CI checks — Lint, Typecheck, Unit tests & coverage, Build —
-  plus the "Conventional title" check, all green before merge
+- the CI checks — Lint, Typecheck, Unit tests & coverage, Build,
+  SonarQube — plus the "Conventional title" check and the SonarQube
+  quality-gate check, all green before merge
 - at least one review (CODEOWNERS auto-requests @akhiakl)
 - linear history (squash or rebase merges only)
 
 Coverage appears as a PR comment and in the job summary on every PR;
 thresholds (90% lines/functions, 85% branches on lib + API routes) fail
 the test check when breached.
+
+SonarQube Cloud one-time setup (project admin):
+
+1. Project Administration → Analysis Method → turn OFF Automatic Analysis
+   (CI-based analysis with coverage replaces it; the two conflict).
+2. Generate a project analysis token and save it as the `SONAR_TOKEN`
+   repository secret. Self-hosted SonarQube Server only: also set
+   `SONAR_HOST_URL` (defaults to sonarcloud.io).
+3. Keep the default "Sonar way" quality gate; set New Code definition to
+   "Previous version" (or reference branch `main`).
+4. Verify `sonar.projectKey` / `sonar.organization` in
+   `sonar-project.properties` match the project's Information page.
 
 ## Releases (Phase 1)
 

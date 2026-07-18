@@ -85,6 +85,8 @@ Do NOT create the workspace until a second consumer actually exists.
 - Coverage: `pnpm test:coverage` (v8) over `src/lib/**` + `src/app/api/**`
   with enforced thresholds; UI components are covered by e2e instead.
   PRs get a coverage comment via `vitest-coverage-report-action`.
+- Static analysis: SonarQube ("Sonar way" gate) via the CI `sonar` job;
+  config in `sonar-project.properties`, coverage fed from vitest lcov.
 
 ## Observability
 

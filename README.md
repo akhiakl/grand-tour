@@ -1,6 +1,8 @@
 # Grand Tour
 
 [![CI](https://github.com/akhiakl/grand-tour/actions/workflows/ci.yml/badge.svg)](https://github.com/akhiakl/grand-tour/actions/workflows/ci.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=akhiakl_grand-tour&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=akhiakl_grand-tour)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=akhiakl_grand-tour&metric=coverage)](https://sonarcloud.io/summary/new_code?id=akhiakl_grand-tour)
 
 Craft a beautiful, interactive travel route map — drawn by AI or by hand —
 and share it with a single link. Guest-first: no accounts, no user database.
