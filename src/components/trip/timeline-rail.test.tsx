@@ -14,7 +14,7 @@ describe("TimelineRail", () => {
   it("renders every stop with its night count", () => {
     render(<TimelineRail trip={trip} selectedIndex={null} onSelect={vi.fn()} />);
     expect(screen.getAllByRole("button")).toHaveLength(3);
-    expect(screen.getAllByText("3n")).toHaveLength(3);
+    expect(screen.getAllByText(/3 nights/i)).toHaveLength(3);
   });
 
   it("renders a transport chip between consecutive stops", () => {
