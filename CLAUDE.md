@@ -27,17 +27,26 @@ route maps — populated by AI chat or manually — shared via short links
   never reach client bundles.
 - Unit tests are written alongside code (colocated `foo.ts` + `foo.test.ts`),
   not deferred. Schema, service layer, and utils always have coverage.
+- **Reused mock data lives in `src/test/fixtures/`** (`make*` builders with
+  `Partial<T>` overrides) — never defined inside an individual test file.
+  Module mocks (`vi.mock`) stay per-file; the data they return comes from
+  fixtures.
 - Playwright e2e is the LAST build step only.
 
 ## Architecture
 
 - Next.js App Router, TypeScript strict, Tailwind v4, shadcn/ui,
   Framer Motion, react-leaflet (dynamic import, `ssr: false`), next-themes.
-- **Service layer**: `src/lib/trips.ts` is plain transport-agnostic functions
-  over Upstash Redis. Only route handlers / server components may call it.
-  UI components receive data and handlers via props — no component reaches
-  into Redis or `fetch` directly.
-- **Validation**: everything through Zod (`src/lib/schema.ts`).
+- **Domain modules**: `src/lib/<domain>` folders are internal packages with
+  an `index.ts` public API (see `docs/ARCHITECTURE.md`). Consume them via
+  `@/lib/trip`, `@/lib/ai`, `@/lib/http` — deep imports are lint-rejected
+  except the server entry points `@/lib/trip/service` and
+  `@/lib/ai/generate`, which carry `import "server-only"`.
+- **Service layer**: `src/lib/trip/service.ts` is plain transport-agnostic
+  functions over Upstash Redis. Only route handlers / server components may
+  call it. UI components receive data and handlers via props — no component
+  reaches into Redis or `fetch` directly.
+- **Validation**: everything through Zod (`src/lib/trip/schema.ts`).
   `GUEST_MAX_CITIES = 5` is enforced server-side (the real gate), in the
   editor UI (counter + upsell modal), and in the AI prompt
   (`suggestedExtra` ghost stops).
@@ -82,10 +91,11 @@ in-voice and actionable, reduced motion respected.
 ## Phase 2 non-goals (do not build, do not block)
 
 Auth, Postgres, premium tier (15 cities, permanent links, PDF export,
-custom themes), views dashboard, GraphQL/tRPC. Keep `lib/trips.ts` plain so
+custom themes), views dashboard, GraphQL/tRPC. Keep the trip service plain so
 another transport can wrap it later.
 
 ## Git
 
-See `docs/BRANCHING.md`. Work happens on `feature/*` branches off `main`;
+See `docs/BRANCHING.md` for branching and `docs/ARCHITECTURE.md` for the
+folder structure, module boundaries and portability rules. Work happens on `feature/*` branches off `main`;
 Conventional Commits only.

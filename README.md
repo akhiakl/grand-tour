@@ -35,6 +35,8 @@ typecheck; commit messages must follow
 
 - [CLAUDE.md](./CLAUDE.md) — AI assistant instructions (architecture,
   design system, hard rules)
+- [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) — folder structure,
+  module boundaries, testing and tooling standards
 - [docs/BRANCHING.md](./docs/BRANCHING.md) — branching strategy
 - `.claude/skills/` — project skills (grand-tour, nextjs, tailwind, shadcn)
 
