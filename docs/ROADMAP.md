@@ -26,6 +26,10 @@ new aesthetic.
 - Verify UI work in a real browser (headless Chromium is available;
   see the screenshot scripts pattern in past sessions) before pushing.
 
+**Deploying:** production only deploys from published `vX.Y.Z` releases,
+and `v1.0.0` (the first production deploy) is gated on the MVP checklist
+in `docs/RELEASE.md`. Do not wire any host to auto-deploy `main`.
+
 ## Status
 
 | Step | Scope                                              | State   |
@@ -211,6 +215,9 @@ Branch: `feature/e2e`
       1 review; linear history (see `docs/BRANCHING.md`).
 - [ ] Optional: allowlist `ui.shadcn.com` in the remote environment's
       network policy so `shadcn add` works in cloud sessions.
+- [ ] `RELEASE_PLEASE_TOKEN` repo secret (PAT) so CI runs on release PRs.
+- [ ] `DEPLOY_HOOK_URL` repo secret once a host is chosen; disable the
+      host's auto-deploy of `main` (see `docs/RELEASE.md`).
 
 ## Phase 2 parking lot (do NOT build in Phase 1)
 

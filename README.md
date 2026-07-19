@@ -45,6 +45,8 @@ typecheck; commit messages must follow
 - [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) — folder structure,
   module boundaries, testing and tooling standards
 - [docs/BRANCHING.md](./docs/BRANCHING.md) — branching strategy
+- [docs/RELEASE.md](./docs/RELEASE.md) — versioning, deploy policy and
+  the MVP launch checklist
 - `.claude/skills/` — project skills (grand-tour, nextjs, tailwind, shadcn)
 
 ## Environment variables
