@@ -90,6 +90,101 @@ checked before merging the `1.0.0` release PR.
       expired link)
 - [ ] README badges green; CHANGELOG reads clean
 
+## How to cut a release — step by step
+
+Nobody runs version commands by hand. The whole flow is: merge work,
+then merge the release PR when you decide it's time.
+
+### 0. Day to day (nothing release-specific to do)
+
+Merge feature PRs into `main` as usual — squash-merge with a
+conventional PR title (`feat: …`, `fix: …`). That title becomes the
+commit on `main`, which is what release-please reads.
+
+### 1. The release PR appears by itself
+
+After the first releasable commit lands on `main`, the Release workflow
+opens (and keeps updating) a PR titled
+**`chore(main): release X.Y.Z`**. It contains exactly two changes:
+
+- `package.json` / `.release-please-manifest.json` version bump
+- `CHANGELOG.md` section generated from the commit messages
+
+Leave it open as long as you like — every new merge to `main` updates
+it automatically. Only `feat`/`fix` (and breaking) commits are
+"releasable"; `chore`/`docs`/`test`/`refactor` merges alone won't open
+or bump it.
+
+### 2. When you decide to release
+
+1. Open the release PR and read the generated CHANGELOG section — it is
+   the release notes; fix commit messages in future PRs if it reads
+   badly.
+2. Check the version is what you expect (see "controlling the number"
+   below).
+3. Make sure its CI checks are green (requires the
+   `RELEASE_PLEASE_TOKEN` PAT secret — without it the PR gets no checks
+   and can't pass branch protection).
+4. **Merge it.** That's the release: release-please immediately creates
+   the `vX.Y.Z` tag and publishes the GitHub Release with the changelog
+   as its notes.
+
+### 3. What happens after the merge
+
+`deploy.yml` fires on the published release:
+
+- `DEPLOY_HOOK_URL` secret set → the host's deploy hook is called and
+  production ships this exact tag.
+- Not set → nothing deploys; the release is a tag + changelog milestone
+  (this is the correct state for all `0.x` releases before launch).
+
+Then verify: the Releases page shows `vX.Y.Z`, and — once deploys are
+live — smoke-test production.
+
+### 4. Controlling the version number
+
+- Normal bumps come from commit types: `fix:` → `0.1.1`,
+  `feat:` → `0.2.0`.
+- To force a specific version, put a footer in any commit on `main`
+  (e.g. the last feature merge):
+
+  ```
+  feat: complete landing polish
+
+  Release-As: 1.0.0
+  ```
+
+  This is exactly how **`v1.0.0` gets cut**: 0.x feat commits only bump
+  the minor, so the MVP release is made by adding `Release-As: 1.0.0`
+  once the checklist above is fully checked — never before.
+
+### 5. Cutting v1.0.0 (the launch, end to end)
+
+1. Steps 4–8 merged; MVP checklist 100% (paste it into the release PR
+   description and tick every box).
+2. Land a commit with `Release-As: 1.0.0` → release PR becomes
+   `chore(main): release 1.0.0`.
+3. Merge it → tag + Release published → deploy hook fires → production
+   smoke test of the four core journeys.
+
+### 6. Hotfix walkthrough
+
+1. `git checkout -b fix/broken-share main` → fix + test → PR → merge
+   (`fix: …` title).
+2. Release PR updates to the next patch (e.g. `1.0.1`). Merge it.
+3. Tag published → auto-deploy → verify the fix in production.
+   Total ceremony: two PR merges.
+
+### Troubleshooting
+
+| Symptom                         | Cause / fix                                                                                                         |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| No release PR after merging     | Only non-releasable types landed (`chore`/`docs`/…) — expected; or the Release workflow failed — check Actions.     |
+| Release PR has no CI checks     | Created with the default `GITHUB_TOKEN`; add the `RELEASE_PLEASE_TOKEN` PAT secret and re-run the Release workflow. |
+| Wrong version proposed          | Add a `Release-As: x.y.z` footer commit; the PR retargets on the next workflow run.                                 |
+| Merged release PR but no deploy | `DEPLOY_HOOK_URL` unset (fine pre-launch) or the hook URL is invalid — check the Deploy workflow logs.              |
+| Need to unpublish               | Never delete tags; ship a `fix:`/revert commit and cut the next patch instead.                                      |
+
 ## After launch
 
 Normal cadence: features merge to `main` behind green checks; releases
