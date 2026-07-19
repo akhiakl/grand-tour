@@ -40,6 +40,8 @@ typecheck; commit messages must follow
 
 - [CLAUDE.md](./CLAUDE.md) — AI assistant instructions (architecture,
   design system, hard rules)
+- [docs/ROADMAP.md](./docs/ROADMAP.md) — Phase 1 build order: status,
+  per-step deliverables and definition of done
 - [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) — folder structure,
   module boundaries, testing and tooling standards
 - [docs/BRANCHING.md](./docs/BRANCHING.md) — branching strategy

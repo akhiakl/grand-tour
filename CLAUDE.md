@@ -99,6 +99,12 @@ Auth, Postgres, premium tier (15 cities, permanent links, PDF export,
 custom themes), views dashboard, GraphQL/tRPC. Keep the trip service plain so
 another transport can wrap it later.
 
+## Build order
+
+`docs/ROADMAP.md` is the authoritative step-by-step plan (deliverables,
+contracts, definition of done per step). One step = one `feature/*` PR,
+reviewed before the next starts.
+
 ## Git
 
 See `docs/BRANCHING.md` for branching and `docs/ARCHITECTURE.md` for the
