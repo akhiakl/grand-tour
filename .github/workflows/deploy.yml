@@ -1,0 +1,23 @@
+# Production deploys ONLY from published releases (tags vX.Y.Z) — never
+# from pushes to main. See docs/RELEASE.md for the policy and the MVP
+# checklist gating v1.0.0.
+name: Deploy
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  production:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger production deploy hook
+        env:
+          HOOK: ${{ secrets.DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "DEPLOY_HOOK_URL not set — release tagged, no deploy triggered."
+            exit 0
+          fi
+          curl -fsS -X POST "$HOOK"
+          echo "Production deploy triggered for ${GITHUB_REF_NAME}."

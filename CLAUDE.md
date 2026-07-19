@@ -99,6 +99,14 @@ Auth, Postgres, premium tier (15 cities, permanent links, PDF export,
 custom themes), views dashboard, GraphQL/tRPC. Keep the trip service plain so
 another transport can wrap it later.
 
+## Build order
+
+`docs/ROADMAP.md` is the authoritative step-by-step plan (deliverables,
+contracts, definition of done per step). One step = one `feature/*` PR,
+reviewed before the next starts. Releases are semver via release-please;
+production deploys only from published releases, and `v1.0.0` is gated on
+the MVP checklist in `docs/RELEASE.md` — never wire deploys to `main`.
+
 ## Git
 
 See `docs/BRANCHING.md` for branching and `docs/ARCHITECTURE.md` for the

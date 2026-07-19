@@ -73,7 +73,9 @@ SonarQube Cloud one-time setup (project admin):
 4. Verify `sonar.projectKey` / `sonar.organization` in
    `sonar-project.properties` match the project's Information page.
 
-## Releases (Phase 1)
+## Releases
 
-`main` deploys continuously. Tag milestones as needed
-(`v0.1.0` = Phase 1 complete) following semver.
+Semver via release-please — see `docs/RELEASE.md`. Conventional Commits
+drive the bump; merging the rolling release PR tags `vX.Y.Z` and
+publishes a GitHub Release, which is the only production deploy trigger.
+`v1.0.0` is gated on the MVP checklist; `main` itself never deploys.

@@ -1,0 +1,23 @@
+# Maintains a rolling "release PR" from Conventional Commits on main.
+# Merging that PR bumps the version, updates CHANGELOG.md, tags vX.Y.Z
+# and publishes a GitHub Release — which is the ONLY deploy trigger
+# (see .github/workflows/deploy.yml and docs/RELEASE.md).
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v4
+        with:
+          # GITHUB_TOKEN-created PRs don't trigger CI; set a repo PAT as
+          # RELEASE_PLEASE_TOKEN so required checks run on release PRs.
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN || secrets.GITHUB_TOKEN }}
