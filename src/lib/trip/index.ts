@@ -6,6 +6,7 @@
  * server-only entry point `@/lib/trip/service`.
  */
 export * from "./geo";
+export * from "./poster-layout";
 export * from "./sample";
 export * from "./schema";
 export * from "./stats";
