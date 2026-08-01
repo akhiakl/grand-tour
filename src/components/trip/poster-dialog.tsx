@@ -27,6 +27,7 @@ function readTheme(): PosterTheme {
     azure: token("--azure"),
     line: token("--line"),
     cardSolid: token("--card-solid"),
+    mapFilter: token("--map-filter"),
   };
 }
 
@@ -76,7 +77,7 @@ export function PosterDialog({
     (async () => {
       const fonts = await readFonts();
       const canvas = document.createElement("canvas");
-      drawPoster(canvas, trip, readTheme(), fonts);
+      await drawPoster(canvas, trip, readTheme(), fonts);
       const rendered = await new Promise<Blob | null>((resolve) =>
         canvas.toBlob(resolve, "image/png"),
       );

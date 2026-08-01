@@ -1,14 +1,16 @@
 import {
   arcPoints,
   labelSide,
-  makeProjector,
+  makeMercatorView,
   routePath,
   tripStats,
   type LatLng,
+  type PosterPoint,
   type Trip,
 } from "@/lib/trip";
 
 import { MODE_META } from "./mode";
+import { drawTileLayer, fadeTileEdges, type TileWindow } from "./poster-tiles";
 
 export const POSTER_WIDTH = 1080;
 export const POSTER_HEIGHT = 1350;
@@ -22,6 +24,7 @@ export interface PosterTheme {
   azure: string;
   line: string;
   cardSolid: string;
+  mapFilter: string;
 }
 
 export interface PosterFonts {
@@ -29,15 +32,15 @@ export interface PosterFonts {
   sans: string;
 }
 
-const MAP_TOP = 330;
-const MAP_BOTTOM = 1080;
+/** The basemap window (frame-inset, between header and footer). */
+const WIN: TileWindow = { x: 40, y: 288, width: POSTER_WIDTH - 80, height: 820 };
 const EDGE = 84;
 
 function drawBackground(ctx: CanvasRenderingContext2D, theme: PosterTheme) {
   ctx.fillStyle = theme.paper;
   ctx.fillRect(0, 0, POSTER_WIDTH, POSTER_HEIGHT);
 
-  // Faint atlas graticule.
+  // Faint atlas graticule (visible where tiles fade out or fail to load).
   ctx.strokeStyle = theme.line;
   ctx.lineWidth = 1;
   ctx.globalAlpha = 0.55;
@@ -54,9 +57,11 @@ function drawBackground(ctx: CanvasRenderingContext2D, theme: PosterTheme) {
     ctx.stroke();
   }
   ctx.globalAlpha = 1;
+}
 
-  // Plate frame.
+function drawFrame(ctx: CanvasRenderingContext2D, theme: PosterTheme) {
   ctx.strokeStyle = theme.line;
+  ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.roundRect(36, 36, POSTER_WIDTH - 72, POSTER_HEIGHT - 72, 24);
   ctx.stroke();
@@ -77,9 +82,7 @@ function drawHeader(
   ctx.fillText("FIELD ATLAS", EDGE, 132);
   ctx.letterSpacing = "0px";
 
-  // Title with the second word in italic azure (brand mark).
   const words = trip.title.split(" ");
-  ctx.font = `500 76px ${fonts.display}`;
   let x = EDGE;
   words.forEach((word, i) => {
     const accent = i === 1 && words.length > 1;
@@ -99,19 +102,10 @@ function drawRoute(
   trip: Trip,
   theme: PosterTheme,
   fonts: PosterFonts,
+  toCanvas: (ll: LatLng) => PosterPoint,
 ) {
   const stops = trip.cities.map((city) => city.ll as LatLng);
-  const project = makeProjector(stops, {
-    width: POSTER_WIDTH,
-    height: MAP_BOTTOM - MAP_TOP,
-    padding: 130,
-  });
-  const toCanvas = (ll: LatLng) => {
-    const { x, y } = project(ll);
-    return { x, y: y + MAP_TOP };
-  };
 
-  // Curved dashed brass route.
   const path = routePath(stops).map(toCanvas);
   ctx.strokeStyle = theme.brass;
   ctx.lineWidth = 5;
@@ -122,7 +116,6 @@ function drawRoute(
   ctx.stroke();
   ctx.setLineDash([]);
 
-  // Transport marks at leg midpoints.
   trip.legs.forEach((leg, i) => {
     const mid = toCanvas(arcPoints(stops[i], stops[i + 1], 2)[1]);
     ctx.fillStyle = theme.cardSolid;
@@ -138,7 +131,6 @@ function drawRoute(
     ctx.fillText(MODE_META[leg.mode].emoji, mid.x, mid.y + 2);
   });
 
-  // Stops + labels.
   const projected = trip.cities.map((city) => toCanvas(city.ll as LatLng));
   trip.cities.forEach((city, i) => {
     const { x, y } = projected[i];
@@ -163,12 +155,29 @@ function drawRoute(
     ctx.lineWidth = 10;
     ctx.strokeStyle = theme.paper;
     ctx.lineJoin = "round";
-    const label = `${city.name}`;
     const clampedX = Math.min(Math.max(x, EDGE + 80), POSTER_WIDTH - EDGE - 80);
-    ctx.strokeText(label, clampedX, labelY);
+    ctx.strokeText(city.name, clampedX, labelY);
     ctx.fillStyle = theme.ink;
-    ctx.fillText(label, clampedX, labelY);
+    ctx.fillText(city.name, clampedX, labelY);
   });
+}
+
+function drawAttribution(
+  ctx: CanvasRenderingContext2D,
+  theme: PosterTheme,
+  fonts: PosterFonts,
+) {
+  ctx.fillStyle = theme.inkSoft;
+  ctx.font = `400 16px ${fonts.sans}`;
+  ctx.textAlign = "right";
+  ctx.textBaseline = "alphabetic";
+  ctx.globalAlpha = 0.85;
+  ctx.fillText(
+    "Map © OpenStreetMap · © CARTO",
+    WIN.x + WIN.width - 14,
+    WIN.y + WIN.height - 14,
+  );
+  ctx.globalAlpha = 1;
 }
 
 function drawFooter(
@@ -179,6 +188,7 @@ function drawFooter(
 ) {
   const stats = tripStats(trip);
   ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
 
   ctx.fillStyle = theme.ink;
   ctx.font = `400 28px ${fonts.sans}`;
@@ -209,8 +219,11 @@ function drawFooter(
   ctx.fillText("Grand Tour", POSTER_WIDTH / 2, 1276);
 }
 
-/** Renders the shareable route poster (1080×1350, Instagram 4:5). */
-export function drawPoster(
+/**
+ * Renders the shareable route poster (1080×1350, Instagram 4:5):
+ * themed basemap tiles under the brass route, faded into the paper.
+ */
+export async function drawPoster(
   canvas: HTMLCanvasElement,
   trip: Trip,
   theme: PosterTheme,
@@ -221,8 +234,23 @@ export function drawPoster(
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("canvas 2d context unavailable");
 
+  const stops = trip.cities.map((city) => city.ll as LatLng);
+  const view = makeMercatorView(stops, {
+    width: WIN.width,
+    height: WIN.height,
+    padding: 130,
+  });
+  const toCanvas = (ll: LatLng) => {
+    const point = view.project(ll);
+    return { x: point.x + WIN.x, y: point.y + WIN.y };
+  };
+
   drawBackground(ctx, theme);
+  const hasTiles = await drawTileLayer(ctx, view, WIN, theme.mapFilter, theme.paper);
+  if (hasTiles) fadeTileEdges(ctx, WIN, theme.paper);
+  drawFrame(ctx, theme);
   drawHeader(ctx, trip, theme, fonts);
-  drawRoute(ctx, trip, theme, fonts);
+  drawRoute(ctx, trip, theme, fonts, toCanvas);
+  if (hasTiles) drawAttribution(ctx, theme, fonts);
   drawFooter(ctx, trip, theme, fonts);
 }
