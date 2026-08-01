@@ -5,6 +5,7 @@
  * client and server code alike. The Redis persistence lives in the
  * server-only entry point `@/lib/trip/service`.
  */
+export * from "./draft";
 export * from "./geo";
 export * from "./local-store";
 export * from "./poster-layout";

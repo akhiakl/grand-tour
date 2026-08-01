@@ -3,6 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { makeTrip } from "@/test/fixtures/trip";
 
 import {
+  AI_HANDOFF_KEY,
+  consumeAiHandoff,
   deleteLocalTrip,
   getLocalTrip,
   listLocalTrips,
@@ -93,5 +95,30 @@ describe("deleteLocalTrip", () => {
 
   it("is a no-op for an id that doesn't exist", () => {
     expect(() => deleteLocalTrip("missing1")).not.toThrow();
+  });
+});
+
+describe("consumeAiHandoff", () => {
+  it("returns null when nothing was handed off", () => {
+    expect(consumeAiHandoff()).toBeNull();
+  });
+
+  it("reads a valid handoff payload and clears the key", () => {
+    const trip = makeTrip();
+    window.localStorage.setItem(AI_HANDOFF_KEY, JSON.stringify(trip));
+
+    expect(consumeAiHandoff()?.title).toBe(trip.title);
+    expect(window.localStorage.getItem(AI_HANDOFF_KEY)).toBeNull();
+  });
+
+  it("drops an invalid payload and still clears the key", () => {
+    window.localStorage.setItem(AI_HANDOFF_KEY, JSON.stringify({ not: "a trip" }));
+    expect(consumeAiHandoff()).toBeNull();
+    expect(window.localStorage.getItem(AI_HANDOFF_KEY)).toBeNull();
+  });
+
+  it("drops malformed JSON instead of throwing", () => {
+    window.localStorage.setItem(AI_HANDOFF_KEY, "not json");
+    expect(consumeAiHandoff()).toBeNull();
   });
 });

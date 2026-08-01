@@ -91,3 +91,22 @@ export function deleteLocalTrip(id: string): void {
   window.localStorage.removeItem(tripKey(id));
   writeIndex(readIndex().filter((existing) => existing !== id));
 }
+
+/** One-shot handoff key the AI flow writes to before sending the guest to `/new?from=ai`. */
+export const AI_HANDOFF_KEY = "trips:ai-handoff";
+
+/** Reads and clears the AI handoff payload; drops it silently if it fails validation. */
+export function consumeAiHandoff(): Trip | null {
+  if (!hasLocalStorage()) return null;
+
+  const raw = window.localStorage.getItem(AI_HANDOFF_KEY);
+  window.localStorage.removeItem(AI_HANDOFF_KEY);
+  if (!raw) return null;
+
+  try {
+    const parsed = TripSchema.safeParse(JSON.parse(raw));
+    return parsed.success ? parsed.data : null;
+  } catch {
+    return null;
+  }
+}
