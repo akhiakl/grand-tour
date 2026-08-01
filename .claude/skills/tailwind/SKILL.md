@@ -5,6 +5,10 @@ description: Tailwind CSS v4 usage rules for this repo. Use when styling compone
 
 # Tailwind v4 conventions
 
+Tailwind v4 differs sharply from v3 (no config file, CSS-first). For
+utility/API questions, query the **context7 MCP server** for current
+Tailwind docs rather than relying on v3-era memory.
+
 ## Setup facts
 
 - Tailwind v4 CSS-first config: there is NO tailwind.config file. Tokens are

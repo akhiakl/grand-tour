@@ -5,6 +5,10 @@ description: Next.js App Router conventions for this repo. Use when creating pag
 
 # Next.js conventions (App Router, v16+)
 
+When an API detail is uncertain (params shapes, metadata, caching,
+route handlers), query the **context7 MCP server** for current Next.js
+docs instead of trusting memory — Next majors move fast.
+
 ## Server vs client
 
 - Server Components by default. Add `"use client"` only for interactivity

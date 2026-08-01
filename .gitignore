@@ -48,3 +48,6 @@ coverage/
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+# transient agent worktrees
+.claude/worktrees/
