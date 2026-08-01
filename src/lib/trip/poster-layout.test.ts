@@ -1,6 +1,15 @@
 import { describe, expect, it } from "vitest";
 
-import { labelSide, makeProjector, type PosterPoint } from "./poster-layout";
+import {
+  labelSide,
+  latToMercY,
+  lngToMercX,
+  makeMercatorView,
+  makeProjector,
+  pickTileZoom,
+  tilesInView,
+  type PosterPoint,
+} from "./poster-layout";
 
 const BOX = { width: 1000, height: 800, padding: 100 };
 
@@ -65,5 +74,97 @@ describe("labelSide", () => {
   it("labels stops above the centroid on top, below otherwise", () => {
     expect(labelSide(points[0], points)).toBe("above");
     expect(labelSide(points[1], points)).toBe("below");
+  });
+});
+
+describe("mercator helpers", () => {
+  it("maps the equator/prime-meridian to the world center", () => {
+    expect(lngToMercX(0)).toBe(0.5);
+    expect(latToMercY(0)).toBeCloseTo(0.5, 10);
+  });
+
+  it("maps north to smaller y", () => {
+    expect(latToMercY(60)).toBeLessThan(latToMercY(0));
+  });
+});
+
+describe("makeMercatorView", () => {
+  const stops: [number, number][] = [
+    [48.86, 2.35],
+    [41.9, 12.5],
+  ];
+  const view = makeMercatorView(stops, BOX);
+
+  it("keeps every stop inside the padded box", () => {
+    for (const stop of stops) {
+      const { x, y } = view.project(stop);
+      expect(x).toBeGreaterThanOrEqual(BOX.padding - 1e-6);
+      expect(x).toBeLessThanOrEqual(BOX.width - BOX.padding + 1e-6);
+      expect(y).toBeGreaterThanOrEqual(BOX.padding - 1e-6);
+      expect(y).toBeLessThanOrEqual(BOX.height - BOX.padding + 1e-6);
+    }
+  });
+
+  it("keeps north up", () => {
+    expect(view.project(stops[0]).y).toBeLessThan(view.project(stops[1]).y);
+  });
+
+  it("projects consistently with worldPx and originPx", () => {
+    const p = view.project(stops[0]);
+    expect(p.x).toBeCloseTo(view.originPx.x + lngToMercX(2.35) * view.worldPx, 6);
+    expect(p.y).toBeCloseTo(view.originPx.y + latToMercY(48.86) * view.worldPx, 6);
+  });
+});
+
+describe("pickTileZoom", () => {
+  it("picks the zoom whose native tiles are not upscaled", () => {
+    expect(pickTileZoom(256 * 2 ** 7)).toBe(7);
+    expect(pickTileZoom(256 * 2 ** 7 + 1)).toBe(8);
+  });
+
+  it("clamps to the allowed range", () => {
+    expect(pickTileZoom(1)).toBe(2);
+    expect(pickTileZoom(256 * 2 ** 15)).toBe(8);
+    expect(pickTileZoom(256 * 2 ** 15, 10)).toBe(10);
+  });
+});
+
+describe("tilesInView", () => {
+  const stops: [number, number][] = [
+    [48.86, 2.35],
+    [41.9, 12.5],
+  ];
+  const view = makeMercatorView(stops, BOX);
+  const z = pickTileZoom(view.worldPx);
+  const tiles = tilesInView(
+    view,
+    { x: 0, y: 0, width: BOX.width, height: BOX.height },
+    z,
+  );
+
+  it("covers the window with adjacent tiles", () => {
+    expect(tiles.length).toBeGreaterThan(0);
+    const size = view.worldPx / 2 ** z;
+    for (const tile of tiles) {
+      expect(tile.size).toBeCloseTo(size, 6);
+      expect(tile.px).toBeCloseTo(view.originPx.x + tile.x * size, 6);
+      expect(tile.py).toBeCloseTo(view.originPx.y + tile.y * size, 6);
+    }
+    // Every tile intersects the window.
+    for (const tile of tiles) {
+      expect(tile.px + tile.size).toBeGreaterThan(0);
+      expect(tile.px).toBeLessThan(BOX.width);
+      expect(tile.py + tile.size).toBeGreaterThan(0);
+      expect(tile.py).toBeLessThan(BOX.height);
+    }
+  });
+
+  it("clamps indices to the tile grid", () => {
+    for (const tile of tiles) {
+      expect(tile.x).toBeGreaterThanOrEqual(0);
+      expect(tile.x).toBeLessThan(2 ** z);
+      expect(tile.y).toBeGreaterThanOrEqual(0);
+      expect(tile.y).toBeLessThan(2 ** z);
+    }
   });
 });
