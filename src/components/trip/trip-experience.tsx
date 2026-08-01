@@ -7,6 +7,7 @@ import { tripStats, type Trip } from "@/lib/trip";
 import { CityDrawer } from "./city-drawer";
 import { IntroSplash } from "./intro-splash";
 import { Panels } from "./panels";
+import { PosterDialog } from "./poster-dialog";
 import { StatsStrip } from "./stats-strip";
 import { TimelineRail } from "./timeline-rail";
 import { TopBar, type PanelId } from "./top-bar";
@@ -20,6 +21,7 @@ import { TripMap } from "./trip-map";
 export function TripExperience({ trip }: { readonly trip: Trip }) {
   const [selected, setSelected] = useState<number | null>(null);
   const [panel, setPanel] = useState<PanelId | null>(null);
+  const [posterOpen, setPosterOpen] = useState(false);
 
   const stats = tripStats(trip);
   const route = trip.cities.map((city) => city.name).join(" → ");
@@ -35,8 +37,10 @@ export function TripExperience({ trip }: { readonly trip: Trip }) {
         eyebrow="Field Atlas"
         activePanel={panel}
         onTogglePanel={(id) => setPanel((current) => (current === id ? null : id))}
+        onPoster={() => setPosterOpen(true)}
       />
       <StatsStrip trip={trip} />
+      <PosterDialog trip={trip} open={posterOpen} onOpenChange={setPosterOpen} />
       <Panels active={panel} />
       <TimelineRail trip={trip} selectedIndex={selected} onSelect={setSelected} />
 

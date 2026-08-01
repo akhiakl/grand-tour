@@ -1,6 +1,6 @@
 "use client";
 
-import { Backpack, Download, Moon, NotebookPen, Sun } from "lucide-react";
+import { Backpack, ImageDown, Moon, NotebookPen, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import * as React from "react";
 
@@ -42,11 +42,13 @@ export function TopBar({
   eyebrow,
   activePanel,
   onTogglePanel,
+  onPoster,
 }: {
   readonly title: string;
   readonly eyebrow: string;
   readonly activePanel: PanelId | null;
   readonly onTogglePanel: (panel: PanelId) => void;
+  readonly onPoster: () => void;
 }) {
   return (
     <header className="pointer-events-none fixed inset-x-0 top-0 z-50 flex items-center justify-between gap-3 p-4 sm:px-7 sm:py-4">
@@ -76,9 +78,9 @@ export function TopBar({
           <NotebookPen />
           <span className="hidden sm:inline">Notes</span>
         </button>
-        <button type="button" className={chipClass} onClick={() => window.print()}>
-          <Download />
-          <span className="hidden sm:inline">Export</span>
+        <button type="button" className={chipClass} onClick={onPoster}>
+          <ImageDown />
+          <span className="hidden sm:inline">Poster</span>
         </button>
         <ThemeChip />
       </div>
