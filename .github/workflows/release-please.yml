@@ -16,7 +16,7 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
-      - uses: googleapis/release-please-action@v4
+      - uses: googleapis/release-please-action@v5
         with:
           # GITHUB_TOKEN-created PRs don't trigger CI; set a repo PAT as
           # RELEASE_PLEASE_TOKEN so required checks run on release PRs.
