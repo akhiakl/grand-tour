@@ -1,6 +1,6 @@
 "use client";
 
-import { Compass, Plus } from "lucide-react";
+import { ArrowLeft, Compass, Plus } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -42,7 +42,12 @@ export function MapsPage() {
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
       <header className="flex flex-wrap items-center justify-between gap-4 border-b border-line pb-5">
         <div>
-          <p className="eyebrow">Field Atlas</p>
+          <Link
+            href="/"
+            className="eyebrow inline-flex w-fit items-center gap-1 text-muted-foreground transition-colors hover:text-brass"
+          >
+            <ArrowLeft className="size-3" /> Field Atlas
+          </Link>
           <h1 className="font-display text-3xl font-medium tracking-tight">
             My <em className="text-azure italic">Maps</em>
           </h1>

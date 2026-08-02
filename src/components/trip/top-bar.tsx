@@ -1,6 +1,15 @@
 "use client";
 
-import { Backpack, ImageDown, Moon, NotebookPen, Sun } from "lucide-react";
+import {
+  Backpack,
+  ImageDown,
+  Map,
+  Moon,
+  NotebookPen,
+  Pencil,
+  Sun,
+} from "lucide-react";
+import Link from "next/link";
 import { useTheme } from "next-themes";
 
 import { useMounted } from "@/hooks/use-mounted";
@@ -37,12 +46,14 @@ export function TopBar({
   activePanel,
   onTogglePanel,
   onPoster,
+  onEditRoute,
 }: {
   readonly title: string;
   readonly eyebrow: string;
   readonly activePanel: PanelId | null;
   readonly onTogglePanel: (panel: PanelId) => void;
   readonly onPoster: () => void;
+  readonly onEditRoute: () => void;
 }) {
   return (
     <header className="pointer-events-none fixed inset-x-0 top-0 z-50 flex items-center justify-between gap-3 p-4 sm:px-7 sm:py-4">
@@ -53,7 +64,15 @@ export function TopBar({
         </h1>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap justify-end gap-2">
+        <button type="button" className={chipClass} onClick={onEditRoute}>
+          <Pencil />
+          <span className="hidden sm:inline">Edit this route</span>
+        </button>
+        <Link href="/maps" className={chipClass}>
+          <Map />
+          <span className="hidden sm:inline">My Maps</span>
+        </Link>
         <button
           type="button"
           className={cn(chipClass, activePanel === "packing" && "text-brass")}

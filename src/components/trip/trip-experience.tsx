@@ -1,8 +1,9 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { tripStats, type Trip } from "@/lib/trip";
+import { saveLocalTrip, tripStats, type Trip } from "@/lib/trip";
 
 import { CityDrawer } from "./city-drawer";
 import { IntroSplash } from "./intro-splash";
@@ -19,12 +20,20 @@ import { TripMap } from "./trip-map";
  * no data fetching happens below this line.
  */
 export function TripExperience({ trip }: { readonly trip: Trip }) {
+  const router = useRouter();
   const [selected, setSelected] = useState<number | null>(null);
   const [panel, setPanel] = useState<PanelId | null>(null);
   const [posterOpen, setPosterOpen] = useState(false);
 
   const stats = tripStats(trip);
   const route = trip.cities.map((city) => city.name).join(" → ");
+
+  // "Edit this route" copies the (possibly read-only) trip into a fresh
+  // local draft — same remix pattern the shared /t/[id] view will use.
+  const handleEditRoute = () => {
+    const id = saveLocalTrip({ ...trip, createdAt: Date.now() });
+    router.push(`/new?remix=${id}`);
+  };
 
   return (
     <div className="relative isolate h-dvh w-full overflow-hidden">
@@ -38,6 +47,7 @@ export function TripExperience({ trip }: { readonly trip: Trip }) {
         activePanel={panel}
         onTogglePanel={(id) => setPanel((current) => (current === id ? null : id))}
         onPoster={() => setPosterOpen(true)}
+        onEditRoute={handleEditRoute}
       />
       <StatsStrip trip={trip} />
       <PosterDialog trip={trip} open={posterOpen} onOpenChange={setPosterOpen} />

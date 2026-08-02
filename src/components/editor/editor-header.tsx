@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Loader2, Share2 } from "lucide-react";
+import { ArrowLeft, Loader2, Map, Share2 } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -37,16 +37,23 @@ export function EditorHeader({
         />
       </div>
 
-      <Button
-        type="button"
-        variant="brass"
-        size="lg"
-        disabled={!canShare || sharing}
-        onClick={onShare}
-      >
-        {sharing ? <Loader2 className="animate-spin" /> : <Share2 />}
-        Share
-      </Button>
+      <div className="flex items-center gap-2">
+        <Button asChild variant="outline">
+          <Link href="/maps">
+            <Map /> My Maps
+          </Link>
+        </Button>
+        <Button
+          type="button"
+          variant="brass"
+          size="lg"
+          disabled={!canShare || sharing}
+          onClick={onShare}
+        >
+          {sharing ? <Loader2 className="animate-spin" /> : <Share2 />}
+          Share
+        </Button>
+      </div>
     </header>
   );
 }
