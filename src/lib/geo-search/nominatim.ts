@@ -78,12 +78,20 @@ export function mapNominatimResults(raw: NominatimPlace[]): CitySearchResult[] {
 }
 
 let lastRequestAt = 0;
+let throttleChain = Promise.resolve();
 
-/** Waits out the remainder of the 1 req/sec budget before the next call. */
+/** Serializes calls so each waits its full 1 req/sec gap before proceeding. */
 async function throttle(): Promise<void> {
+  let resolveNext!: () => void;
+  const previous = throttleChain;
+  throttleChain = new Promise<void>((resolve) => {
+    resolveNext = resolve;
+  });
+  await previous;
   const wait = lastRequestAt + MIN_REQUEST_INTERVAL_MS - Date.now();
   if (wait > 0) await new Promise((resolve) => setTimeout(resolve, wait));
   lastRequestAt = Date.now();
+  resolveNext();
 }
 
 /**

@@ -38,7 +38,14 @@ function readTrip(id: string): Trip | null {
   const raw = window.localStorage.getItem(tripKey(id));
   if (!raw) return null;
 
-  const parsed = TripSchema.safeParse(JSON.parse(raw));
+  let parsed;
+  try {
+    parsed = TripSchema.safeParse(JSON.parse(raw));
+  } catch {
+    window.localStorage.removeItem(tripKey(id));
+    writeIndex(readIndex().filter((existing) => existing !== id));
+    return null;
+  }
   if (parsed.success) return parsed.data;
 
   window.localStorage.removeItem(tripKey(id));

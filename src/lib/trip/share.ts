@@ -27,13 +27,24 @@ export async function shareTrip(trip: Trip): Promise<ShareOutcome> {
   }
 
   if (response.status === 201) {
-    const body = (await response.json()) as { id: string };
-    return { kind: "success", id: body.id };
+    try {
+      const body = (await response.json()) as { id: string };
+      if (typeof body?.id === "string") return { kind: "success", id: body.id };
+    } catch {
+      // fall through to generic error
+    }
+    return { kind: "error", message: DEFAULT_ERROR_MESSAGE };
   }
 
   if (response.status === 403) {
-    const body = (await response.json()) as { limit: number };
-    return { kind: "city_limit", limit: body.limit };
+    try {
+      const body = (await response.json()) as { limit: number };
+      if (typeof body?.limit === "number")
+        return { kind: "city_limit", limit: body.limit };
+    } catch {
+      // fall through to generic error
+    }
+    return { kind: "error", message: DEFAULT_ERROR_MESSAGE };
   }
 
   return {

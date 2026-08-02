@@ -19,14 +19,12 @@ export function StopCard({
   id,
   city,
   index,
-  count,
   onChange,
   onRemove,
 }: {
   readonly id: string;
   readonly city: City;
   readonly index: number;
-  readonly count: number;
   readonly onChange: (patch: Partial<City>) => void;
   readonly onRemove: () => void;
 }) {
@@ -100,9 +98,8 @@ export function StopCard({
         <button
           type="button"
           onClick={onRemove}
-          disabled={count <= 2}
           aria-label={`Remove ${city.name || "stop"}`}
-          className="rounded-md p-1.5 text-muted-foreground outline-none hover:text-destructive focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-30"
+          className="rounded-md p-1.5 text-muted-foreground outline-none hover:text-destructive focus-visible:ring-2 focus-visible:ring-ring"
         >
           <X className="size-4" />
         </button>

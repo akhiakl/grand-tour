@@ -17,6 +17,7 @@ import {
 
 import type { CitySearchResult } from "@/lib/geo-search";
 import type { City, Leg } from "@/lib/trip";
+import { GUEST_MAX_CITIES } from "@/lib/trip";
 
 import { CitySearch } from "./city-search";
 import { LegCard } from "./leg-card";
@@ -79,7 +80,6 @@ export function StopsList({
                   id={stopIds[index]}
                   city={city}
                   index={index}
-                  count={cities.length}
                   onChange={(patch) => onUpdateCity(index, patch)}
                   onRemove={() => onRemoveCity(index)}
                 />
@@ -111,7 +111,7 @@ export function StopsList({
           onClick={onLimitReached}
           className="text-left text-xs text-brass underline-offset-2 hover:underline"
         >
-          Guest routes top out at 5 stops — see what unlocks with an account
+          Guest routes top out at {GUEST_MAX_CITIES} stops — see what unlocks with an account
         </button>
       )}
     </div>
