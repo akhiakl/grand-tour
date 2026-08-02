@@ -2,8 +2,8 @@
 
 import { Backpack, ImageDown, Moon, NotebookPen, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import * as React from "react";
 
+import { useMounted } from "@/hooks/use-mounted";
 import { cn } from "@/lib/utils";
 
 import { TitleWithAccent } from "./intro-splash";
@@ -13,15 +13,9 @@ export type PanelId = "packing" | "notes";
 const chipClass =
   "pointer-events-auto flex items-center gap-2 rounded-full border border-line bg-card px-4 py-2 text-[13px] font-medium shadow-soft backdrop-blur-lg transition-transform outline-none hover:-translate-y-px focus-visible:ring-2 focus-visible:ring-ring [&_svg]:size-[15px]";
 
-const emptySubscribe = () => () => {};
-
 function ThemeChip() {
   const { resolvedTheme, setTheme } = useTheme();
-  const mounted = React.useSyncExternalStore(
-    emptySubscribe,
-    () => true,
-    () => false,
-  );
+  const mounted = useMounted();
   const isDark = mounted && resolvedTheme === "dark";
 
   return (
