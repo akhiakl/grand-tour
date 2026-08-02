@@ -7,6 +7,7 @@ import {
   Moon,
   NotebookPen,
   Pencil,
+  Plus,
   Sun,
 } from "lucide-react";
 import Link from "next/link";
@@ -47,6 +48,7 @@ export function TopBar({
   onTogglePanel,
   onPoster,
   onEditRoute,
+  variant = "edit",
 }: {
   readonly title: string;
   readonly eyebrow: string;
@@ -54,6 +56,7 @@ export function TopBar({
   readonly onTogglePanel: (panel: PanelId) => void;
   readonly onPoster: () => void;
   readonly onEditRoute: () => void;
+  readonly variant?: "edit" | "remix";
 }) {
   return (
     <header className="pointer-events-none fixed inset-x-0 top-0 z-50 flex items-center justify-between gap-3 p-4 sm:px-7 sm:py-4">
@@ -67,12 +70,21 @@ export function TopBar({
       <div className="flex flex-wrap justify-end gap-2">
         <button type="button" className={chipClass} onClick={onEditRoute}>
           <Pencil />
-          <span className="hidden sm:inline">Edit this route</span>
+          <span className="hidden sm:inline">
+            {variant === "remix" ? "Remix this trip" : "Edit this route"}
+          </span>
         </button>
-        <Link href="/maps" className={chipClass}>
-          <Map />
-          <span className="hidden sm:inline">My Maps</span>
-        </Link>
+        {variant === "remix" ? (
+          <Link href="/new" className={chipClass}>
+            <Plus />
+            <span className="hidden sm:inline">Create your own</span>
+          </Link>
+        ) : (
+          <Link href="/maps" className={chipClass}>
+            <Map />
+            <span className="hidden sm:inline">My Maps</span>
+          </Link>
+        )}
         <button
           type="button"
           className={cn(chipClass, activePanel === "packing" && "text-brass")}

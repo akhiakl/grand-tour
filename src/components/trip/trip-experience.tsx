@@ -19,7 +19,16 @@ import { TripMap } from "./trip-map";
  * topbar, stats, rail, panels, drawer. Receives the trip via props;
  * no data fetching happens below this line.
  */
-export function TripExperience({ trip }: { readonly trip: Trip }) {
+export function TripExperience({
+  trip,
+  actions = "edit",
+}: {
+  readonly trip: Trip;
+  /** "edit" (default, home): "Edit this route" + "My Maps". "remix" (shared
+   * `/t/[id]` view): "Remix this trip" + "Create your own" — no implication
+   * the viewer owns or can directly edit the original. */
+  readonly actions?: "edit" | "remix";
+}) {
   const router = useRouter();
   const [selected, setSelected] = useState<number | null>(null);
   const [panel, setPanel] = useState<PanelId | null>(null);
@@ -48,6 +57,7 @@ export function TripExperience({ trip }: { readonly trip: Trip }) {
         onTogglePanel={(id) => setPanel((current) => (current === id ? null : id))}
         onPoster={() => setPosterOpen(true)}
         onEditRoute={handleEditRoute}
+        variant={actions}
       />
       <StatsStrip trip={trip} />
       <PosterDialog trip={trip} open={posterOpen} onOpenChange={setPosterOpen} />
