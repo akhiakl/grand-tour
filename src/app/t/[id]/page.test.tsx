@@ -26,7 +26,7 @@ beforeEach(() => {
 });
 
 describe("SharedTripPage", () => {
-  it("renders TripExperience with the trip in remix mode and counts a view", async () => {
+  it("renders TripExperience with the trip in shared mode and counts a view", async () => {
     const trip = makeTrip(2, { title: "Alpine Loop" });
     mocks.getTrip.mockResolvedValue(trip);
     mocks.incrViews.mockResolvedValue(1);
@@ -36,7 +36,7 @@ describe("SharedTripPage", () => {
     });
 
     expect(element.props.trip).toEqual(trip);
-    expect(element.props.actions).toBe("remix");
+    expect(element.props.actions).toBe("shared");
     expect(mocks.incrViews).toHaveBeenCalledWith("abc12345");
   });
 

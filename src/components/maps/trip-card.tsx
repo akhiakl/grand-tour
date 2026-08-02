@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, Share2, Trash2 } from "lucide-react";
+import { Loader2, Pencil, Share2, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 import {
@@ -17,6 +17,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { tripStats, type LocalTripRecord } from "@/lib/trip";
+
+import { RoutePreview } from "./route-preview";
 
 const RELATIVE_UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
   ["day", 86_400_000],
@@ -49,6 +51,10 @@ export function TripCard({
 
   return (
     <Card>
+      <Link href={`/maps/${record.id}`} aria-label={`View ${record.trip.title}`}>
+        <RoutePreview cities={record.trip.cities} />
+      </Link>
+
       <CardHeader>
         <CardTitle>{record.trip.title}</CardTitle>
         <p className="text-sm text-muted-foreground">
@@ -58,19 +64,28 @@ export function TripCard({
       </CardHeader>
 
       <CardFooter>
-        <Button asChild variant="outline" size="sm">
-          <Link href={`/new?remix=${record.id}`}>Open</Link>
+        <Button asChild variant="brass" size="sm">
+          <Link href={`/maps/${record.id}`}>View</Link>
         </Button>
 
-        <div className="flex gap-2">
+        <div className="flex gap-1">
+          <Button asChild variant="ghost" size="icon">
+            <Link
+              href={`/new?remix=${record.id}`}
+              aria-label={`Edit ${record.trip.title}`}
+            >
+              <Pencil />
+            </Link>
+          </Button>
           <Button
             type="button"
             variant="ghost"
-            size="sm"
+            size="icon"
+            aria-label={`Share ${record.trip.title}`}
             disabled={sharing}
             onClick={onShare}
           >
-            {sharing ? <Loader2 className="animate-spin" /> : <Share2 />} Share
+            {sharing ? <Loader2 className="animate-spin" /> : <Share2 />}
           </Button>
 
           <AlertDialog>

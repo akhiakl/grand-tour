@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { ShareDialog } from "@/components/share/share-dialog";
+import { useShareTrip } from "@/hooks/use-share-trip";
 import { saveLocalTrip, tripStats, type Trip } from "@/lib/trip";
 
 import { CityDrawer } from "./city-drawer";
@@ -11,23 +13,28 @@ import { Panels } from "./panels";
 import { PosterDialog } from "./poster-dialog";
 import { StatsStrip } from "./stats-strip";
 import { TimelineRail } from "./timeline-rail";
-import { TopBar, type PanelId } from "./top-bar";
+import { TopBar, type ExperienceVariant, type PanelId } from "./top-bar";
 import { TripMap } from "./trip-map";
+
+const noop = () => {};
 
 /**
  * The immersive product view: full-bleed map with floating chrome —
  * topbar, stats, rail, panels, drawer. Receives the trip via props;
- * no data fetching happens below this line.
+ * no data fetching happens below this line. Hosted by three pages, each
+ * passing its own `actions` variant (see `ExperienceVariant`): the Demo
+ * Experience (`/`), a Shared View (`/t/[id]`), and Map View (`/maps/[id]`).
  */
 export function TripExperience({
   trip,
-  actions = "edit",
+  actions = "demo",
+  localId,
 }: {
   readonly trip: Trip;
-  /** "edit" (default, home): "Edit this route" + "My Maps". "remix" (shared
-   * `/t/[id]` view): "Remix this trip" + "Create your own" — no implication
-   * the viewer owns or can directly edit the original. */
-  readonly actions?: "edit" | "remix";
+  readonly actions?: ExperienceVariant;
+  /** The trip's local-store id, when `actions="own"` — lets "Edit" update
+   * this same record in place instead of forking a new copy. */
+  readonly localId?: string;
 }) {
   const router = useRouter();
   const [selected, setSelected] = useState<number | null>(null);
@@ -37,10 +44,21 @@ export function TripExperience({
   const stats = tripStats(trip);
   const route = trip.cities.map((city) => city.name).join(" → ");
 
-  // "Edit this route" copies the (possibly read-only) trip into a fresh
-  // local draft — same remix pattern the shared /t/[id] view will use.
+  const { share, sharing, shareId, dialogOpen, setDialogOpen } = useShareTrip({
+    // Local trips are already within the guest city limit by construction,
+    // so the 403 branch this would gate is unreachable here.
+    onCityLimit: noop,
+  });
+
+  // "Edit"/"Edit this route"/"Remix this trip" all copy the (possibly
+  // read-only) trip into a local draft and open the editor. Owning a
+  // `localId` (Map View) means updating that same record in place;
+  // otherwise (Demo Experience, Shared View) it forks a fresh copy.
   const handleEditRoute = () => {
-    const id = saveLocalTrip({ ...trip, createdAt: Date.now() });
+    const id = saveLocalTrip(
+      { ...trip, createdAt: localId ? trip.createdAt : Date.now() },
+      localId,
+    );
     router.push(`/new?remix=${id}`);
   };
 
@@ -57,10 +75,19 @@ export function TripExperience({
         onTogglePanel={(id) => setPanel((current) => (current === id ? null : id))}
         onPoster={() => setPosterOpen(true)}
         onEditRoute={handleEditRoute}
+        onShare={() => void share(trip)}
+        sharing={sharing}
         variant={actions}
       />
       <StatsStrip trip={trip} />
       <PosterDialog trip={trip} open={posterOpen} onOpenChange={setPosterOpen} />
+      {actions === "own" && (
+        <ShareDialog
+          shareId={shareId}
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+        />
+      )}
       <Panels active={panel} />
       <TimelineRail trip={trip} selectedIndex={selected} onSelect={setSelected} />
 

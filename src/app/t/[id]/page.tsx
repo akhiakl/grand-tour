@@ -39,5 +39,5 @@ export default async function SharedTripPage({
 
   await incrViews(id);
 
-  return <TripExperience trip={trip} actions="remix" />;
+  return <TripExperience trip={trip} actions="shared" />;
 }
