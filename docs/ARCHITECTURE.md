@@ -3,6 +3,21 @@
 This repo doubles as a template: the structure, boundaries and tooling here
 are the standard for any Next.js project we start.
 
+## Routes (named — never "home page")
+
+| Route        | Name                | What it is                                                                                                                                 |
+| ------------ | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `/`          | **Demo Experience** | The sample trip, full immersive view. Becomes the real **Landing** page in Step 7 (hero + CTAs).                                           |
+| `/new`       | **Editor**          | Manual trip builder (`?remix=`, `?from=ai`).                                                                                               |
+| `/maps`      | **My Maps**         | Index of this device's local trips.                                                                                                        |
+| `/maps/[id]` | **Map View**        | Immersive read-only-ish view of one of _your_ local trips — no share link needed. `TripExperience actions="own"`: Edit (in place) + Share. |
+| `/t/[id]`    | **Shared View**     | Public, read-only view of a shared Redis snapshot. `TripExperience actions="shared"`: Remix (forks a copy) + Create your own.              |
+
+`TripExperience` (the full-bleed map + chrome) is hosted by three of these
+routes, distinguished only by its `actions` prop (`"demo" | "shared" |
+"own"`, see `components/trip/top-bar.tsx`'s `ExperienceVariant`) — the map,
+drawer, timeline and panels are identical everywhere.
+
 ## Folder structure
 
 ```
