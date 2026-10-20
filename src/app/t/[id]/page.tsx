@@ -19,12 +19,14 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   const trip = await loadTrip(id);
-  if (!trip) return { title: "Map not found" };
+  // Shared maps are private-by-link: unfurl them, never index them.
+  if (!trip) return { title: "Map not found", robots: { index: false } };
 
   const stats = tripStats(trip);
   return {
     title: trip.title,
     description: `${stats.cities} cities · ${stats.nights} nights · ${stats.countries} countries — a route drawn with Grand Tour.`,
+    robots: { index: false, follow: false },
   };
 }
 

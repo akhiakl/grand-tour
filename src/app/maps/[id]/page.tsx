@@ -4,6 +4,7 @@ import { MapViewPage } from "@/components/maps/map-view-page";
 
 export const metadata: Metadata = {
   title: "Your map",
+  robots: { index: false },
 };
 
 export default function Page() {

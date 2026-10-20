@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "Build a trip",
   description:
     "Draw your route stop by stop: cities, nights, legs and the notes that make each one yours.",
+  robots: { index: false },
 };
 
 export default function NewPage() {

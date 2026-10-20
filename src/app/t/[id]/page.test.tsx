@@ -61,6 +61,7 @@ describe("generateMetadata", () => {
 
     expect(metadata.title).toBe("Coastal Run");
     expect(metadata.description).toContain("3 cities");
+    expect(metadata.robots).toEqual({ index: false, follow: false });
   });
 
   it("falls back to a plain title for a missing trip", async () => {
@@ -71,5 +72,6 @@ describe("generateMetadata", () => {
     });
 
     expect(metadata.title).toBe("Map not found");
+    expect(metadata.robots).toEqual({ index: false });
   });
 });
