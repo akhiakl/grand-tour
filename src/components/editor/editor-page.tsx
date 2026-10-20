@@ -41,6 +41,7 @@ function resolveInitialState(searchParams: URLSearchParams) {
         draft: draftFromTrip(record.trip),
         localId: remixId,
         createdAt: record.trip.createdAt,
+        ghostNames: [] as string[],
       };
     }
   }
@@ -52,11 +53,17 @@ function resolveInitialState(searchParams: URLSearchParams) {
         draft: { title: aiTrip.title, cities: aiTrip.cities, legs: aiTrip.legs },
         localId: null,
         createdAt: Date.now(),
+        ghostNames: aiTrip.suggestedExtra,
       };
     }
   }
 
-  return { draft: createBlankDraft(), localId: null, createdAt: Date.now() };
+  return {
+    draft: createBlankDraft(),
+    localId: null,
+    createdAt: Date.now(),
+    ghostNames: [] as string[],
+  };
 }
 
 export function EditorPage() {
@@ -124,7 +131,11 @@ export function EditorPage() {
         />
 
         <div className="relative isolate order-first h-64 overflow-hidden rounded-2xl border border-line lg:sticky lg:top-8 lg:order-none lg:h-[32rem]">
-          <EditorMapPreview draft={draft} />
+          <EditorMapPreview
+            draft={draft}
+            ghostNames={initial.ghostNames}
+            onGhostSelect={() => setUpsellOpen(true)}
+          />
         </div>
       </div>
 

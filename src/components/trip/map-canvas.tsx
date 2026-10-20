@@ -6,9 +6,11 @@ import L from "leaflet";
 import { useEffect, useMemo } from "react";
 import { MapContainer, Marker, useMap } from "react-leaflet";
 
+import type { GhostStop } from "@/lib/ai";
 import { routeBounds, type City, type LatLng, type Trip } from "@/lib/trip";
 import { escapeHtml } from "@/lib/utils";
 
+import { GhostMarkers } from "./ghost-markers";
 import { RouteLayer } from "./route-layer";
 import { VectorBasemap } from "./vector-basemap";
 
@@ -16,6 +18,9 @@ export interface TripMapProps {
   readonly trip: Trip;
   readonly selectedIndex: number | null;
   readonly onCitySelect: (index: number) => void;
+  /** Locked AI suggestions (editor only); selecting one opens the upsell. */
+  readonly ghosts?: readonly GhostStop[];
+  readonly onGhostSelect?: () => void;
 }
 
 /** Fits the route, fences panning, and flies to the selected stop. */
@@ -80,6 +85,8 @@ export default function MapCanvas({
   trip,
   selectedIndex,
   onCitySelect,
+  ghosts = [],
+  onGhostSelect = () => undefined,
 }: TripMapProps) {
   const initialBounds = useMemo(
     () => L.latLngBounds(routeBounds(trip.cities)).pad(0.25),
@@ -108,6 +115,7 @@ export default function MapCanvas({
           onSelect={onCitySelect}
         />
       ))}
+      <GhostMarkers ghosts={ghosts} onSelect={onGhostSelect} />
     </MapContainer>
   );
 }

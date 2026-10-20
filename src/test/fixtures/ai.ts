@@ -1,6 +1,6 @@
 import type { AiTrip, GenerateRequest } from "@/lib/ai";
 
-import { makeCity, makeLeg } from "./trip";
+import { makeCity, makeLeg, makeTrip } from "./trip";
 
 /** Builders for AI-generation inputs/outputs shared across unit tests. */
 
@@ -24,4 +24,10 @@ export const makeAiTrip = (
   legs: Array.from({ length: cityCount - 1 }, () => makeLeg()),
   suggestedExtra: [],
   ...overrides,
+});
+
+/** `/api/generate` success body: a full Trip plus overflow ghost names. */
+export const makeGeneratedDraft = (suggestedExtra: string[] = ["Ljubljana"]) => ({
+  trip: makeTrip(2, { title: "Alpine Arc" }),
+  suggestedExtra,
 });
