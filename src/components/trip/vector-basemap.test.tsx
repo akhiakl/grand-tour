@@ -10,6 +10,9 @@ const mocks = vi.hoisted(() => {
     off: vi.fn((event: string) => handlers.delete(event)),
     setStyle: vi.fn(),
     isStyleLoaded: vi.fn(() => false),
+    getStyle: () => ({ layers: [{ id: "poi_r1", type: "symbol" }] }),
+    setLayoutProperty: vi.fn(),
+    setPaintProperty: vi.fn(),
   };
   const layer = {
     addTo: vi.fn(),
@@ -78,6 +81,11 @@ describe("VectorBasemap", () => {
 
     mocks.handlers.get("error")?.();
     mocks.handlers.get("style.load")?.();
+    expect(mocks.basemap.setLayoutProperty).toHaveBeenCalledWith(
+      "poi_r1",
+      "visibility",
+      "none",
+    );
 
     expect(mocks.toast.dismiss).toHaveBeenCalledWith(
       mocks.toast.error.mock.calls[0][1].id,

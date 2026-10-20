@@ -27,6 +27,15 @@ export const makeLeg = (overrides: Partial<Leg> = {}): Leg => ({
   ...overrides,
 });
 
+/** `count` distinct stops heading west from Vienna, for routes that need real legs. */
+export const makeRouteCities = (count: number): City[] =>
+  Array.from({ length: count }, (_, i) =>
+    makeCity({
+      name: i === 0 ? "Vienna" : `Stop ${i + 1}`,
+      ll: [48.2 - i * 0.2, 16.37 - i * 1.3],
+    }),
+  );
+
 export const makeTrip = (cityCount = 2, overrides: Partial<Trip> = {}): Trip => ({
   v: 1,
   title: "Grand Tour",

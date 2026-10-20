@@ -1,11 +1,12 @@
 "use client";
 
+import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 
-import type { PanelId } from "./top-bar";
+import type { ToolId } from "./panel-actions";
 
 const PACKING = [
   "Passport & ID",
@@ -19,29 +20,51 @@ const PACKING = [
   "Day pack",
 ];
 
-function PanelShell({
+/** Return link shared by every panel view that replaces the itinerary. */
+export function BackToRoute({ onBack }: { readonly onBack: () => void }) {
+  return (
+    <button
+      type="button"
+      autoFocus
+      onClick={onBack}
+      className="-ml-1 flex w-fit items-center gap-1.5 rounded-full px-1 text-sm text-ink-soft transition-colors outline-none hover:text-ink focus-visible:ring-2 focus-visible:ring-ring [&_svg]:size-4"
+    >
+      <ArrowLeft /> Route
+    </button>
+  );
+}
+
+function ToolSection({
   open,
   title,
+  onBack,
   children,
 }: {
   readonly open: boolean;
   readonly title: string;
+  readonly onBack: () => void;
   readonly children: React.ReactNode;
 }) {
   return (
-    <section
-      className={cn(
-        "frost fixed top-24 right-4 z-55 max-h-[60vh] w-75 max-w-[calc(100vw-2rem)] overflow-y-auto p-5 sm:right-7",
-        !open && "hidden",
-      )}
-    >
-      <h4 className="mb-3 font-display text-lg font-medium">{title}</h4>
+    <section hidden={!open} className="flex flex-col gap-4">
+      {open && <BackToRoute onBack={onBack} />}
+      <h2 className="font-display text-2xl font-medium">{title}</h2>
       {children}
     </section>
   );
 }
 
-export function Panels({ active }: { readonly active: PanelId | null }) {
+/**
+ * Packing checklist and notes. Both stay mounted (hidden when inactive)
+ * so ticks and text survive switching back to the route.
+ */
+export function TripTools({
+  active,
+  onBack,
+}: {
+  readonly active: ToolId | null;
+  readonly onBack: () => void;
+}) {
   const [checked, setChecked] = useState<ReadonlySet<string>>(new Set());
   const [notes, setNotes] = useState("");
 
@@ -61,8 +84,12 @@ export function Panels({ active }: { readonly active: PanelId | null }) {
 
   return (
     <>
-      <PanelShell open={active === "packing"} title="Packing checklist">
-        <div className="mb-3 h-1 overflow-hidden rounded-full bg-secondary">
+      <ToolSection
+        open={active === "packing"}
+        title="Packing checklist"
+        onBack={onBack}
+      >
+        <div className="h-1 overflow-hidden rounded-full bg-secondary">
           <div
             className="h-full rounded-full bg-brass transition-[width]"
             style={{ width: `${progress}%` }}
@@ -93,16 +120,17 @@ export function Panels({ active }: { readonly active: PanelId | null }) {
             );
           })}
         </ul>
-      </PanelShell>
+      </ToolSection>
 
-      <PanelShell open={active === "notes"} title="Trip notes">
+      <ToolSection open={active === "notes"} title="Trip notes" onBack={onBack}>
         <textarea
+          aria-label="Trip notes"
           value={notes}
           onChange={(event) => setNotes(event.target.value)}
           placeholder="Booking codes, addresses, ideas…"
-          className="min-h-35 w-full resize-y rounded-lg border border-line bg-transparent p-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="min-h-48 w-full resize-y rounded-lg border border-line bg-transparent p-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
         />
-      </PanelShell>
+      </ToolSection>
     </>
   );
 }

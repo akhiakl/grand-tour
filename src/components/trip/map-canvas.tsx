@@ -3,7 +3,7 @@
 import "leaflet/dist/leaflet.css";
 
 import L from "leaflet";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, type CSSProperties } from "react";
 import { MapContainer, Marker, useMap } from "react-leaflet";
 
 import type { GhostStop } from "@/lib/ai";
@@ -12,6 +12,9 @@ import { escapeHtml } from "@/lib/utils";
 
 import { fitPadding } from "./fit-padding";
 import { GhostMarkers } from "./ghost-markers";
+import { MapControls } from "./map-controls";
+import { MapDeclutter } from "./map-declutter";
+import { MapLegend } from "./map-legend";
 import { RouteLayer } from "./route-layer";
 import { VectorBasemap } from "./vector-basemap";
 
@@ -22,22 +25,25 @@ export interface TripMapProps {
   /** Locked AI suggestions (editor only); selecting one opens the upsell. */
   readonly ghosts?: readonly GhostStop[];
   readonly onGhostSelect?: () => void;
-  /** Full-bleed experience: fit the route clear of the floating chrome. */
-  readonly withChrome?: boolean;
+  /** Pixels the mobile bottom sheet covers; fits and overlays clear it. */
+  readonly bottomInset?: number;
 }
+
+const CITY_ZOOM = 9;
 
 /** Fits the route, fences panning, and flies to the selected stop. */
 function MapFocus({
   cities,
   selectedIndex,
-  withChrome,
+  bounds,
+  bottomInset,
 }: {
   readonly cities: City[];
   readonly selectedIndex: number | null;
-  readonly withChrome: boolean;
+  readonly bounds: L.LatLngBounds;
+  readonly bottomInset: number;
 }) {
   const map = useMap();
-  const bounds = useMemo(() => L.latLngBounds(routeBounds(cities)), [cities]);
 
   useEffect(() => {
     map.setMaxBounds(bounds.pad(1));
@@ -46,13 +52,17 @@ function MapFocus({
   useEffect(() => {
     if (selectedIndex === null) {
       map.flyToBounds(bounds, {
-        ...fitPadding(map.getSize().x, withChrome),
+        ...fitPadding(bottomInset),
         duration: 1,
       });
     } else {
-      map.flyTo(cities[selectedIndex].ll as LatLng, 9, { duration: 1.2 });
+      // Centre the stop in the part of the map the sheet leaves visible.
+      const point = map
+        .project(cities[selectedIndex].ll as LatLng, CITY_ZOOM)
+        .add([0, bottomInset / 2]);
+      map.flyTo(map.unproject(point, CITY_ZOOM), CITY_ZOOM, { duration: 1.2 });
     }
-  }, [map, bounds, cities, selectedIndex, withChrome]);
+  }, [map, bounds, cities, selectedIndex, bottomInset]);
 
   return null;
 }
@@ -72,7 +82,7 @@ function CityMarker({
     () =>
       L.divIcon({
         className: "marker-anchor",
-        html: `<div class="marker${selected ? " marker-active" : ""}"><span class="marker-pulse"></span><span class="marker-dot"></span><span class="marker-lbl">${escapeHtml(city.flag)} ${escapeHtml(city.name)}</span></div>`,
+        html: `<div class="marker${selected ? " marker-active" : ""}">${selected ? '<span class="marker-pulse"></span>' : ""}<span class="marker-dot"></span><span class="marker-lbl">${escapeHtml(city.flag)} ${escapeHtml(city.name)}</span></div>`,
         iconSize: [0, 0],
         iconAnchor: [0, 0],
       }),
@@ -95,12 +105,13 @@ export default function MapCanvas({
   onCitySelect,
   ghosts = [],
   onGhostSelect = () => undefined,
-  withChrome = false,
+  bottomInset = 0,
 }: TripMapProps) {
-  const initialBounds = useMemo(
-    () => L.latLngBounds(routeBounds(trip.cities)).pad(0.25),
+  const bounds = useMemo(
+    () => L.latLngBounds(routeBounds(trip.cities)),
     [trip.cities],
   );
+  const initialBounds = useMemo(() => bounds.pad(0.25), [bounds]);
 
   return (
     <MapContainer
@@ -111,12 +122,14 @@ export default function MapCanvas({
       zoomControl={false}
       scrollWheelZoom
       className="atlas-map h-full w-full"
+      style={{ "--map-inset-bottom": `${bottomInset}px` } as CSSProperties}
     >
       <VectorBasemap />
       <MapFocus
         cities={trip.cities}
         selectedIndex={selectedIndex}
-        withChrome={withChrome}
+        bounds={bounds}
+        bottomInset={bottomInset}
       />
       <RouteLayer trip={trip} />
       {trip.cities.map((city, index) => (
@@ -129,6 +142,9 @@ export default function MapCanvas({
         />
       ))}
       <GhostMarkers ghosts={ghosts} onSelect={onGhostSelect} />
+      <MapDeclutter />
+      <MapControls bounds={bounds} bottomInset={bottomInset} />
+      <MapLegend legs={trip.legs} hasGhosts={ghosts.length > 0} />
     </MapContainer>
   );
 }

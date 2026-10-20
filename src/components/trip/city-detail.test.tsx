@@ -4,21 +4,19 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { makeCity } from "@/test/fixtures/trip";
 
-import { CityDrawer } from "./city-drawer";
+import { CityDetail } from "./city-detail";
 
 const city = makeCity();
-const onOpenChange = vi.fn();
+const onBack = vi.fn();
 
 const renderDrawer = () =>
-  render(
-    <CityDrawer city={city} index={0} count={5} open onOpenChange={onOpenChange} />,
-  );
+  render(<CityDetail city={city} index={0} count={5} onBack={onBack} />);
 
 beforeEach(() => {
-  onOpenChange.mockClear();
+  onBack.mockClear();
 });
 
-describe("CityDrawer", () => {
+describe("CityDetail", () => {
   it("shows the city header with stop position and budget", () => {
     renderDrawer();
     expect(screen.getByRole("heading", { name: city.name })).toBeInTheDocument();
@@ -34,7 +32,7 @@ describe("CityDrawer", () => {
 
   it("switches to the itinerary tab", async () => {
     renderDrawer();
-    await userEvent.click(screen.getByRole("tab", { name: "Itinerary" }));
+    await userEvent.click(screen.getByRole("tab", { name: "Days" }));
     expect(screen.getByText(city.days[0][1])).toBeInTheDocument();
     expect(screen.getByText(city.days[0][2])).toBeInTheDocument();
   });
@@ -59,9 +57,11 @@ describe("CityDrawer", () => {
     expect(screen.getByText(`1/${total} planned`)).toBeInTheDocument();
   });
 
-  it("closes on Escape", async () => {
+  it("focuses the way back to the route and uses it", async () => {
     renderDrawer();
-    await userEvent.keyboard("{Escape}");
-    expect(onOpenChange).toHaveBeenCalledWith(false);
+    const back = screen.getByRole("button", { name: "Route" });
+    expect(back).toHaveFocus();
+    await userEvent.click(back);
+    expect(onBack).toHaveBeenCalledOnce();
   });
 });

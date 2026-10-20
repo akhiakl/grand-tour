@@ -13,10 +13,10 @@ are the standard for any Next.js project we start.
 | `/maps/[id]` | **Map View**        | Immersive read-only-ish view of one of _your_ local trips — no share link needed. `TripExperience actions="own"`: Edit (in place) + Share. |
 | `/t/[id]`    | **Shared View**     | Public, read-only view of a shared Redis snapshot. `TripExperience actions="shared"`: Remix (forks a copy) + Create your own.              |
 
-`TripExperience` (the full-bleed map + chrome) is hosted by three of these
-routes, distinguished only by its `actions` prop (`"demo" | "shared" |
-"own"`, see `components/trip/top-bar.tsx`'s `ExperienceVariant`) — the map,
-drawer, timeline and panels are identical everywhere.
+`TripExperience` (trip panel + map) is hosted by three of these routes,
+distinguished only by its `actions` prop (`"demo" | "shared" | "own"`, see
+`components/trip/panel-actions.tsx`'s `ExperienceVariant`) — the map,
+itinerary, city detail and tools are identical everywhere.
 
 ## Folder structure
 

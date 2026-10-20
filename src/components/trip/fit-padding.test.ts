@@ -3,20 +3,18 @@ import { describe, expect, it } from "vitest";
 import { fitPadding } from "./fit-padding";
 
 describe("fitPadding", () => {
-  it("keeps a plain margin for embedded maps", () => {
-    expect(fitPadding(1280, false)).toEqual({
-      paddingTopLeft: [72, 72],
-      paddingBottomRight: [72, 72],
+  it("keeps a margin, wider where labels sit, when nothing covers the map", () => {
+    expect(fitPadding()).toEqual({
+      paddingTopLeft: [56, 56],
+      paddingBottomRight: [120, 56],
     });
   });
 
-  it("clears the stats strip on the left from md up", () => {
-    expect(fitPadding(768, true).paddingTopLeft[0]).toBeGreaterThan(200);
-    expect(fitPadding(767, true).paddingTopLeft[0]).toBeLessThan(100);
+  it("clears the mobile sheet along the bottom", () => {
+    expect(fitPadding(180).paddingBottomRight).toEqual([120, 236]);
   });
 
-  it("always clears the bottom rail and CTA row", () => {
-    expect(fitPadding(360, true).paddingBottomRight[1]).toBeGreaterThanOrEqual(230);
-    expect(fitPadding(1280, true).paddingBottomRight[1]).toBeGreaterThanOrEqual(230);
+  it("ignores a negative inset", () => {
+    expect(fitPadding(-20).paddingBottomRight).toEqual([120, 56]);
   });
 });

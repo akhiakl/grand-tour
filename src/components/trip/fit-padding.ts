@@ -3,18 +3,19 @@ export interface FitPadding {
   paddingBottomRight: [number, number];
 }
 
-const PLAIN: FitPadding = { paddingTopLeft: [72, 72], paddingBottomRight: [72, 72] };
+const MARGIN = 56;
+/** Stop labels hang to the right of their dot; leave them room. */
+const LABEL_ROOM = 64;
 
 /**
- * Padding for fitting the route inside the full-bleed experience, so stops
- * don't land under its floating chrome: top bar, the stats strip (left,
- * md+), and the timeline rail plus landing CTA row along the bottom.
- * Embedded maps without chrome (editor preview) keep a plain margin.
+ * Padding for fitting the route: a plain margin (wider on the right, where
+ * stop labels sit), plus whatever the mobile
+ * bottom sheet covers along the bottom (0 when the panel is docked beside
+ * the map), so no stop lands under the sheet.
  */
-export function fitPadding(width: number, withChrome: boolean): FitPadding {
-  if (!withChrome) return PLAIN;
-  if (width >= 768) {
-    return { paddingTopLeft: [250, 120], paddingBottomRight: [80, 230] };
-  }
-  return { paddingTopLeft: [40, 150], paddingBottomRight: [40, 230] };
+export function fitPadding(bottomInset = 0): FitPadding {
+  return {
+    paddingTopLeft: [MARGIN, MARGIN],
+    paddingBottomRight: [MARGIN + LABEL_ROOM, MARGIN + Math.max(0, bottomInset)],
+  };
 }

@@ -46,7 +46,7 @@ poster is the model case: projection math lives in
   contract (`asChild`, `data-slot`, ESC/focus behavior) so any of them
   can be regenerated from the registry without breaking callers.
 - **Interface segregation** — components receive the narrowest props
-  that do the job (`CityDrawer` takes a `City`, not the whole app
+  that do the job (`CityDetail` takes a `City`, not the whole app
   state). Domain barrels (`lib/<domain>/index.ts`) are deliberate,
   narrow public APIs — exporting something is a commitment.
 - **Dependency inversion** — UI depends on data and callbacks via
