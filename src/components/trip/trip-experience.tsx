@@ -37,7 +37,8 @@ export function TripExperience({
    * this same record in place instead of forking a new copy. */
   readonly localId?: string;
   /** Page-specific floating chrome (the landing CTA on `/`); hidden while
-   * a city drawer is open so it never covers it on small screens. */
+   * a city drawer is open so it never covers it on small screens, but kept
+   * mounted so its one-time entrance doesn't replay on close. */
   readonly cta?: ReactNode;
 }) {
   const router = useRouter();
@@ -99,7 +100,8 @@ export function TripExperience({
       )}
       <Panels active={panel} />
       <TimelineRail trip={trip} selectedIndex={selected} onSelect={setSelected} />
-      {selected === null && cta}
+      {/* Hidden, not unmounted, so its intro entrance doesn't replay. */}
+      {cta && <div hidden={selected !== null}>{cta}</div>}
 
       <CityDrawer
         city={selected === null ? null : trip.cities[selected]}
