@@ -89,4 +89,95 @@ describe("StopList", () => {
     await userEvent.click(screen.getByRole("button", { name: "Edit all details" }));
     expect(screen.getByDisplayValue("Coffee houses")).toBeInTheDocument();
   });
+
+  it("keeps the open detail panel on its stop after a reorder", async () => {
+    const vienna = makeCity({ name: "Vienna", why: "Coffee houses" });
+    const prague = makeCity({ name: "Prague", why: "Castle district" });
+    const { rerender } = render(
+      <StopList
+        {...props}
+        cities={[vienna, prague]}
+        legs={[makeLeg()]}
+        canAddCity
+      />,
+    );
+
+    await userEvent.click(
+      screen.getAllByRole("button", { name: "Edit all details" })[0],
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Move Vienna down" }));
+    rerender(
+      <StopList
+        {...props}
+        cities={[prague, vienna]}
+        legs={[makeLeg()]}
+        canAddCity
+      />,
+    );
+
+    expect(screen.getByDisplayValue("Coffee houses")).toBeInTheDocument();
+    expect(screen.queryByDisplayValue("Castle district")).not.toBeInTheDocument();
+  });
+
+  it("closes the detail panel when its stop is removed", async () => {
+    const vienna = makeCity({ name: "Vienna", why: "Coffee houses" });
+    const prague = makeCity({ name: "Prague", why: "Castle district" });
+    const { rerender } = render(
+      <StopList
+        {...props}
+        cities={[vienna, prague]}
+        legs={[makeLeg()]}
+        canAddCity
+      />,
+    );
+
+    await userEvent.click(
+      screen.getAllByRole("button", { name: "Edit all details" })[0],
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Remove Vienna" }));
+    rerender(<StopList {...props} cities={[prague]} legs={[]} canAddCity />);
+
+    expect(screen.queryByDisplayValue("Castle district")).not.toBeInTheDocument();
+  });
+
+  it("shows inline errors linked to the offending fields", () => {
+    const cities = [makeCity({ name: "" }), makeCity({ name: "Prague" })];
+    render(
+      <StopList
+        {...props}
+        cities={cities}
+        legs={[makeLeg()]}
+        canAddCity
+        issues={{
+          "cities.0.name": "Give this stop a name.",
+          "cities.1.nights": "Nights run from 0 to 30.",
+        }}
+      />,
+    );
+
+    const name = screen.getAllByLabelText("City")[0];
+    expect(name).toHaveAttribute("aria-invalid", "true");
+    expect(name).toHaveAccessibleDescription("Give this stop a name.");
+    expect(screen.getAllByLabelText("Nights")[1]).toHaveAccessibleDescription(
+      "Nights run from 0 to 30.",
+    );
+    expect(screen.getAllByLabelText("City")[1]).not.toHaveAttribute("aria-invalid");
+  });
+
+  it("clamps typed nights into range", async () => {
+    render(
+      <StopList
+        {...props}
+        cities={[makeCity({ nights: 3 })]}
+        legs={[]}
+        canAddCity
+      />,
+    );
+
+    const nights = screen.getByLabelText("Nights");
+    await userEvent.clear(nights);
+    expect(props.onUpdateCity).toHaveBeenLastCalledWith(0, { nights: 0 });
+    await userEvent.type(nights, "45");
+    expect(props.onUpdateCity).toHaveBeenLastCalledWith(0, { nights: 30 });
+  });
 });

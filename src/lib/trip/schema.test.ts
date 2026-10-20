@@ -21,6 +21,12 @@ describe("CitySchema", () => {
     expect(CitySchema.safeParse(makeCity({ nights: -1 })).success).toBe(false);
   });
 
+  it("rejects a blank city name and trims the rest", () => {
+    expect(CitySchema.safeParse(makeCity({ name: "" })).success).toBe(false);
+    expect(CitySchema.safeParse(makeCity({ name: "   " })).success).toBe(false);
+    expect(CitySchema.parse(makeCity({ name: " Lyon " })).name).toBe("Lyon");
+  });
+
   it("caps list lengths", () => {
     const tooManyMust = Array.from({ length: 11 }, (_, i) => `Sight ${i}`);
     expect(CitySchema.safeParse(makeCity({ must: tooManyMust })).success).toBe(
@@ -71,8 +77,9 @@ describe("TripSchema", () => {
     }
   });
 
-  it("rejects an empty or over-long title", () => {
+  it("rejects an empty, blank or over-long title", () => {
     expect(TripSchema.safeParse(makeTrip(2, { title: "" })).success).toBe(false);
+    expect(TripSchema.safeParse(makeTrip(2, { title: "  " })).success).toBe(false);
     expect(
       TripSchema.safeParse(makeTrip(2, { title: "x".repeat(81) })).success,
     ).toBe(false);

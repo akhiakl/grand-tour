@@ -5,7 +5,14 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { GUEST_MAX_CITIES, type City, type Leg } from "@/lib/trip";
+import {
+  GUEST_MAX_CITIES,
+  indexAfterMove,
+  indexAfterRemove,
+  type City,
+  type DraftIssues,
+  type Leg,
+} from "@/lib/trip";
 
 import { CitySearch } from "./city-search";
 import { LegRow } from "./leg-row";
@@ -38,6 +45,7 @@ export function StopList({
   onUpdateLeg,
   canAddCity,
   onLimitReached,
+  issues = {},
 }: {
   readonly cities: City[];
   readonly legs: Leg[];
@@ -48,9 +56,25 @@ export function StopList({
   readonly onUpdateLeg: (index: number, patch: Partial<Leg>) => void;
   readonly canAddCity: boolean;
   readonly onLimitReached: () => void;
+  readonly issues?: DraftIssues;
 }) {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+
+  // The open detail panel follows its stop through reorders and deletes.
+  const moveCity = (from: number, to: number) => {
+    onMoveCity(from, to);
+    setExpandedIndex((current) =>
+      current === null ? null : indexAfterMove(current, from, to),
+    );
+  };
+
+  const removeCity = (index: number) => {
+    onRemoveCity(index);
+    setExpandedIndex((current) =>
+      current === null ? null : indexAfterRemove(current, index),
+    );
+  };
 
   return (
     <div className="flex flex-col gap-2">
@@ -72,9 +96,9 @@ export function StopList({
               setExpandedIndex((current) => (current === index ? null : index))
             }
             onChange={(patch) => onUpdateCity(index, patch)}
-            onRemove={() => onRemoveCity(index)}
-            onMoveUp={() => onMoveCity(index, index - 1)}
-            onMoveDown={() => onMoveCity(index, index + 1)}
+            onRemove={() => removeCity(index)}
+            onMoveUp={() => moveCity(index, index - 1)}
+            onMoveDown={() => moveCity(index, index + 1)}
             draggable
             dragging={draggedIndex === index}
             onDragStart={() => setDraggedIndex(index)}
@@ -82,11 +106,15 @@ export function StopList({
             onDrop={(e) => {
               e.preventDefault();
               if (draggedIndex !== null && draggedIndex !== index) {
-                onMoveCity(draggedIndex, index);
+                moveCity(draggedIndex, index);
               }
               setDraggedIndex(null);
             }}
             onDragEnd={() => setDraggedIndex(null)}
+            errors={{
+              name: issues[`cities.${index}.name`],
+              nights: issues[`cities.${index}.nights`],
+            }}
           />
           {index < legs.length && (
             <LegRow
