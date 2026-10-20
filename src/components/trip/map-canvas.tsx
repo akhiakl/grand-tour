@@ -4,7 +4,7 @@ import "leaflet/dist/leaflet.css";
 
 import L from "leaflet";
 import { useEffect, useMemo } from "react";
-import { MapContainer, Marker, useMap } from "react-leaflet";
+import { MapContainer, Marker, useMap, useMapEvents } from "react-leaflet";
 
 import type { GhostStop } from "@/lib/ai";
 import { routeBounds, type City, type LatLng, type Trip } from "@/lib/trip";
@@ -12,6 +12,9 @@ import { escapeHtml } from "@/lib/utils";
 
 import { fitPadding } from "./fit-padding";
 import { GhostMarkers } from "./ghost-markers";
+import { MapControls } from "./map-controls";
+import { MapDeclutter } from "./map-declutter";
+import { MapLegend } from "./map-legend";
 import { RouteLayer } from "./route-layer";
 import { VectorBasemap } from "./vector-basemap";
 
@@ -22,38 +25,80 @@ export interface TripMapProps {
   /** Locked AI suggestions (editor only); selecting one opens the upsell. */
   readonly ghosts?: readonly GhostStop[];
   readonly onGhostSelect?: () => void;
-  /** Full-bleed experience: fit the route clear of the floating chrome. */
-  readonly withChrome?: boolean;
+  /** Pixels the mobile bottom sheet covers; fits and overlays clear it. */
+  readonly bottomInset?: number;
+  /** Pixels the desktop atlas card covers along the left edge. */
+  readonly leftInset?: number;
+  /** A tap on the map itself (not a marker), e.g. to lower the sheet. */
+  readonly onBackgroundClick?: () => void;
 }
+
+const CITY_ZOOM = 9;
 
 /** Fits the route, fences panning, and flies to the selected stop. */
 function MapFocus({
   cities,
   selectedIndex,
-  withChrome,
+  bounds,
+  bottomInset,
+  leftInset,
 }: {
   readonly cities: City[];
   readonly selectedIndex: number | null;
-  readonly withChrome: boolean;
+  readonly bounds: L.LatLngBounds;
+  readonly bottomInset: number;
+  readonly leftInset: number;
 }) {
   const map = useMap();
-  const bounds = useMemo(() => L.latLngBounds(routeBounds(cities)), [cities]);
 
   useEffect(() => {
-    map.setMaxBounds(bounds.pad(1));
+    // Fence panning one screen beyond the route (measured at the minimum
+    // zoom), so a fit can always slide the route clear of the atlas card
+    // while the route can never be dragged out of reach.
+    const fence = () => {
+      const zoom = map.getMinZoom();
+      const { x, y } = map.getSize();
+      const sw = map.project(bounds.getSouthWest(), zoom).add([-x, y]);
+      const ne = map.project(bounds.getNorthEast(), zoom).add([x, -y]);
+      map.setMaxBounds(
+        L.latLngBounds(map.unproject(sw, zoom), map.unproject(ne, zoom)),
+      );
+    };
+    fence();
+    map.on("resize", fence);
+    return () => {
+      map.off("resize", fence);
+    };
   }, [map, bounds]);
+
+  useEffect(() => {
+    // MapContainer only applies `style` on mount, so set the insets the
+    // overlays (legend, attribution) offset by on the live container.
+    const container = map.getContainer();
+    container.style.setProperty("--map-inset-bottom", `${bottomInset}px`);
+    container.style.setProperty("--map-inset-left", `${leftInset}px`);
+  }, [map, bottomInset, leftInset]);
 
   useEffect(() => {
     if (selectedIndex === null) {
       map.flyToBounds(bounds, {
-        ...fitPadding(map.getSize().x, withChrome),
+        ...fitPadding({ bottom: bottomInset, left: leftInset }, map.getSize().y),
         duration: 1,
       });
     } else {
-      map.flyTo(cities[selectedIndex].ll as LatLng, 9, { duration: 1.2 });
+      // Centre the stop in the part of the map the sheet leaves visible.
+      const point = map
+        .project(cities[selectedIndex].ll as LatLng, CITY_ZOOM)
+        .add([-leftInset / 2, bottomInset / 2]);
+      map.flyTo(map.unproject(point, CITY_ZOOM), CITY_ZOOM, { duration: 1.2 });
     }
-  }, [map, bounds, cities, selectedIndex, withChrome]);
+  }, [map, bounds, cities, selectedIndex, bottomInset, leftInset]);
 
+  return null;
+}
+
+function BackgroundClick({ onClick }: { readonly onClick: () => void }) {
+  useMapEvents({ click: onClick });
   return null;
 }
 
@@ -72,7 +117,7 @@ function CityMarker({
     () =>
       L.divIcon({
         className: "marker-anchor",
-        html: `<div class="marker${selected ? " marker-active" : ""}"><span class="marker-pulse"></span><span class="marker-dot"></span><span class="marker-lbl">${escapeHtml(city.flag)} ${escapeHtml(city.name)}</span></div>`,
+        html: `<div class="marker${selected ? " marker-active" : ""}">${selected ? '<span class="marker-pulse"></span>' : ""}<span class="marker-dot"></span><span class="marker-lbl">${escapeHtml(city.flag)} ${escapeHtml(city.name)}</span></div>`,
         iconSize: [0, 0],
         iconAnchor: [0, 0],
       }),
@@ -95,12 +140,15 @@ export default function MapCanvas({
   onCitySelect,
   ghosts = [],
   onGhostSelect = () => undefined,
-  withChrome = false,
+  bottomInset = 0,
+  leftInset = 0,
+  onBackgroundClick,
 }: TripMapProps) {
-  const initialBounds = useMemo(
-    () => L.latLngBounds(routeBounds(trip.cities)).pad(0.25),
+  const bounds = useMemo(
+    () => L.latLngBounds(routeBounds(trip.cities)),
     [trip.cities],
   );
+  const initialBounds = useMemo(() => bounds.pad(0.25), [bounds]);
 
   return (
     <MapContainer
@@ -116,7 +164,9 @@ export default function MapCanvas({
       <MapFocus
         cities={trip.cities}
         selectedIndex={selectedIndex}
-        withChrome={withChrome}
+        bounds={bounds}
+        bottomInset={bottomInset}
+        leftInset={leftInset}
       />
       <RouteLayer trip={trip} />
       {trip.cities.map((city, index) => (
@@ -129,6 +179,13 @@ export default function MapCanvas({
         />
       ))}
       <GhostMarkers ghosts={ghosts} onSelect={onGhostSelect} />
+      <MapDeclutter />
+      {onBackgroundClick && <BackgroundClick onClick={onBackgroundClick} />}
+      <MapControls
+        bounds={bounds}
+        insets={{ bottom: bottomInset, left: leftInset }}
+      />
+      <MapLegend legs={trip.legs} hasGhosts={ghosts.length > 0} />
     </MapContainer>
   );
 }

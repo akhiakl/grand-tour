@@ -21,7 +21,7 @@ export function EditorHeader({
 }) {
   return (
     <header className="flex flex-wrap items-start justify-between gap-4 border-b border-line pb-5">
-      <div className="flex min-w-0 flex-1 flex-col gap-2">
+      <div className="flex min-w-64 flex-1 flex-col gap-2">
         <Link
           href="/"
           className="eyebrow inline-flex w-fit items-center gap-1 text-muted-foreground transition-colors hover:text-brass-text"

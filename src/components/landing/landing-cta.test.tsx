@@ -4,9 +4,13 @@ import { describe, expect, it } from "vitest";
 import { LandingCta } from "./landing-cta";
 
 describe("LandingCta", () => {
-  it("links every journey from the landing", () => {
+  it("offers both ways to start a route, grouped for screen readers", () => {
     render(<LandingCta />);
 
+    const group = screen.getByRole("group", { name: /start your own route/i });
+    expect(group).toContainElement(
+      screen.getByRole("link", { name: /plan with ai/i }),
+    );
     expect(screen.getByRole("link", { name: /plan with ai/i })).toHaveAttribute(
       "href",
       "/plan",
@@ -15,17 +19,5 @@ describe("LandingCta", () => {
       "href",
       "/new",
     );
-    expect(screen.getByRole("link", { name: /my maps/i })).toHaveAttribute(
-      "href",
-      "/maps",
-    );
-  });
-
-  it("is labelled as a landmark for screen readers", () => {
-    render(<LandingCta />);
-
-    expect(
-      screen.getByRole("complementary", { name: /start your own route/i }),
-    ).toBeInTheDocument();
   });
 });

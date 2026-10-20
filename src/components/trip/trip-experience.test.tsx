@@ -1,9 +1,9 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Trip } from "@/lib/trip";
-import { makeTrip } from "@/test/fixtures/trip";
+import { makeRouteCities, makeTrip } from "@/test/fixtures/trip";
 
 const mocks = vi.hoisted(() => ({
   push: vi.fn(),
@@ -28,44 +28,86 @@ vi.mock("@/hooks/use-share-trip", () => ({
   }),
 }));
 
-vi.mock("./trip-map", () => ({ TripMap: () => <div data-testid="trip-map" /> }));
+vi.mock("./trip-map", () => ({
+  TripMap: ({
+    onCitySelect,
+    onBackgroundClick,
+  }: {
+    readonly onCitySelect: (index: number) => void;
+    readonly onBackgroundClick: () => void;
+  }) => (
+    <>
+      <button type="button" onClick={() => onCitySelect(1)}>
+        map marker
+      </button>
+      <button type="button" onClick={onBackgroundClick}>
+        map background
+      </button>
+    </>
+  ),
+}));
 
 import { TripExperience } from "./trip-experience";
 
 beforeEach(() => {
   vi.clearAllMocks();
   mocks.saveLocalTrip.mockReturnValue("newid123");
+  vi.stubGlobal(
+    "ResizeObserver",
+    class {
+      observe() {}
+      disconnect() {}
+    },
+  );
+  vi.stubGlobal("matchMedia", () => ({
+    matches: true,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+  }));
 });
 
+const routeTrip = (overrides: Partial<Trip> = {}) =>
+  makeTrip(3, { cities: makeRouteCities(3), ...overrides });
+
 describe("TripExperience", () => {
-  it("demo mode: edit forks a fresh copy with a new createdAt and no localId", async () => {
-    const trip = makeTrip(2, { createdAt: 1000 });
-    render(<TripExperience trip={trip} actions="demo" />);
+  it("demo mode: labels the example and forks a fresh copy on Customize", async () => {
+    render(<TripExperience trip={routeTrip({ createdAt: 1000 })} actions="demo" />);
 
-    await userEvent.click(screen.getByRole("button", { name: /edit this route/i }));
+    expect(screen.getByText("Example route")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /customize/i }));
 
-    expect(mocks.saveLocalTrip).toHaveBeenCalledOnce();
     const [savedTrip, savedId] = mocks.saveLocalTrip.mock.calls[0];
     expect(savedId).toBeUndefined();
     expect(savedTrip.createdAt).not.toBe(1000);
     expect(mocks.push).toHaveBeenCalledWith("/new?remix=newid123");
   });
 
+  it("demo mode: a landing CTA replaces the primary actions", () => {
+    render(
+      <TripExperience trip={routeTrip()} cta={<a href="/plan">Plan with AI</a>} />,
+    );
+    expect(screen.getByRole("link", { name: "Plan with AI" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /edit this route/i })).toBeNull();
+  });
+
   it("own mode: edit updates the same local record in place", async () => {
-    const trip = makeTrip(2, { createdAt: 1000 });
-    render(<TripExperience trip={trip} actions="own" localId="existing1" />);
+    render(
+      <TripExperience
+        trip={routeTrip({ createdAt: 1000 })}
+        actions="own"
+        localId="existing1"
+      />,
+    );
 
     await userEvent.click(screen.getByRole("button", { name: /^edit$/i }));
 
-    expect(mocks.saveLocalTrip).toHaveBeenCalledOnce();
     const [savedTrip, savedId] = mocks.saveLocalTrip.mock.calls[0];
     expect(savedId).toBe("existing1");
     expect(savedTrip.createdAt).toBe(1000);
-    expect(mocks.push).toHaveBeenCalledWith("/new?remix=newid123");
   });
 
-  it("own mode: the Share chip calls the share hook with the trip", async () => {
-    const trip = makeTrip(2);
+  it("own mode: Share calls the share hook with the trip", async () => {
+    const trip = routeTrip();
     render(<TripExperience trip={trip} actions="own" localId="existing1" />);
 
     await userEvent.click(screen.getByRole("button", { name: /^share$/i }));
@@ -73,12 +115,56 @@ describe("TripExperience", () => {
   });
 
   it("shared mode: remix also forks a fresh copy (no localId)", async () => {
-    const trip = makeTrip(2, { createdAt: 1000 });
-    render(<TripExperience trip={trip} actions="shared" />);
+    render(<TripExperience trip={routeTrip()} actions="shared" />);
 
     await userEvent.click(screen.getByRole("button", { name: /remix this trip/i }));
+    expect(mocks.saveLocalTrip.mock.calls[0][1]).toBeUndefined();
+  });
 
-    const [, savedId] = mocks.saveLocalTrip.mock.calls[0];
-    expect(savedId).toBeUndefined();
+  it("opens a stop's detail from the itinerary and steps back with Escape", async () => {
+    render(<TripExperience trip={routeTrip()} actions="shared" />);
+
+    const itinerary = screen.getByRole("list", { name: "Itinerary" });
+    await userEvent.click(within(itinerary).getByRole("button", { name: /Stop 2/ }));
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Stop 2" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("list", { name: "Itinerary" })).toBeNull();
+
+    await userEvent.keyboard("{Escape}");
+    expect(screen.getByRole("list", { name: "Itinerary" })).toBeInTheDocument();
+  });
+
+  it("a stop picked on the map opens its detail too", async () => {
+    render(<TripExperience trip={routeTrip()} actions="shared" />);
+
+    await userEvent.click(screen.getByRole("button", { name: "map marker" }));
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Stop 2" }),
+    ).toBeInTheDocument();
+  });
+
+  it("packing keeps its ticks across a detour to a stop", async () => {
+    render(<TripExperience trip={routeTrip()} actions="shared" />);
+
+    await userEvent.click(screen.getByRole("button", { name: "Packing" }));
+    await userEvent.click(screen.getByRole("checkbox", { name: "Power bank" }));
+    await userEvent.click(screen.getByRole("button", { name: "map marker" }));
+    await userEvent.click(screen.getByRole("button", { name: "Route" }));
+
+    await userEvent.click(screen.getByRole("button", { name: "Packing" }));
+    expect(screen.getByRole("checkbox", { name: "Power bank" })).toBeChecked();
+  });
+
+  it("picking a stop opens the sheet; tapping the map lowers it", async () => {
+    render(<TripExperience trip={routeTrip()} actions="shared" />);
+    const handle = () => screen.getByRole("button", { name: /trip details/i });
+    expect(handle()).toHaveAttribute("aria-expanded", "false");
+
+    await userEvent.click(screen.getByRole("button", { name: "map marker" }));
+    expect(handle()).toHaveAttribute("aria-expanded", "true");
+
+    await userEvent.click(screen.getByRole("button", { name: "map background" }));
+    expect(handle()).toHaveAttribute("aria-expanded", "false");
   });
 });

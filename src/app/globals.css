@@ -199,6 +199,17 @@ input[type="range"] {
   );
 }
 
+/* The floating atlas card: frost, but dense enough that map labels
+   behind it blur away instead of bleeding through. */
+.atlas-card {
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--paper) 90%, transparent);
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  box-shadow: var(--shadow-soft);
+}
+
 /* ——— Map chrome (Leaflet) ——— */
 
 .atlas-map.leaflet-container {
@@ -209,6 +220,11 @@ input[type="range"] {
 .atlas-map .leaflet-tile-pane {
   filter: var(--map-filter);
   transition: filter 0.4s;
+}
+
+/* Bottom controls (attribution) ride above the mobile sheet. */
+.atlas-map .leaflet-bottom {
+  bottom: var(--map-inset-bottom, 0px);
 }
 
 .atlas-map .leaflet-control-attribution {
@@ -237,7 +253,11 @@ input[type="range"] {
   }
 }
 
-/* ——— Markers: pulse + brass dot + label pill (reference style) ——— */
+/* ——— Markers: brass dot with its label beside it ———
+   The icon box is 0×0 at the stop; dot and label hang off that point.
+   MapDeclutter flips labels to the left (.marker-flip), fades ones with
+   no room (.marker-lbl-hidden, back on hover/focus) and hides colliding
+   leg badges, so nothing stacks on top of anything else. */
 
 .marker-anchor {
   border: none;
@@ -246,13 +266,12 @@ input[type="range"] {
 
 .marker {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transform: translateY(-4px);
 }
 
 .marker-dot {
+  position: absolute;
+  top: -7px;
+  left: -7px;
   width: 14px;
   height: 14px;
   border: 3px solid var(--paper);
@@ -260,46 +279,61 @@ input[type="range"] {
   background: var(--brass);
   box-shadow:
     0 0 0 2px var(--brass),
-    0 6px 14px rgba(0, 0, 0, 0.3);
-  transition: transform 0.25s;
+    0 4px 10px rgba(0, 0, 0, 0.25);
+  transition: transform 0.25s var(--ease-atlas);
 }
 
 .marker-lbl {
-  margin-top: 6px;
-  padding: 4px 12px;
+  position: absolute;
+  top: 0;
+  left: 13px;
+  padding: 2px 9px;
   border: 1px solid var(--line);
   border-radius: 99px;
   background: var(--card-solid);
-  box-shadow: var(--shadow-soft);
+  box-shadow: 0 2px 8px rgba(22, 35, 58, 0.12);
   color: var(--ink);
   font-family: var(--font-fraunces), ui-serif, Georgia, serif;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
-  transition: transform 0.25s;
+  transform: translateY(-50%);
+  transition: opacity 0.2s;
 }
 
-.marker:hover .marker-dot,
+.marker-flip .marker-lbl {
+  right: 13px;
+  left: auto;
+}
+
+.marker-lbl-hidden .marker-lbl {
+  opacity: 0;
+}
+
+.marker-anchor:hover .marker-lbl,
+.marker-anchor:focus-visible .marker-lbl {
+  z-index: 1;
+  opacity: 1;
+}
+
+.marker-anchor:hover .marker-dot,
 .marker-active .marker-dot {
-  transform: scale(1.35);
-}
-
-.marker:hover .marker-lbl {
-  transform: translateY(-2px);
+  transform: scale(1.3);
 }
 
 .marker-active .marker-lbl {
+  border-color: var(--brass);
   color: var(--brass-text);
 }
 
 /* Ghost stops: locked AI suggestions past the guest limit. */
 .marker-ghost {
-  opacity: 0.4;
+  opacity: 0.55;
   cursor: pointer;
 }
 
 .marker-ghost .marker-dot {
-  background: transparent;
+  background: var(--paper);
   box-shadow: 0 0 0 2px var(--ink-soft);
 }
 
@@ -308,22 +342,22 @@ input[type="range"] {
   align-items: center;
   gap: 4px;
   border: 1px dashed var(--ink-soft);
-  background: transparent;
+  background: var(--card-solid);
   box-shadow: none;
   color: var(--ink-soft);
 }
 
 .marker-ghost:hover {
-  opacity: 0.7;
+  opacity: 0.85;
 }
 
+/* Only the selected stop pulses. */
 .marker-pulse {
   position: absolute;
-  top: -8px;
-  left: 50%;
+  top: -15px;
+  left: -15px;
   width: 30px;
   height: 30px;
-  margin-left: -15px;
   border-radius: 50%;
   background: var(--brass);
   opacity: 0;
@@ -347,13 +381,41 @@ input[type="range"] {
 .leg-badge {
   display: inline-grid;
   place-items: center;
-  padding: 1px 7px;
+  padding: 0 6px;
   border: 1px solid var(--line);
   border-radius: 999px;
-  background: var(--card);
-  backdrop-filter: blur(8px);
-  font-size: 12px;
-  line-height: 1.4;
+  background: var(--card-solid);
+  font-size: 11px;
+  line-height: 1.6;
+  transition: opacity 0.2s;
+}
+
+.leg-badge-hidden {
+  opacity: 0;
+}
+
+/* Legend swatches mirror the map marks. */
+.legend-dot {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--paper);
+  border-radius: 50%;
+  background: var(--brass);
+  box-shadow: 0 0 0 1.5px var(--brass);
+}
+
+.legend-dot-active {
+  width: 13px;
+  height: 13px;
+  box-shadow:
+    0 0 0 1.5px var(--brass),
+    0 0 0 5px color-mix(in srgb, var(--brass) 25%, transparent);
+}
+
+.legend-dot-ghost {
+  background: var(--paper);
+  box-shadow: 0 0 0 1.5px var(--ink-soft);
 }
 
 @media (prefers-reduced-motion: reduce) {

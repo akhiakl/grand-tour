@@ -9,6 +9,7 @@ import { toast } from "sonner";
 
 import "./maplibre";
 
+import { quietBasemap } from "./basemap-tweaks";
 import { MAP_STYLE } from "./map-style";
 
 const OFFLINE_TOAST_ID = "basemap-offline";
@@ -45,7 +46,10 @@ export function VectorBasemap() {
         },
       });
     };
-    const onStyleLoad = () => toast.dismiss(OFFLINE_TOAST_ID);
+    const onStyleLoad = () => {
+      toast.dismiss(OFFLINE_TOAST_ID);
+      quietBasemap(basemap);
+    };
     basemap.on("error", onError);
     basemap.on("style.load", onStyleLoad);
 

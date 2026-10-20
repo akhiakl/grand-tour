@@ -8,8 +8,9 @@ description: The product skill for the Grand Tour travel-route-map app — data 
 ## What this app is
 
 Shareable AI travel route maps. Guest-first: no accounts. A trip = ordered
-cities + connecting legs, rendered as a full-bleed Leaflet experience with
-city drawers, a floating timeline rail and stats cards. Share = immutable
+cities + connecting legs, rendered as a full-bleed Leaflet map with one
+floating atlas card (title, actions, 2×2 stats, vertical itinerary, city
+detail; top-left from `lg`, a draggable bottom card below). Share = immutable
 Redis snapshot at `/t/{id}` (60-day sliding TTL); creator's editable copies
 live in localStorage; a canvas-drawn Instagram poster shares the route as
 an image. `docs/ROADMAP.md` says what's built and what's next — check the
@@ -52,8 +53,9 @@ status table before starting work. Visual truth: `reference/grand-tour.html`.
   `handoff` (chat → editor localStorage), `ghosts` (approximate positions
   for `suggestedExtra`).
 - `lib/geo-search`: Photon city search behind `searchCities`.
-- `components/landing`: `landing-cta` (frost card on `/` into `/plan`,
-  `/new`, `/maps`; passed to `TripExperience` via its `cta` slot).
+- `components/landing`: `landing-cta` (Plan with AI / Build manually on
+  `/`; passed to `TripExperience` via its `cta` slot as the example
+  route's primary actions).
 - `components/off-the-map`: shared in-voice dead end (global 404,
   expired share, map missing on this device).
 - `components/ai`: `ai-chat` (`/plan`, 3 questions → one `/api/generate`
@@ -63,12 +65,19 @@ status table before starting work. Visual truth: `reference/grand-tour.html`.
 - `lib/http`: per-IP sliding-window rate limiters (trips 10/h,
   generate 5/h) + `getClientIp`; `security-headers` (CSP etc., used by
   `next.config.ts`).
-- `components/trip`: `trip-experience` (orchestrator), `trip-map` →
-  `map-canvas` (`vector-basemap`/markers/flyTo) + `route-layer` (staged curved
-  draw), `timeline-rail`, `city-drawer` + `drawer-sections` (5 tabs incl.
-  budget calculator), `top-bar` (chips: Packing/Notes/Poster/theme),
-  `stats-strip`, `panels`, `intro-splash`, `poster-dialog` +
-  `draw-poster` + `poster-tiles` (canvas poster w/ basemap), `mode`.
+- `components/trip`: `trip-experience` (orchestrator: panel + map grid),
+  `trip-panel` (views: route / city / packing / notes; ESC steps back) in
+  `panel-shell` (the floating `.atlas-card`: top-left from `lg`, draggable
+  bottom card below; reports the inset it covers), `panel-head` (eyebrow per variant, title, theme),
+  `panel-actions` (`ExperienceVariant`, primary + labeled secondary
+  tools), `route-overview` (2×2 stats, vertical itinerary), `city-detail`
+  - `drawer-sections` (5 tabs incl. budget calculator), `trip-tools`
+    (packing, notes). Map: `trip-map` → `map-canvas`
+    (`vector-basemap` + `basemap-tweaks` label muting, markers, flyTo,
+    `fit-padding`) + `route-layer` (staged curved draw), `map-controls`
+    (zoom, fit route), `map-legend`, `map-declutter` + `declutter` (label
+    flip/hide, badge hide), `map-overlay`. Also `intro-splash`,
+    `poster-dialog` + `draw-poster` + `poster-tiles`, `mode`.
 - `components/ui`: button, sheet, tabs, dialog, checkbox, badge,
   separator — vendored shadcn shape.
 
