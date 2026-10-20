@@ -67,7 +67,7 @@ export function CityDetail({
               </b>
             </span>
             <span>
-              💶{" "}
+              💰{" "}
               <b className="font-semibold text-ink">{money(city.budget)} per day</b>
             </span>
           </p>
