@@ -9,6 +9,7 @@ const mocks = vi.hoisted(() => {
     on: vi.fn((event: string, handler: () => void) => handlers.set(event, handler)),
     off: vi.fn((event: string) => handlers.delete(event)),
     setStyle: vi.fn(),
+    isStyleLoaded: vi.fn(() => false),
   };
   const layer = {
     addTo: vi.fn(),
@@ -36,6 +37,7 @@ vi.mock("sonner", () => ({ toast: mocks.toast }));
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mocks.basemap.isStyleLoaded.mockReturnValue(false);
   mocks.handlers.clear();
 });
 
@@ -62,12 +64,36 @@ describe("VectorBasemap", () => {
     expect(mocks.basemap.setStyle).toHaveBeenCalledTimes(1);
   });
 
+  it("ignores per-tile errors once the style has loaded", () => {
+    mocks.basemap.isStyleLoaded.mockReturnValue(true);
+    render(<VectorBasemap />);
+
+    mocks.handlers.get("error")?.();
+
+    expect(mocks.toast.error).not.toHaveBeenCalled();
+  });
+
+  it("dismisses the toast once the style loads after a retry", () => {
+    render(<VectorBasemap />);
+
+    mocks.handlers.get("error")?.();
+    mocks.handlers.get("style.load")?.();
+
+    expect(mocks.toast.dismiss).toHaveBeenCalledWith(
+      mocks.toast.error.mock.calls[0][1].id,
+    );
+  });
+
   it("cleans up the layer, listener and toast on unmount", () => {
     const { unmount } = render(<VectorBasemap />);
 
     unmount();
 
     expect(mocks.basemap.off).toHaveBeenCalledWith("error", expect.any(Function));
+    expect(mocks.basemap.off).toHaveBeenCalledWith(
+      "style.load",
+      expect.any(Function),
+    );
     expect(mocks.toast.dismiss).toHaveBeenCalled();
     expect(mocks.leafletMap.attributionControl.removeAttribution).toHaveBeenCalled();
     expect(mocks.layer.remove).toHaveBeenCalled();

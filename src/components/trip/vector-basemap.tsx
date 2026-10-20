@@ -32,10 +32,12 @@ export function VectorBasemap() {
 
     const basemap = layer.getMaplibreMap();
     const onError = () => {
-      // A shared id keeps a burst of tile errors down to one toast.
+      // Once the style is up, errors are per-tile hiccups the map rides
+      // out on its own; only a style that never arrived means an outage.
+      if (basemap.isStyleLoaded()) return;
       toast.error("The basemap is out of reach. Your route is still here.", {
         id: OFFLINE_TOAST_ID,
-        // Stays until retried or the map unmounts; the outage is ongoing.
+        // Stays until the style loads (after Retry) or the map unmounts.
         duration: Infinity,
         action: {
           label: "Retry",
@@ -43,10 +45,13 @@ export function VectorBasemap() {
         },
       });
     };
+    const onStyleLoad = () => toast.dismiss(OFFLINE_TOAST_ID);
     basemap.on("error", onError);
+    basemap.on("style.load", onStyleLoad);
 
     return () => {
       basemap.off("error", onError);
+      basemap.off("style.load", onStyleLoad);
       toast.dismiss(OFFLINE_TOAST_ID);
       map.attributionControl?.removeAttribution(MAP_STYLE.attribution);
       layer.remove();
