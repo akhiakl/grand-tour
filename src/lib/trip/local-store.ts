@@ -148,6 +148,11 @@ export function duplicateLocalTrip(id: string): string | null {
   return saveLocalTrip({ ...record.trip, title, createdAt: Date.now() });
 }
 
+/** Save an imported trip as a new local record, created now; returns its id. */
+export function importLocalTrip(trip: Trip): string {
+  return saveLocalTrip({ ...trip, createdAt: Date.now() });
+}
+
 /** Remove a local trip, its index entry and its packing/notes. No-op if missing. */
 export function deleteLocalTrip(id: string): void {
   if (!hasStorage()) return;

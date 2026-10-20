@@ -6,6 +6,7 @@ import {
   deleteLocalTrip,
   duplicateLocalTrip,
   getLocalTrip,
+  importLocalTrip,
   isShareStale,
   listLocalTrips,
   markLocalTripShared,
@@ -132,5 +133,17 @@ describe("local-store sharing and copies", () => {
     expect(getLocalTrip(copyId)?.shared).toBeUndefined();
     expect(listLocalTrips()).toHaveLength(2);
     expect(duplicateLocalTrip("ghost123")).toBeNull();
+  });
+});
+
+describe("importLocalTrip", () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+  });
+
+  it("saves an imported trip as a new record created now", () => {
+    const id = importLocalTrip(makeTrip(2, { createdAt: 1 }));
+    expect(getLocalTrip(id)?.trip.createdAt).toBeGreaterThan(1);
+    expect(listLocalTrips()).toHaveLength(1);
   });
 });

@@ -3,14 +3,26 @@
 import { ArrowLeft, Compass, Plus, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { toast } from "sonner";
 
+import { downloadFile } from "@/components/download-file";
 import { ShareDialog } from "@/components/share/share-dialog";
 import { Button } from "@/components/ui/button";
 import { UpsellModal } from "@/components/upsell/upsell-modal";
 import { useMounted } from "@/hooks/use-mounted";
 import { useShareTrip } from "@/hooks/use-share-trip";
-import { deleteLocalTrip, listLocalTrips, type LocalTripRecord } from "@/lib/trip";
+import {
+  deleteLocalTrip,
+  duplicateLocalTrip,
+  importLocalTrip,
+  listLocalTrips,
+  serializeTripFile,
+  tripFileSlug,
+  type LocalTripRecord,
+  type Trip,
+} from "@/lib/trip";
 
+import { ImportTripButton } from "./import-trip-button";
 import { TripCard } from "./trip-card";
 
 export function MapsPage() {
@@ -25,7 +37,7 @@ export function MapsPage() {
 
   const { share, shareId, sharedTitle, dialogOpen, setDialogOpen } = useShareTrip({
     onCityLimit: () => setUpsellOpen(true),
-    onShared: () => forceRefresh((key) => key + 1),
+    onShared: () => refresh(),
   });
 
   const handleShare = async (record: LocalTripRecord) => {
@@ -34,9 +46,29 @@ export function MapsPage() {
     setSharingId(null);
   };
 
+  const refresh = () => forceRefresh((key) => key + 1);
+
   const handleDelete = (id: string) => {
     deleteLocalTrip(id);
-    forceRefresh((key) => key + 1);
+    refresh();
+  };
+
+  const handleDuplicate = (record: LocalTripRecord) => {
+    duplicateLocalTrip(record.id);
+    refresh();
+  };
+
+  const handleExport = ({ trip }: LocalTripRecord) =>
+    downloadFile(
+      `${tripFileSlug(trip.title)}.grand-tour.json`,
+      serializeTripFile(trip),
+      "application/json",
+    );
+
+  const handleImport = (trip: Trip) => {
+    importLocalTrip(trip);
+    refresh();
+    toast.success(`Imported ${trip.title}`);
   };
 
   return (
@@ -53,11 +85,14 @@ export function MapsPage() {
             My <em className="text-azure italic">Maps</em>
           </h1>
         </div>
-        <Button asChild variant="brass">
-          <Link href="/new">
-            <Plus /> New map
-          </Link>
-        </Button>
+        <div className="flex gap-2">
+          <ImportTripButton onImport={handleImport} />
+          <Button asChild variant="brass">
+            <Link href="/new">
+              <Plus /> New map
+            </Link>
+          </Button>
+        </div>
       </header>
 
       {mounted && records.length === 0 && (
@@ -86,6 +121,8 @@ export function MapsPage() {
             record={record}
             sharing={sharingId === record.id}
             onShare={() => void handleShare(record)}
+            onDuplicate={() => handleDuplicate(record)}
+            onExport={() => handleExport(record)}
             onDelete={() => handleDelete(record.id)}
           />
         ))}

@@ -2,35 +2,40 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { tripFingerprint } from "@/lib/trip";
+import { tripFingerprint, type LocalTripRecord } from "@/lib/trip";
 import { makeTrip } from "@/test/fixtures/trip";
 
 import { TripCard } from "./trip-card";
 
-const record = {
+const record: LocalTripRecord = {
   id: "abc12345",
   trip: makeTrip(2, { title: "Alpine Loop" }),
   updatedAt: Date.now(),
 };
-const onShare = vi.fn();
-const onDelete = vi.fn();
+const handlers = {
+  onShare: vi.fn(),
+  onDuplicate: vi.fn(),
+  onExport: vi.fn(),
+  onDelete: vi.fn(),
+};
+
+function renderCard(overrides: Partial<LocalTripRecord> = {}, sharing = false) {
+  return render(
+    <TripCard
+      record={{ ...record, ...overrides }}
+      sharing={sharing}
+      {...handlers}
+    />,
+  );
+}
 
 beforeEach(() => {
-  onShare.mockClear();
-  onDelete.mockClear();
+  vi.clearAllMocks();
 });
 
 describe("TripCard", () => {
   it("links the thumbnail and View button to Map View", () => {
-    render(
-      <TripCard
-        record={record}
-        sharing={false}
-        onShare={onShare}
-        onDelete={onDelete}
-      />,
-    );
-
+    renderCard();
     expect(screen.getByRole("link", { name: "View Alpine Loop" })).toHaveAttribute(
       "href",
       "/maps/abc12345",
@@ -42,15 +47,7 @@ describe("TripCard", () => {
   });
 
   it("links Edit to the editor's remix query", () => {
-    render(
-      <TripCard
-        record={record}
-        sharing={false}
-        onShare={onShare}
-        onDelete={onDelete}
-      />,
-    );
-
+    renderCard();
     expect(screen.getByRole("link", { name: "Edit Alpine Loop" })).toHaveAttribute(
       "href",
       "/new?remix=abc12345",
@@ -58,61 +55,47 @@ describe("TripCard", () => {
   });
 
   it("calls onShare when Share is clicked", async () => {
-    render(
-      <TripCard
-        record={record}
-        sharing={false}
-        onShare={onShare}
-        onDelete={onDelete}
-      />,
-    );
+    renderCard();
     await userEvent.click(screen.getByRole("button", { name: "Share Alpine Loop" }));
-    expect(onShare).toHaveBeenCalledOnce();
+    expect(handlers.onShare).toHaveBeenCalledOnce();
   });
 
   it("disables Share while sharing", () => {
-    render(
-      <TripCard record={record} sharing onShare={onShare} onDelete={onDelete} />,
-    );
+    renderCard({}, true);
     expect(screen.getByRole("button", { name: "Share Alpine Loop" })).toBeDisabled();
   });
 
-  it("confirms before deleting", async () => {
-    render(
-      <TripCard
-        record={record}
-        sharing={false}
-        onShare={onShare}
-        onDelete={onDelete}
-      />,
+  it("duplicates and downloads a backup", async () => {
+    renderCard();
+    await userEvent.click(
+      screen.getByRole("button", { name: "Duplicate Alpine Loop" }),
     );
+    await userEvent.click(
+      screen.getByRole("button", { name: "Download a backup of Alpine Loop" }),
+    );
+    expect(handlers.onDuplicate).toHaveBeenCalledOnce();
+    expect(handlers.onExport).toHaveBeenCalledOnce();
+  });
 
+  it("confirms before deleting", async () => {
+    renderCard();
     await userEvent.click(
       screen.getByRole("button", { name: "Delete Alpine Loop" }),
     );
-    expect(onDelete).not.toHaveBeenCalled();
+    expect(handlers.onDelete).not.toHaveBeenCalled();
 
     await userEvent.click(screen.getByRole("button", { name: "Delete" }));
-    expect(onDelete).toHaveBeenCalledOnce();
+    expect(handlers.onDelete).toHaveBeenCalledOnce();
   });
 
   it("links to the last share while it still matches the trip", () => {
-    const shared = {
-      ...record,
+    renderCard({
       shared: {
         id: "share123",
         at: Date.now(),
         fingerprint: tripFingerprint(record.trip),
       },
-    };
-    render(
-      <TripCard
-        record={shared}
-        sharing={false}
-        onShare={onShare}
-        onDelete={onDelete}
-      />,
-    );
+    });
     expect(screen.getByRole("link", { name: "open link" })).toHaveAttribute(
       "href",
       "/t/share123",
@@ -120,18 +103,9 @@ describe("TripCard", () => {
   });
 
   it("nudges to share again once the trip changed since sharing", () => {
-    const stale = {
-      ...record,
+    renderCard({
       shared: { id: "share123", at: Date.now(), fingerprint: "outdated" },
-    };
-    render(
-      <TripCard
-        record={stale}
-        sharing={false}
-        onShare={onShare}
-        onDelete={onDelete}
-      />,
-    );
+    });
     expect(screen.getByText(/Edited since you shared it/)).toBeInTheDocument();
   });
 });

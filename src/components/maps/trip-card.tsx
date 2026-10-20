@@ -1,6 +1,15 @@
 "use client";
 
-import { Link2, Loader2, Pencil, RefreshCw, Share2, Trash2 } from "lucide-react";
+import {
+  CopyPlus,
+  FileDown,
+  Link2,
+  Loader2,
+  Pencil,
+  RefreshCw,
+  Share2,
+  Trash2,
+} from "lucide-react";
 import Link from "next/link";
 
 import {
@@ -65,11 +74,16 @@ export function TripCard({
   record,
   sharing,
   onShare,
+  onDuplicate,
+  onExport,
   onDelete,
 }: {
   readonly record: LocalTripRecord;
   readonly sharing: boolean;
   readonly onShare: () => void;
+  readonly onDuplicate: () => void;
+  /** Saves the trip as a backup file. */
+  readonly onExport: () => void;
   readonly onDelete: () => void;
 }) {
   const stats = tripStats(record.trip);
@@ -112,6 +126,26 @@ export function TripCard({
             onClick={onShare}
           >
             {sharing ? <Loader2 className="animate-spin" /> : <Share2 />}
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            aria-label={`Duplicate ${record.trip.title}`}
+            title="Duplicate"
+            onClick={onDuplicate}
+          >
+            <CopyPlus />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            aria-label={`Download a backup of ${record.trip.title}`}
+            title="Download backup"
+            onClick={onExport}
+          >
+            <FileDown />
           </Button>
 
           <AlertDialog>
