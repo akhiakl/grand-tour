@@ -2,6 +2,7 @@
 
 import {
   Backpack,
+  CalendarPlus,
   ImageDown,
   Map,
   NotebookPen,
@@ -127,12 +128,15 @@ export function SecondaryActions({
   tool,
   onTool,
   onPoster,
+  onCalendar,
   onEditRoute,
 }: {
   readonly variant: ExperienceVariant;
   readonly tool: ToolId | null;
   readonly onTool: (tool: ToolId) => void;
   readonly onPoster: () => void;
+  /** Present for dated trips: downloads the stops as calendar events. */
+  readonly onCalendar?: () => void;
   readonly onEditRoute: () => void;
 }) {
   return (
@@ -154,6 +158,9 @@ export function SecondaryActions({
         onClick={() => onTool("notes")}
       />
       <Tile icon={<ImageDown />} label="Poster" onClick={onPoster} />
+      {onCalendar && (
+        <Tile icon={<CalendarPlus />} label="Calendar" onClick={onCalendar} />
+      )}
     </nav>
   );
 }

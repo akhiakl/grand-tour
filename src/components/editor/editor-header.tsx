@@ -2,6 +2,7 @@
 
 import {
   ArrowLeft,
+  CalendarDays,
   CircleAlert,
   Loader2,
   Map,
@@ -14,6 +15,57 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export const TRIP_TITLE_INPUT_ID = "trip-title";
+export const TRIP_START_INPUT_ID = "trip-start-date";
+
+function FieldError({
+  id,
+  message,
+}: {
+  readonly id: string;
+  readonly message: string;
+}) {
+  return (
+    <p id={id} className="flex items-center gap-1.5 text-xs text-destructive">
+      <CircleAlert className="size-3.5 shrink-0" aria-hidden />
+      {message}
+    </p>
+  );
+}
+
+/** Optional first day: dates the itinerary and unlocks calendar export. */
+function StartDateField({
+  value,
+  onChange,
+  error,
+}: {
+  readonly value: string;
+  readonly onChange: (value: string) => void;
+  readonly error?: string;
+}) {
+  return (
+    <div className="flex flex-col gap-1">
+      <div className="flex items-center gap-2 text-sm text-ink-soft">
+        <CalendarDays className="size-4 shrink-0" aria-hidden />
+        <label htmlFor={TRIP_START_INPUT_ID}>Starts</label>
+        <Input
+          id={TRIP_START_INPUT_ID}
+          type="date"
+          value={value}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? "trip-start-error" : "trip-start-hint"}
+          onChange={(e) => onChange(e.target.value)}
+          className="h-8 w-auto"
+        />
+        {!error && (
+          <span id="trip-start-hint" className="text-xs">
+            Optional: dates each stop
+          </span>
+        )}
+      </div>
+      {error && <FieldError id="trip-start-error" message={error} />}
+    </div>
+  );
+}
 
 export function EditorHeader({
   title,
@@ -23,6 +75,9 @@ export function EditorHeader({
   sharing,
   titleError,
   shareStale,
+  startDate,
+  onStartDateChange,
+  startDateError,
 }: {
   readonly title: string;
   readonly onTitleChange: (title: string) => void;
@@ -32,6 +87,9 @@ export function EditorHeader({
   readonly titleError?: string;
   /** Edited since its last share: the link still shows the older version. */
   readonly shareStale?: boolean;
+  readonly startDate: string;
+  readonly onStartDateChange: (value: string) => void;
+  readonly startDateError?: string;
 }) {
   return (
     <header className="flex flex-wrap items-start justify-between gap-4 border-b border-line pb-5">
@@ -52,15 +110,12 @@ export function EditorHeader({
           onChange={(e) => onTitleChange(e.target.value)}
           className="h-auto border-none bg-transparent px-0 font-display text-3xl font-medium tracking-tight shadow-none focus-visible:ring-0"
         />
-        {titleError && (
-          <p
-            id="trip-title-error"
-            className="flex items-center gap-1.5 text-xs text-destructive"
-          >
-            <CircleAlert className="size-3.5 shrink-0" aria-hidden />
-            {titleError}
-          </p>
-        )}
+        {titleError && <FieldError id="trip-title-error" message={titleError} />}
+        <StartDateField
+          value={startDate}
+          onChange={onStartDateChange}
+          error={startDateError}
+        />
       </div>
 
       <div className="flex flex-wrap items-center justify-end gap-2">

@@ -17,6 +17,7 @@ import {
   removeCityAt,
   updateCityAt,
   updateLegAt,
+  updateStartDate,
   updateTitle,
   type DraftTrip,
 } from "./draft";
@@ -213,5 +214,23 @@ describe("indexAfterMove / indexAfterRemove", () => {
     expect(indexAfterRemove(2, 2)).toBeNull();
     expect(indexAfterRemove(3, 2)).toBe(2);
     expect(indexAfterRemove(1, 2)).toBe(1);
+  });
+});
+
+describe("updateStartDate", () => {
+  it("dates and undates a draft, carried through to the trip", () => {
+    const dated = updateStartDate(draftFromTrip(makeTrip(2)), "2027-05-01");
+    expect(dated.startDate).toBe("2027-05-01");
+    expect(draftToTrip(dated, 1)?.startDate).toBe("2027-05-01");
+    expect(draftFromTrip(draftToTrip(dated, 1)!).startDate).toBe("2027-05-01");
+
+    const undated = updateStartDate(dated, "");
+    expect("startDate" in undated).toBe(false);
+    expect(draftToTrip(undated, 1)?.startDate).toBeUndefined();
+  });
+
+  it("reports an impossible date as a field issue", () => {
+    const draft = updateStartDate(draftFromTrip(makeTrip(2)), "2027-02-30");
+    expect(draftIssues(draft)).toEqual({ startDate: "Pick a real calendar date." });
   });
 });

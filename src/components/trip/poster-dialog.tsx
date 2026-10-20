@@ -13,7 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useUnits } from "@/components/units/units-provider";
-import type { Trip } from "@/lib/trip";
+import { tripFileSlug, type Trip } from "@/lib/trip";
 
 import { drawPoster, type PosterFonts, type PosterTheme } from "./draw-poster";
 
@@ -50,12 +50,6 @@ async function readFonts(): Promise<PosterFonts> {
 
   return { display, sans };
 }
-
-const slug = (title: string) =>
-  title
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "") || "grand-tour";
 
 function PosterPreview({
   url,
@@ -121,7 +115,7 @@ export function PosterDialog({
       setBlob(rendered);
       setUrl(objectUrl);
 
-      const file = new File([rendered], `${slug(trip.title)}-route.png`, {
+      const file = new File([rendered], `${tripFileSlug(trip.title)}-route.png`, {
         type: "image/png",
       });
       setCanShare(navigator.canShare?.({ files: [file] }) ?? false);
@@ -144,13 +138,13 @@ export function PosterDialog({
     if (!url) return;
     const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = `${slug(trip.title)}-route.png`;
+    anchor.download = `${tripFileSlug(trip.title)}-route.png`;
     anchor.click();
   };
 
   const share = async () => {
     if (!blob) return;
-    const file = new File([blob], `${slug(trip.title)}-route.png`, {
+    const file = new File([blob], `${tripFileSlug(trip.title)}-route.png`, {
       type: "image/png",
     });
     await navigator

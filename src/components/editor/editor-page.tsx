@@ -24,6 +24,7 @@ import {
   tripFingerprint,
   updateCityAt,
   updateLegAt,
+  updateStartDate,
   updateTitle,
   type City,
   type DraftIssues,
@@ -32,7 +33,11 @@ import {
   type Trip,
 } from "@/lib/trip";
 
-import { EditorHeader, TRIP_TITLE_INPUT_ID } from "./editor-header";
+import {
+  EditorHeader,
+  TRIP_START_INPUT_ID,
+  TRIP_TITLE_INPUT_ID,
+} from "./editor-header";
 import { EditorMapPreview } from "./editor-map-preview";
 import { StopList } from "./stop-list";
 
@@ -41,6 +46,7 @@ const AUTOSAVE_DEBOUNCE_MS = 600;
 /** The input id for an issue key, for fields the editor always shows. */
 function fieldIdFor(key: string): string | null {
   if (key === "title") return TRIP_TITLE_INPUT_ID;
+  if (key === "startDate") return TRIP_START_INPUT_ID;
   const match = /^cities\.(\d+)\.(name|nights)$/.exec(key);
   return match ? `stop-${match[1]}-${match[2]}` : null;
 }
@@ -175,6 +181,9 @@ function EditorWorkspace() {
         sharing={sharing}
         titleError={issues.title}
         shareStale={shareStale}
+        startDate={draft.startDate ?? ""}
+        onStartDateChange={(value) => update((d) => updateStartDate(d, value))}
+        startDateError={issues.startDate}
       />
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_26rem]">

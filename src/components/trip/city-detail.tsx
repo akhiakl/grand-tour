@@ -4,7 +4,7 @@ import { useId } from "react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUnits } from "@/components/units/units-provider";
-import type { City } from "@/lib/trip";
+import { formatDateSpan, type City, type StopDates } from "@/lib/trip";
 
 import {
   FoodSection,
@@ -28,11 +28,14 @@ export function CityDetail({
   city,
   index,
   count,
+  dates,
   onBack,
 }: {
   readonly city: City;
   readonly index: number;
   readonly count: number;
+  /** This stop's stay, for dated trips. */
+  readonly dates?: StopDates;
   readonly onBack: () => void;
 }) {
   const titleId = useId();
@@ -67,6 +70,11 @@ export function CityDetail({
                 {city.nights} night{city.nights === 1 ? "" : "s"}
               </b>
             </span>
+            {dates && (
+              <span>
+                📅 <b className="font-semibold text-ink">{formatDateSpan(dates)}</b>
+              </span>
+            )}
             <span>
               💰{" "}
               <b className="font-semibold text-ink">{money(city.budget)} per day</b>

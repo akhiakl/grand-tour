@@ -18,6 +18,8 @@ export type DraftTrip = {
   title: string;
   cities: City[];
   legs: Leg[];
+  /** YYYY-MM-DD, or absent for an undated trip. */
+  startDate?: string;
 };
 
 const MAX_NIGHTS = 30;
@@ -35,7 +37,8 @@ export function createBlankDraft(): DraftTrip {
 }
 
 export function draftFromTrip(trip: Trip): DraftTrip {
-  return { title: trip.title, cities: trip.cities, legs: trip.legs };
+  const { title, cities, legs, startDate } = trip;
+  return startDate ? { title, cities, legs, startDate } : { title, cities, legs };
 }
 
 export function canAddCity(draft: DraftTrip): boolean {
@@ -115,6 +118,12 @@ export function updateTitle(draft: DraftTrip, title: string): DraftTrip {
   return { ...draft, title };
 }
 
+/** Sets the first day (YYYY-MM-DD); an empty value makes the trip undated. */
+export function updateStartDate(draft: DraftTrip, startDate: string): DraftTrip {
+  const { title, cities, legs } = draft;
+  return startDate ? { title, cities, legs, startDate } : { title, cities, legs };
+}
+
 /**
  * Cities ≥ 2 is the only gate that disables Share — field-level problems
  * are reported by {@link draftIssues} so the editor can point at them.
@@ -130,6 +139,7 @@ const FRIENDLY_MESSAGES: Record<string, string> = {
   title: "Give your map a title.",
   name: "Give this stop a name.",
   nights: "Nights run from 0 to 30.",
+  startDate: "Pick a real calendar date.",
 };
 
 /**
@@ -143,7 +153,8 @@ export function draftIssues(draft: DraftTrip): DraftIssues {
 
   const issues: DraftIssues = {};
   for (const issue of parsed.error.issues) {
-    if (issue.path.length === 1 && issue.path[0] !== "title") continue;
+    const topLevelField = issue.path[0] === "title" || issue.path[0] === "startDate";
+    if (issue.path.length === 1 && !topLevelField) continue;
     const key = issue.path.join(".");
     const field = String(issue.path.at(-1));
     issues[key] ??= FRIENDLY_MESSAGES[field] ?? issue.message;
@@ -157,6 +168,7 @@ function toCandidate(draft: DraftTrip, createdAt: number) {
     title: draft.title,
     cities: draft.cities,
     legs: draft.legs,
+    ...(draft.startDate ? { startDate: draft.startDate } : {}),
     createdBy: "guest" as const,
     createdAt,
   };

@@ -2,7 +2,14 @@ import { ChevronRight } from "lucide-react";
 import { Fragment } from "react";
 
 import { useUnits } from "@/components/units/units-provider";
-import { tripStats, type Leg, type Trip } from "@/lib/trip";
+import {
+  formatDateSpan,
+  stopDates,
+  tripDateRange,
+  tripStats,
+  type Leg,
+  type Trip,
+} from "@/lib/trip";
 import { cn } from "@/lib/utils";
 
 import { MODE_META } from "./mode";
@@ -35,11 +42,16 @@ function Stat({
 
 export function StatsGrid({ trip }: { readonly trip: Trip }) {
   const stats = tripStats(trip);
+  const range = tripDateRange(trip);
   const { money, distance } = useUnits();
 
   return (
     <div className="grid grid-cols-2 gap-2">
-      <Stat value={stats.nights} caption="Nights" />
+      <Stat
+        value={stats.nights}
+        detail={range ? formatDateSpan(range) : undefined}
+        caption="Nights"
+      />
       <Stat
         value={stats.cities}
         detail={`in ${stats.countries} countr${stats.countries === 1 ? "y" : "ies"}`}
@@ -85,6 +97,7 @@ export function Itinerary({
   readonly hoveredIndex?: number | null;
   readonly onHover?: (index: number | null) => void;
 }) {
+  const dates = stopDates(trip);
   return (
     <ol aria-label="Itinerary">
       {trip.cities.map((city, index) => (
@@ -119,6 +132,7 @@ export function Itinerary({
                   {city.name}
                 </span>
                 <span className="block text-xs text-ink-soft">
+                  {dates && `${formatDateSpan(dates[index])} · `}
                   {city.nights} night{city.nights === 1 ? "" : "s"} · {city.country}
                 </span>
               </span>

@@ -139,6 +139,36 @@ describe("TripExperience", () => {
     expect(screen.getByText(/stays live for 60 days/)).toBeInTheDocument();
   });
 
+  it("offers a calendar download only for dated trips", async () => {
+    const createObjectURL = vi.fn(() => "blob:ics");
+    vi.stubGlobal(
+      "URL",
+      Object.assign(URL, { createObjectURL, revokeObjectURL: vi.fn() }),
+    );
+    const click = vi
+      .spyOn(HTMLAnchorElement.prototype, "click")
+      .mockImplementation(() => {});
+
+    const { unmount } = render(
+      <TripExperience trip={routeTrip()} actions="shared" />,
+    );
+    expect(
+      screen.queryByRole("button", { name: "Calendar" }),
+    ).not.toBeInTheDocument();
+    unmount();
+
+    render(
+      <TripExperience
+        trip={routeTrip({ startDate: "2027-05-01" })}
+        actions="shared"
+      />,
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Calendar" }));
+    expect(createObjectURL).toHaveBeenCalledOnce();
+    expect(click).toHaveBeenCalledOnce();
+    click.mockRestore();
+  });
+
   it("shared mode: remix also forks a fresh copy (no localId)", async () => {
     render(<TripExperience trip={routeTrip()} actions="shared" />);
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useState, type ReactNode } from "react";
 
-import type { Trip, TripToolsScope } from "@/lib/trip";
+import { stopDates, type Trip, type TripToolsScope } from "@/lib/trip";
 
 import { CityDetail } from "./city-detail";
 import type { MapInsets } from "./fit-padding";
@@ -16,6 +16,7 @@ import { PanelHead } from "./panel-head";
 import { PanelShell } from "./panel-shell";
 import { Itinerary, StatsGrid } from "./route-overview";
 import { SharedLinkNote } from "./shared-link-note";
+import { downloadTripCalendar } from "./trip-calendar";
 import { TripTools } from "./trip-tools";
 
 /**
@@ -66,6 +67,7 @@ export function TripPanel({
   const [collapsed, setCollapsed] = useState(false);
   const bodyId = useId();
   const city = selected === null ? null : trip.cities[selected];
+  const dates = stopDates(trip);
 
   // A newly picked stop (from the map or the itinerary) takes over the
   // panel from any open tool, unfolding a collapsed card to show it.
@@ -132,6 +134,7 @@ export function TripPanel({
             city={city}
             index={selected}
             count={trip.cities.length}
+            dates={dates?.[selected]}
             onBack={() => onSelect(null)}
           />
         )}
@@ -149,6 +152,7 @@ export function TripPanel({
               tool={tool}
               onTool={openTool}
               onPoster={onPoster}
+              onCalendar={dates ? () => downloadTripCalendar(trip) : undefined}
               onEditRoute={onEditRoute}
             />
             <StatsGrid trip={trip} />
