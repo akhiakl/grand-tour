@@ -63,13 +63,14 @@ export function AiChat() {
   const router = useRouter();
   const [answers, setAnswers] = useState<Answers>({});
 
-  const onDrafted = ({ trip, suggestedExtra }: GeneratedDraft) => {
-    writeAiHandoff({
-      title: trip.title,
-      cities: trip.cities,
-      legs: trip.legs,
-      suggestedExtra,
-    });
+  const onDrafted = (
+    { trip, suggestedExtra }: GeneratedDraft,
+    request: GenerateRequest,
+  ) => {
+    writeAiHandoff(
+      { title: trip.title, cities: trip.cities, legs: trip.legs, suggestedExtra },
+      request,
+    );
     router.push("/new?from=ai");
   };
   const { generate, status } = useGenerateTrip({ onDrafted });

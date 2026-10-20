@@ -20,7 +20,8 @@ export interface GeneratedDraft {
 export function useGenerateTrip({
   onDrafted,
 }: {
-  readonly onDrafted: (draft: GeneratedDraft) => void;
+  /** Receives the draft and the request that produced it. */
+  readonly onDrafted: (draft: GeneratedDraft, request: GenerateRequest) => void;
 }) {
   const [status, setStatus] = useState<GenerateStatus>("idle");
 
@@ -34,7 +35,8 @@ export function useGenerateTrip({
       });
 
       if (response.ok) {
-        onDrafted((await response.json()) as GeneratedDraft);
+        // Stays "drafting": the chat navigates away; other callers reset().
+        onDrafted((await response.json()) as GeneratedDraft, request);
         return;
       }
       setStatus(response.status === 429 ? "rate_limited" : "failed");

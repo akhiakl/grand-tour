@@ -30,7 +30,7 @@ describe("useGenerateTrip", () => {
     const [url, init] = fetchMock.mock.calls[0];
     expect(url).toBe("/api/generate");
     expect(JSON.parse(init.body)).toEqual(makeGenerateRequest());
-    expect(onDrafted).toHaveBeenCalledWith(draft);
+    expect(onDrafted).toHaveBeenCalledWith(draft, makeGenerateRequest());
     expect(result.current.status).toBe("drafting");
   });
 

@@ -6,9 +6,15 @@ import { toast } from "sonner";
 
 import { ShareDialog } from "@/components/share/share-dialog";
 import { UpsellModal } from "@/components/upsell/upsell-modal";
+import type { GeneratedDraft } from "@/hooks/use-generate-trip";
 import { useMounted } from "@/hooks/use-mounted";
 import { useShareTrip } from "@/hooks/use-share-trip";
-import { clearAiHandoff, readAiHandoff } from "@/lib/ai";
+import {
+  clearAiHandoff,
+  readAiHandoff,
+  redraftDefaults,
+  type GenerateRequest,
+} from "@/lib/ai";
 import {
   addCity,
   canAddCity,
@@ -27,6 +33,7 @@ import {
   updateStartDate,
   updateTitle,
   type City,
+  type DraftTrip,
   type DraftIssues,
   type Leg,
   type Trip,
@@ -38,6 +45,7 @@ import {
   TRIP_TITLE_INPUT_ID,
 } from "./editor-header";
 import { EditorMapPreview } from "./editor-map-preview";
+import { RedraftCard } from "./redraft-card";
 import { StopList } from "./stop-list";
 import { useDraftHistory } from "./use-draft-history";
 
@@ -66,7 +74,13 @@ function focusFirstIssue(issues: DraftIssues) {
   }
 }
 
-function resolveInitialState(searchParams: URLSearchParams) {
+function resolveInitialState(searchParams: URLSearchParams): {
+  draft: DraftTrip;
+  localId: string | null;
+  createdAt: number;
+  ghostNames: string[];
+  request: GenerateRequest | undefined;
+} {
   const remixId = searchParams.get("remix");
   if (remixId) {
     const record = getLocalTrip(remixId);
@@ -76,6 +90,7 @@ function resolveInitialState(searchParams: URLSearchParams) {
         localId: remixId,
         createdAt: record.trip.createdAt,
         ghostNames: [] as string[],
+        request: undefined,
       };
     }
   }
@@ -88,6 +103,7 @@ function resolveInitialState(searchParams: URLSearchParams) {
         localId: null,
         createdAt: Date.now(),
         ghostNames: aiTrip.suggestedExtra,
+        request: aiTrip.request,
       };
     }
   }
@@ -97,6 +113,7 @@ function resolveInitialState(searchParams: URLSearchParams) {
     localId: null,
     createdAt: Date.now(),
     ghostNames: [] as string[],
+    request: undefined,
   };
 }
 
@@ -121,6 +138,8 @@ function EditorWorkspace() {
   const [localId, setLocalId] = useState(initial.localId);
   const [upsellOpen, setUpsellOpen] = useState(false);
   const [createdAt] = useState(initial.createdAt);
+  const [ghostNames, setGhostNames] = useState(initial.ghostNames);
+  const [request, setRequest] = useState(initial.request);
 
   // The AI draft is now in state; consume the handoff so a later visit to
   // /new?from=ai starts blank. Cleared here, not while rendering (see
@@ -163,6 +182,16 @@ function EditorWorkspace() {
     lastShare !== undefined &&
     currentTrip !== null &&
     tripFingerprint(currentTrip) !== lastShare.fingerprint;
+
+  const handleRedraft = (
+    { trip, suggestedExtra }: GeneratedDraft,
+    next: GenerateRequest,
+  ) => {
+    update((d) => ({ ...draftFromTrip(trip), startDate: d.startDate }));
+    setGhostNames(suggestedExtra);
+    setRequest(next);
+    toast.success("Route redrafted. Undo brings the previous one back.");
+  };
 
   const handleShare = () => {
     if (Object.keys(issues).length > 0) {
@@ -217,12 +246,21 @@ function EditorWorkspace() {
           }
         />
 
-        <div className="relative isolate order-first h-64 overflow-hidden rounded-2xl border border-line lg:sticky lg:top-8 lg:order-none lg:h-[32rem]">
-          <EditorMapPreview
-            draft={draft}
-            ghostNames={initial.ghostNames}
-            onGhostSelect={() => setUpsellOpen(true)}
-          />
+        <div className="order-first flex flex-col gap-4 lg:sticky lg:top-8 lg:order-none lg:self-start">
+          <div className="relative isolate h-64 overflow-hidden rounded-2xl border border-line lg:h-[32rem]">
+            <EditorMapPreview
+              draft={draft}
+              ghostNames={ghostNames}
+              onGhostSelect={() => setUpsellOpen(true)}
+            />
+          </div>
+          {draft.cities.length > 0 && (
+            <RedraftCard
+              key={JSON.stringify(request)}
+              defaults={redraftDefaults(draft, request)}
+              onDrafted={handleRedraft}
+            />
+          )}
         </div>
       </div>
 

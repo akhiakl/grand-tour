@@ -61,6 +61,7 @@ describe("AiChat", () => {
       title: draft.trip.title,
       cities: draft.trip.cities,
       suggestedExtra: ["Ljubljana"],
+      request: { destination: "Austria", days: 6, vibe: "balanced" },
     });
   });
 
