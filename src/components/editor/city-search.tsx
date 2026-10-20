@@ -131,7 +131,7 @@ export function CitySearch({
                 onMouseEnter={() => setHighlighted(index)}
                 onClick={() => select(result)}
               >
-                <MapPin className="size-4 shrink-0 text-brass" />
+                <MapPin className="size-4 shrink-0 text-brass-text" />
                 <span className="flex-1 truncate">{result.displayName}</span>
               </button>
             </li>

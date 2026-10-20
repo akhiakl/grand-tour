@@ -52,6 +52,10 @@ status table before starting work. Visual truth: `reference/grand-tour.html`.
   `handoff` (chat → editor localStorage), `ghosts` (approximate positions
   for `suggestedExtra`).
 - `lib/geo-search`: Photon city search behind `searchCities`.
+- `components/landing`: `landing-cta` (frost card on `/` into `/plan`,
+  `/new`, `/maps`; passed to `TripExperience` via its `cta` slot).
+- `components/off-the-map`: shared in-voice dead end (global 404,
+  expired share, map missing on this device).
 - `components/ai`: `ai-chat` (`/plan`, 3 questions → one `/api/generate`
   via `hooks/use-generate-trip` → `/new?from=ai`), `chat-steps`,
   `chat-bubble`. Ghost stops render via `trip/ghost-markers` and open the

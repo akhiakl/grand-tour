@@ -10,6 +10,7 @@ import type { GhostStop } from "@/lib/ai";
 import { routeBounds, type City, type LatLng, type Trip } from "@/lib/trip";
 import { escapeHtml } from "@/lib/utils";
 
+import { fitPadding } from "./fit-padding";
 import { GhostMarkers } from "./ghost-markers";
 import { RouteLayer } from "./route-layer";
 import { VectorBasemap } from "./vector-basemap";
@@ -21,15 +22,19 @@ export interface TripMapProps {
   /** Locked AI suggestions (editor only); selecting one opens the upsell. */
   readonly ghosts?: readonly GhostStop[];
   readonly onGhostSelect?: () => void;
+  /** Full-bleed experience: fit the route clear of the floating chrome. */
+  readonly withChrome?: boolean;
 }
 
 /** Fits the route, fences panning, and flies to the selected stop. */
 function MapFocus({
   cities,
   selectedIndex,
+  withChrome,
 }: {
   readonly cities: City[];
   readonly selectedIndex: number | null;
+  readonly withChrome: boolean;
 }) {
   const map = useMap();
   const bounds = useMemo(() => L.latLngBounds(routeBounds(cities)), [cities]);
@@ -40,11 +45,14 @@ function MapFocus({
 
   useEffect(() => {
     if (selectedIndex === null) {
-      map.flyToBounds(bounds, { padding: [72, 72], duration: 1 });
+      map.flyToBounds(bounds, {
+        ...fitPadding(map.getSize().x, withChrome),
+        duration: 1,
+      });
     } else {
       map.flyTo(cities[selectedIndex].ll as LatLng, 9, { duration: 1.2 });
     }
-  }, [map, bounds, cities, selectedIndex]);
+  }, [map, bounds, cities, selectedIndex, withChrome]);
 
   return null;
 }
@@ -87,6 +95,7 @@ export default function MapCanvas({
   onCitySelect,
   ghosts = [],
   onGhostSelect = () => undefined,
+  withChrome = false,
 }: TripMapProps) {
   const initialBounds = useMemo(
     () => L.latLngBounds(routeBounds(trip.cities)).pad(0.25),
@@ -104,7 +113,11 @@ export default function MapCanvas({
       className="atlas-map h-full w-full"
     >
       <VectorBasemap />
-      <MapFocus cities={trip.cities} selectedIndex={selectedIndex} />
+      <MapFocus
+        cities={trip.cities}
+        selectedIndex={selectedIndex}
+        withChrome={withChrome}
+      />
       <RouteLayer trip={trip} />
       {trip.cities.map((city, index) => (
         <CityMarker

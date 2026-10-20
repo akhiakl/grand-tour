@@ -10,7 +10,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-primary text-primary-foreground shadow-sm hover:opacity-90",
-        brass: "bg-brass text-paper shadow-sm hover:opacity-90 dark:text-[#0e1420]",
+        brass: "bg-brass text-ink shadow-sm hover:opacity-90 dark:text-paper",
         outline:
           "border border-line bg-transparent text-foreground hover:bg-secondary",
         ghost: "text-foreground hover:bg-secondary",

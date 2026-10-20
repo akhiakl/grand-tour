@@ -60,7 +60,7 @@ export function TimelineRail({
                 className={cn(
                   "text-[10px] tracking-[0.14em] uppercase",
                   selectedIndex === index
-                    ? "font-semibold text-brass"
+                    ? "font-semibold text-brass-text"
                     : "text-muted-foreground",
                 )}
               >
