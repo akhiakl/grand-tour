@@ -2,6 +2,7 @@ import { nanoid } from "nanoid";
 import { z } from "zod";
 
 import { TripSchema, type Trip } from "./schema";
+import { clearTripTools } from "./tools-store";
 
 /**
  * Client-side persistence for the creator's editable trips — plain
@@ -99,9 +100,10 @@ export function saveLocalTrip(trip: Trip, id?: string): string {
   return targetId;
 }
 
-/** Remove a local trip and its index entry. No-op if it doesn't exist. */
+/** Remove a local trip, its index entry and its packing/notes. No-op if missing. */
 export function deleteLocalTrip(id: string): void {
   if (!hasStorage()) return;
   window.localStorage.removeItem(recordKey(id));
+  clearTripTools({ kind: "local", id });
   writeIndex(readIndex().filter((existing) => existing !== id));
 }

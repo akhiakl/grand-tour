@@ -5,7 +5,12 @@ import { useState, type ReactNode } from "react";
 
 import { ShareDialog } from "@/components/share/share-dialog";
 import { useShareTrip } from "@/hooks/use-share-trip";
-import { saveLocalTrip, tripStats, type Trip } from "@/lib/trip";
+import {
+  saveLocalTrip,
+  tripStats,
+  type Trip,
+  type TripToolsScope,
+} from "@/lib/trip";
 
 import type { MapInsets } from "./fit-padding";
 import { IntroSplash } from "./intro-splash";
@@ -15,6 +20,17 @@ import { TripMap } from "./trip-map";
 import { TripPanel } from "./trip-panel";
 
 const noop = () => {};
+
+/** Where a viewer's packing and notes are saved for the hosting page. */
+function toolsScopeFor(
+  actions: ExperienceVariant,
+  ids: { localId?: string; shareId?: string },
+): TripToolsScope {
+  if (actions === "shared" && ids.shareId)
+    return { kind: "shared", id: ids.shareId };
+  if (actions === "own" && ids.localId) return { kind: "local", id: ids.localId };
+  return { kind: "demo" };
+}
 
 /**
  * The product view: a full-bleed map with one floating atlas card (the
@@ -28,6 +44,7 @@ export function TripExperience({
   trip,
   actions = "demo",
   localId,
+  shareId,
   cta,
 }: {
   readonly trip: Trip;
@@ -35,6 +52,8 @@ export function TripExperience({
   /** The trip's local-store id, when `actions="own"` — lets "Edit" update
    * this same record in place instead of forking a new copy. */
   readonly localId?: string;
+  /** The snapshot id, when `actions="shared"` (`/t/{id}`). */
+  readonly shareId?: string;
   /** The landing's own primary actions, shown in place of the variant's. */
   readonly cta?: ReactNode;
 }) {
@@ -55,9 +74,16 @@ export function TripExperience({
   };
 
   const stats = tripStats(trip);
+  const toolsScope = toolsScopeFor(actions, { localId, shareId });
   const route = trip.cities.map((city) => city.name).join(" → ");
 
-  const { share, sharing, shareId, dialogOpen, setDialogOpen } = useShareTrip({
+  const {
+    share,
+    sharing,
+    shareId: sharedId,
+    dialogOpen,
+    setDialogOpen,
+  } = useShareTrip({
     // Local trips are already within the guest city limit by construction,
     // so the 403 branch this would gate is unreachable here.
     onCityLimit: noop,
@@ -79,6 +105,7 @@ export function TripExperience({
     <div className="relative isolate h-dvh w-full overflow-hidden">
       <TripPanel
         trip={trip}
+        toolsScope={toolsScope}
         variant={actions}
         cta={cta}
         selected={selected}
@@ -109,7 +136,7 @@ export function TripExperience({
       <PosterDialog trip={trip} open={posterOpen} onOpenChange={setPosterOpen} />
       {actions === "own" && (
         <ShareDialog
-          shareId={shareId}
+          shareId={sharedId}
           open={dialogOpen}
           onOpenChange={setDialogOpen}
         />

@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useState, type ReactNode } from "react";
 
-import type { Trip } from "@/lib/trip";
+import type { Trip, TripToolsScope } from "@/lib/trip";
 
 import { CityDetail } from "./city-detail";
 import type { MapInsets } from "./fit-padding";
@@ -25,6 +25,7 @@ import { TripTools } from "./trip-tools";
  */
 export function TripPanel({
   trip,
+  toolsScope,
   variant,
   cta,
   selected,
@@ -40,6 +41,8 @@ export function TripPanel({
   onExpandedChange,
 }: {
   readonly trip: Trip;
+  /** Where this viewer's packing ticks and notes are saved. */
+  readonly toolsScope: TripToolsScope;
   readonly variant: ExperienceVariant;
   readonly cta?: ReactNode;
   readonly selected: number | null;
@@ -130,7 +133,12 @@ export function TripPanel({
           />
         )}
         {/* Always mounted so ticks and notes survive a detour to a stop. */}
-        <TripTools active={city ? null : tool} onBack={() => setTool(null)} />
+        <TripTools
+          trip={trip}
+          scope={toolsScope}
+          active={city ? null : tool}
+          onBack={() => setTool(null)}
+        />
         {!city && !tool && (
           <>
             <SecondaryActions

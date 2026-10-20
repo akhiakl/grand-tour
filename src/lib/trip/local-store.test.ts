@@ -49,10 +49,12 @@ describe("local-store", () => {
 
   it("deletes a trip and its index entry", () => {
     const id = saveLocalTrip(makeTrip());
+    window.localStorage.setItem(`trip-tools:local:${id}`, '{"notes":"x"}');
     deleteLocalTrip(id);
 
     expect(getLocalTrip(id)).toBeNull();
     expect(listLocalTrips()).toHaveLength(0);
+    expect(window.localStorage.getItem(`trip-tools:local:${id}`)).toBeNull();
   });
 
   it("returns null for a missing id", () => {
