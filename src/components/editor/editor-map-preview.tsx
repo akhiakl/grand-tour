@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-import type { GhostStop } from "@/lib/ai";
+import { placeGhostStops } from "@/lib/ai";
 import type { DraftTrip, Trip } from "@/lib/trip";
 
 import { TripMap } from "../trip/trip-map";
@@ -27,15 +27,22 @@ function useDebouncedDraft(draft: DraftTrip): DraftTrip {
  */
 export function EditorMapPreview({
   draft,
-  ghosts,
+  ghostNames = [],
   onGhostSelect,
 }: {
   readonly draft: DraftTrip;
-  readonly ghosts?: readonly GhostStop[];
+  /** AI overflow stops; never saved with the trip. */
+  readonly ghostNames?: readonly string[];
   readonly onGhostSelect?: () => void;
 }) {
   const debounced = useDebouncedDraft(draft);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  // Placed from the same debounced draft as the route, so the ghost fan
+  // moves together with the route's end while the guest edits.
+  const ghosts = useMemo(
+    () => placeGhostStops(debounced.cities, ghostNames),
+    [debounced.cities, ghostNames],
+  );
 
   if (debounced.cities.length === 0) {
     return (

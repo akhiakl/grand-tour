@@ -1,12 +1,12 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { ShareDialog } from "@/components/share/share-dialog";
 import { UpsellModal } from "@/components/upsell/upsell-modal";
 import { useShareTrip } from "@/hooks/use-share-trip";
-import { placeGhostStops, readAndClearAiHandoff } from "@/lib/ai";
+import { readAndClearAiHandoff } from "@/lib/ai";
 import {
   addCity,
   canAddCity,
@@ -75,12 +75,6 @@ export function EditorPage() {
   const [localId, setLocalId] = useState(initial.localId);
   const [upsellOpen, setUpsellOpen] = useState(false);
   const [createdAt] = useState(initial.createdAt);
-  // Ghosts trail the route's current end, so they follow edits and vanish
-  // once the guest removes every stop; they are never saved with the trip.
-  const ghosts = useMemo(
-    () => placeGhostStops(draft.cities, initial.ghostNames),
-    [draft.cities, initial.ghostNames],
-  );
 
   const { share, sharing, shareId, dialogOpen, setDialogOpen } = useShareTrip({
     onCityLimit: () => setUpsellOpen(true),
@@ -139,7 +133,7 @@ export function EditorPage() {
         <div className="relative isolate order-first h-64 overflow-hidden rounded-2xl border border-line lg:sticky lg:top-8 lg:order-none lg:h-[32rem]">
           <EditorMapPreview
             draft={draft}
-            ghosts={ghosts}
+            ghostNames={initial.ghostNames}
             onGhostSelect={() => setUpsellOpen(true)}
           />
         </div>

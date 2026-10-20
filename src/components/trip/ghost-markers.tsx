@@ -46,7 +46,7 @@ export function GhostMarkers({
   readonly ghosts: readonly GhostStop[];
   readonly onSelect: () => void;
 }) {
-  return ghosts.map((ghost) => (
-    <GhostMarker key={ghost.name} ghost={ghost} onSelect={onSelect} />
+  return ghosts.map((ghost, index) => (
+    <GhostMarker key={`${ghost.name}-${index}`} ghost={ghost} onSelect={onSelect} />
   ));
 }
