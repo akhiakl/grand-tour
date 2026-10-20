@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
 
 import type { Trip } from "@/lib/trip";
 
 import { CityDetail } from "./city-detail";
+import type { MapInsets } from "./fit-padding";
 import {
   PrimaryActions,
   SecondaryActions,
@@ -28,11 +29,13 @@ export function TripPanel({
   cta,
   selected,
   onSelect,
+  hovered,
+  onHover,
   onEditRoute,
   onShare,
   sharing,
   onPoster,
-  onInsetChange,
+  onInsetsChange,
   expanded,
   onExpandedChange,
 }: {
@@ -41,25 +44,33 @@ export function TripPanel({
   readonly cta?: ReactNode;
   readonly selected: number | null;
   readonly onSelect: (index: number | null) => void;
+  /** The stop under the pointer (or focus), on the map or in the list. */
+  readonly hovered: number | null;
+  readonly onHover: (index: number | null) => void;
   readonly onEditRoute: () => void;
   readonly onShare?: () => void;
   readonly sharing?: boolean;
   readonly onPoster: () => void;
-  readonly onInsetChange: (px: number) => void;
+  readonly onInsetsChange: (insets: MapInsets) => void;
   /** Mobile sheet state; picking a stop opens it (see TripExperience). */
   readonly expanded: boolean;
   readonly onExpandedChange: (expanded: boolean) => void;
 }) {
   const [tool, setTool] = useState<ToolId | null>(null);
+  const [collapsed, setCollapsed] = useState(false);
+  const bodyId = useId();
   const city = selected === null ? null : trip.cities[selected];
 
   // A newly picked stop (from the map or the itinerary) takes over the
-  // panel from any open tool. Adjusted during render, React's pattern for
-  // state that follows a prop.
+  // panel from any open tool, unfolding a collapsed card to show it.
+  // Adjusted during render, React's pattern for state that follows a prop.
   const [shownSelection, setShownSelection] = useState(selected);
   if (selected !== shownSelection) {
     setShownSelection(selected);
-    if (selected !== null) setTool(null);
+    if (selected !== null) {
+      setTool(null);
+      setCollapsed(false);
+    }
   }
 
   useEffect(() => {
@@ -79,6 +90,7 @@ export function TripPanel({
     onSelect(null);
     setTool((current) => (current === next ? null : next));
     onExpandedChange(true);
+    setCollapsed(false);
   };
 
   return (
@@ -86,11 +98,16 @@ export function TripPanel({
       label="Trip details"
       expanded={expanded}
       onExpandedChange={onExpandedChange}
-      onInsetChange={onInsetChange}
+      collapsed={collapsed}
+      bodyId={bodyId}
+      onInsetsChange={onInsetsChange}
       head={
         <PanelHead
           trip={trip}
           variant={variant}
+          collapsed={collapsed}
+          bodyId={bodyId}
+          onCollapsedChange={setCollapsed}
           actions={
             <PrimaryActions
               variant={variant}
@@ -126,7 +143,13 @@ export function TripPanel({
             <StatsGrid trip={trip} />
             <section aria-label="Route" className="flex flex-col gap-2">
               <p className="eyebrow">The route</p>
-              <Itinerary trip={trip} selectedIndex={selected} onSelect={onSelect} />
+              <Itinerary
+                trip={trip}
+                selectedIndex={selected}
+                onSelect={onSelect}
+                hoveredIndex={hovered}
+                onHover={onHover}
+              />
             </section>
           </>
         )}

@@ -32,13 +32,25 @@ vi.mock("./trip-map", () => ({
   TripMap: ({
     onCitySelect,
     onBackgroundClick,
+    hoveredIndex,
+    onCityHover,
   }: {
     readonly onCitySelect: (index: number) => void;
     readonly onBackgroundClick: () => void;
+    readonly hoveredIndex: number | null;
+    readonly onCityHover: (index: number | null) => void;
   }) => (
     <>
       <button type="button" onClick={() => onCitySelect(1)}>
         map marker
+      </button>
+      <button
+        type="button"
+        data-hovered={hoveredIndex ?? "none"}
+        onMouseEnter={() => onCityHover(2)}
+        onMouseLeave={() => onCityHover(null)}
+      >
+        hoverable marker
       </button>
       <button type="button" onClick={onBackgroundClick}>
         map background
@@ -166,5 +178,54 @@ describe("TripExperience", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "map background" }));
     expect(handle()).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("syncs hover between itinerary rows and map markers", async () => {
+    render(<TripExperience trip={routeTrip()} actions="shared" />);
+    const marker = screen.getByRole("button", { name: "hoverable marker" });
+    const row = (name: RegExp) =>
+      within(screen.getByRole("list", { name: "Itinerary" })).getByRole("button", {
+        name,
+      });
+
+    await userEvent.hover(row(/Stop 2/));
+    expect(marker).toHaveAttribute("data-hovered", "1");
+    await userEvent.unhover(row(/Stop 2/));
+    expect(marker).toHaveAttribute("data-hovered", "none");
+
+    await userEvent.hover(marker);
+    expect(row(/Stop 3/)).toHaveAttribute("data-hovered");
+    await userEvent.unhover(marker);
+    expect(row(/Stop 3/)).not.toHaveAttribute("data-hovered");
+  });
+
+  it("collapses the desktop card to its head and expands it again", async () => {
+    render(<TripExperience trip={routeTrip()} actions="shared" />);
+    const itinerary = screen.getByRole("list", { name: "Itinerary" });
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "Collapse trip card" }),
+    );
+    const toggle = screen.getByRole("button", { name: "Expand trip card" });
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    expect(itinerary.closest("[inert]")).not.toBeNull();
+
+    await userEvent.click(toggle);
+    expect(
+      screen.getByRole("button", { name: "Collapse trip card" }),
+    ).toHaveAttribute("aria-expanded", "true");
+    expect(itinerary.closest("[inert]")).toBeNull();
+  });
+
+  it("a stop picked on the map unfolds a collapsed card", async () => {
+    render(<TripExperience trip={routeTrip()} actions="shared" />);
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "Collapse trip card" }),
+    );
+    await userEvent.click(screen.getByRole("button", { name: "map marker" }));
+    expect(
+      screen.getByRole("button", { name: "Collapse trip card" }),
+    ).toHaveAttribute("aria-expanded", "true");
   });
 });

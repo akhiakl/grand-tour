@@ -202,6 +202,8 @@ input[type="range"] {
 /* The floating atlas card: frost, but dense enough that map labels
    behind it blur away instead of bleeding through. */
 .atlas-card {
+  /* Desktop width: grows with the viewport, within readable bounds. */
+  --card-w: clamp(340px, 26vw, 420px);
   border: 1px solid var(--line);
   border-radius: 22px;
   background: color-mix(in srgb, var(--paper) 90%, transparent);
@@ -256,7 +258,8 @@ input[type="range"] {
 /* ——— Markers: brass dot with its label beside it ———
    The icon box is 0×0 at the stop; dot and label hang off that point.
    MapDeclutter flips labels to the left (.marker-flip), fades ones with
-   no room (.marker-lbl-hidden, back on hover/focus) and hides colliding
+   no room (.marker-lbl-hidden, back on hover/focus/.marker-hover — the
+   synced itinerary row) and hides colliding
    leg badges, so nothing stacks on top of anything else. */
 
 .marker-anchor {
@@ -296,6 +299,9 @@ input[type="range"] {
   font-family: var(--font-fraunces), ui-serif, Georgia, serif;
   font-size: 12px;
   font-weight: 600;
+  max-width: 14rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
   transform: translateY(-50%);
   transition: opacity 0.2s;
@@ -311,19 +317,33 @@ input[type="range"] {
 }
 
 .marker-anchor:hover .marker-lbl,
-.marker-anchor:focus-visible .marker-lbl {
+.marker-anchor:focus-visible .marker-lbl,
+.marker-hover .marker-lbl {
   z-index: 1;
   opacity: 1;
 }
 
 .marker-anchor:hover .marker-dot,
-.marker-active .marker-dot {
+.marker-active .marker-dot,
+.marker-hover .marker-dot {
   transform: scale(1.3);
 }
 
-.marker-active .marker-lbl {
+.marker-active .marker-lbl,
+.marker-hover .marker-lbl {
   border-color: var(--brass);
   color: var(--brass-text);
+}
+
+/* Keyboard focus: a brass ring around the dot (the 0×0 anchor itself
+   can't show an outline). */
+.marker-anchor:focus-visible {
+  outline: none;
+}
+
+.marker-anchor:focus-visible .marker-dot {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
 }
 
 /* Ghost stops: locked AI suggestions past the guest limit. */

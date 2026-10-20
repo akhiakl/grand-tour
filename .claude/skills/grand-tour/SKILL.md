@@ -82,7 +82,7 @@ status table before starting work. Visual truth: `reference/grand-tour.html`.
   - `drawer-sections` (5 tabs incl. budget calculator), `trip-tools`
     (packing, notes). Map: `trip-map` → `map-canvas`
     (`vector-basemap` + `basemap-tweaks` label muting, markers, flyTo,
-    `fit-padding`) + `route-layer` (staged curved draw), `map-controls`
+    `map-focus` fit/fly + focus-pan clear of the card, `fit-padding` insets + `clearPanOffset`) + `route-layer` (staged curved draw), `map-controls`
     (zoom, fit route), `map-legend`, `map-declutter` + `declutter` (label
     flip/hide, badge hide), `map-overlay`. Also `intro-splash`,
     `poster-dialog` + `draw-poster` + `poster-tiles`, `mode`.

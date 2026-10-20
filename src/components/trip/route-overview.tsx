@@ -17,16 +17,16 @@ function Stat({
   readonly caption: string;
 }) {
   return (
-    <div className="rounded-xl border border-line px-3.5 py-2.5">
-      <b className="block font-display text-lg leading-tight font-medium">
+    <div className="min-w-0 rounded-xl border border-line px-3.5 py-2.5">
+      <b className="block font-display text-lg leading-tight font-medium wrap-break-word">
         {value}
         {detail && (
-          <span className="ml-1.5 font-sans text-xs font-normal text-ink-soft">
+          <span className="ml-1.5 inline-block font-sans text-xs font-normal text-ink-soft">
             {detail}
           </span>
         )}
       </b>
-      <span className="text-[10px] tracking-[0.16em] text-ink-soft uppercase">
+      <span className="block text-[10px] tracking-[0.16em] text-ink-soft uppercase wrap-break-word">
         {caption}
       </span>
     </div>
@@ -66,15 +66,24 @@ function LegLine({ leg }: { readonly leg: Leg }) {
   );
 }
 
-/** The route as a vertical, scrollable itinerary; each stop opens its detail. */
+/**
+ * The route as a vertical, scrollable itinerary; each stop opens its
+ * detail. Hovering or focusing a row reports it (`onHover`) so the map can
+ * highlight its marker, and `hoveredIndex` lights the row back up when
+ * the pointer is on that marker instead.
+ */
 export function Itinerary({
   trip,
   selectedIndex,
   onSelect,
+  hoveredIndex = null,
+  onHover,
 }: {
   readonly trip: Trip;
   readonly selectedIndex: number | null;
   readonly onSelect: (index: number) => void;
+  readonly hoveredIndex?: number | null;
+  readonly onHover?: (index: number | null) => void;
 }) {
   return (
     <ol aria-label="Itinerary">
@@ -85,9 +94,14 @@ export function Itinerary({
             <button
               type="button"
               onClick={() => onSelect(index)}
+              onPointerEnter={() => onHover?.(index)}
+              onPointerLeave={() => onHover?.(null)}
+              onFocus={() => onHover?.(index)}
+              onBlur={() => onHover?.(null)}
               aria-current={selectedIndex === index ? "step" : undefined}
+              data-hovered={hoveredIndex === index || undefined}
               className={cn(
-                "group flex w-full items-center gap-3 rounded-xl p-1.5 text-left transition-colors outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring",
+                "group flex w-full items-center gap-3 rounded-xl p-1.5 text-left transition-colors outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring data-hovered:bg-accent",
                 selectedIndex === index && "bg-accent",
               )}
             >
@@ -98,7 +112,10 @@ export function Itinerary({
                 {city.flag}
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block truncate font-display text-base font-medium">
+                <span
+                  title={city.name}
+                  className="block truncate font-display text-base font-medium"
+                >
                   {city.name}
                 </span>
                 <span className="block text-xs text-ink-soft">

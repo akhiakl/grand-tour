@@ -3,17 +3,18 @@
 import "leaflet/dist/leaflet.css";
 
 import L from "leaflet";
-import { useEffect, useMemo } from "react";
-import { MapContainer, Marker, useMap, useMapEvents } from "react-leaflet";
+import { useEffect, useMemo, useRef } from "react";
+import { MapContainer, Marker, useMapEvents } from "react-leaflet";
 
 import type { GhostStop } from "@/lib/ai";
 import { routeBounds, type City, type LatLng, type Trip } from "@/lib/trip";
 import { escapeHtml } from "@/lib/utils";
 
-import { fitPadding } from "./fit-padding";
+import type { MapInsets } from "./fit-padding";
 import { GhostMarkers } from "./ghost-markers";
 import { MapControls } from "./map-controls";
 import { MapDeclutter } from "./map-declutter";
+import { MapFocus, MarkerFocusPan } from "./map-focus";
 import { MapLegend } from "./map-legend";
 import { RouteLayer } from "./route-layer";
 import { VectorBasemap } from "./vector-basemap";
@@ -22,80 +23,20 @@ export interface TripMapProps {
   readonly trip: Trip;
   readonly selectedIndex: number | null;
   readonly onCitySelect: (index: number) => void;
+  /** A stop highlighted from elsewhere (its itinerary row is hovered). */
+  readonly hoveredIndex?: number | null;
+  /** The pointer entered (index) or left (null) a stop's marker. */
+  readonly onCityHover?: (index: number | null) => void;
   /** Locked AI suggestions (editor only); selecting one opens the upsell. */
   readonly ghosts?: readonly GhostStop[];
   readonly onGhostSelect?: () => void;
-  /** Pixels the mobile bottom sheet covers; fits and overlays clear it. */
-  readonly bottomInset?: number;
-  /** Pixels the desktop atlas card covers along the left edge. */
-  readonly leftInset?: number;
+  /** Pixels the atlas card covers; fits, focus pans and overlays clear it. */
+  readonly insets?: MapInsets;
   /** A tap on the map itself (not a marker), e.g. to lower the sheet. */
   readonly onBackgroundClick?: () => void;
 }
 
-const CITY_ZOOM = 9;
-
-/** Fits the route, fences panning, and flies to the selected stop. */
-function MapFocus({
-  cities,
-  selectedIndex,
-  bounds,
-  bottomInset,
-  leftInset,
-}: {
-  readonly cities: City[];
-  readonly selectedIndex: number | null;
-  readonly bounds: L.LatLngBounds;
-  readonly bottomInset: number;
-  readonly leftInset: number;
-}) {
-  const map = useMap();
-
-  useEffect(() => {
-    // Fence panning one screen beyond the route (measured at the minimum
-    // zoom), so a fit can always slide the route clear of the atlas card
-    // while the route can never be dragged out of reach.
-    const fence = () => {
-      const zoom = map.getMinZoom();
-      const { x, y } = map.getSize();
-      const sw = map.project(bounds.getSouthWest(), zoom).add([-x, y]);
-      const ne = map.project(bounds.getNorthEast(), zoom).add([x, -y]);
-      map.setMaxBounds(
-        L.latLngBounds(map.unproject(sw, zoom), map.unproject(ne, zoom)),
-      );
-    };
-    fence();
-    map.on("resize", fence);
-    return () => {
-      map.off("resize", fence);
-    };
-  }, [map, bounds]);
-
-  useEffect(() => {
-    // MapContainer only applies `style` on mount, so set the insets the
-    // overlays (legend, attribution) offset by on the live container.
-    const container = map.getContainer();
-    container.style.setProperty("--map-inset-bottom", `${bottomInset}px`);
-    container.style.setProperty("--map-inset-left", `${leftInset}px`);
-  }, [map, bottomInset, leftInset]);
-
-  useEffect(() => {
-    if (selectedIndex === null) {
-      map.flyToBounds(bounds, {
-        ...fitPadding({ bottom: bottomInset, left: leftInset }, map.getSize().y),
-        duration: 1,
-      });
-    } else {
-      // Centre the stop in the part of the map the sheet leaves visible.
-      const point = map
-        .project(cities[selectedIndex].ll as LatLng, CITY_ZOOM)
-        .add([-leftInset / 2, bottomInset / 2]);
-      map.flyTo(map.unproject(point, CITY_ZOOM), CITY_ZOOM, { duration: 1.2 });
-    }
-  }, [map, bounds, cities, selectedIndex, bottomInset, leftInset]);
-
-  return null;
-}
+const NO_INSETS: MapInsets = {};
 
 function BackgroundClick({ onClick }: { readonly onClick: () => void }) {
   useMapEvents({ click: onClick });
@@ -106,13 +47,18 @@ function CityMarker({
   city,
   index,
   selected,
+  hovered,
   onSelect,
+  onHover,
 }: {
   readonly city: City;
   readonly index: number;
   readonly selected: boolean;
+  readonly hovered: boolean;
   readonly onSelect: (index: number) => void;
+  readonly onHover?: (index: number | null) => void;
 }) {
+  const marker = useRef<L.Marker>(null);
   const icon = useMemo(
     () =>
       L.divIcon({
@@ -124,12 +70,29 @@ function CityMarker({
     [city.flag, city.name, selected],
   );
 
+  // Toggled on the live element rather than baked into the icon: swapping
+  // the icon would replace the element under the pointer (and its focus).
+  useEffect(() => {
+    marker.current
+      ?.getElement()
+      ?.querySelector(".marker")
+      ?.classList.toggle("marker-hover", hovered);
+  }, [hovered, icon]);
+
   return (
     <Marker
+      ref={marker}
       position={city.ll as LatLng}
       icon={icon}
-      alt={`${city.name}, stop ${index + 1}`}
-      eventHandlers={{ click: () => onSelect(index) }}
+      // Leaflet applies `alt` only to <img> icons; `title` names a divIcon
+      // for screen readers and shows the full name over a truncated label.
+      title={`${city.name}, stop ${index + 1}`}
+      autoPanOnFocus={false}
+      eventHandlers={{
+        click: () => onSelect(index),
+        mouseover: () => onHover?.(index),
+        mouseout: () => onHover?.(null),
+      }}
     />
   );
 }
@@ -138,10 +101,11 @@ export default function MapCanvas({
   trip,
   selectedIndex,
   onCitySelect,
+  hoveredIndex = null,
+  onCityHover,
   ghosts = [],
   onGhostSelect = () => undefined,
-  bottomInset = 0,
-  leftInset = 0,
+  insets = NO_INSETS,
   onBackgroundClick,
 }: TripMapProps) {
   const bounds = useMemo(
@@ -165,9 +129,9 @@ export default function MapCanvas({
         cities={trip.cities}
         selectedIndex={selectedIndex}
         bounds={bounds}
-        bottomInset={bottomInset}
-        leftInset={leftInset}
+        insets={insets}
       />
+      <MarkerFocusPan insets={insets} />
       <RouteLayer trip={trip} />
       {trip.cities.map((city, index) => (
         <CityMarker
@@ -175,16 +139,15 @@ export default function MapCanvas({
           city={city}
           index={index}
           selected={selectedIndex === index}
+          hovered={hoveredIndex === index}
           onSelect={onCitySelect}
+          onHover={onCityHover}
         />
       ))}
       <GhostMarkers ghosts={ghosts} onSelect={onGhostSelect} />
       <MapDeclutter />
       {onBackgroundClick && <BackgroundClick onClick={onBackgroundClick} />}
-      <MapControls
-        bounds={bounds}
-        insets={{ bottom: bottomInset, left: leftInset }}
-      />
+      <MapControls bounds={bounds} insets={insets} />
       <MapLegend legs={trip.legs} hasGhosts={ghosts.length > 0} />
     </MapContainer>
   );

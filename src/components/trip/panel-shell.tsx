@@ -12,12 +12,12 @@ import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "re
 
 import { DESKTOP_QUERY, useMediaQuery } from "@/hooks/use-media-query";
 
-/** Desktop card: `lg:left-5` + `lg:w-[380px]`; the map fits clear of it. */
-export const CARD_RIGHT_EDGE = 20 + 380;
+import type { MapInsets } from "./fit-padding";
+
 /** Mobile card floats this far above the bottom edge (`bottom-3`). */
 const CARD_GAP = 12;
 
-const EASE_ATLAS = [0.32, 0.72, 0.24, 1] as const;
+export const EASE_ATLAS = [0.32, 0.72, 0.24, 1] as const;
 /** Drag distance (px) or flick speed (px/s) that commits a snap. */
 const SNAP_DISTANCE = 48;
 const SNAP_VELOCITY = 400;
@@ -25,22 +25,30 @@ const SNAP_VELOCITY = 400;
 /**
  * The trip panel's frame: one frosted "atlas card" floating over the
  * full-bleed map, top-left from `lg` up and along the bottom below it. The sheet rests showing just `head` and expands (handle click,
- * drag, or flick) to reveal `children`; `onInsetChange` reports how much
+ * drag, or flick) to reveal `children`; `onInsetsChange` reports how much
  * of the screen it covers in either state, so the map aims above it.
+ * On desktop the card is a fluid-width column (`--card-w`) that can
+ * `collapse` to its head; the reported inset follows its measured edges.
  */
 export function PanelShell({
   label,
   head,
+  bodyId,
   expanded,
   onExpandedChange,
-  onInsetChange,
+  collapsed,
+  onInsetsChange,
   children,
 }: {
   readonly label: string;
   readonly head: ReactNode;
+  /** Lets the head's collapse toggle point `aria-controls` at the body. */
+  readonly bodyId: string;
   readonly expanded: boolean;
   readonly onExpandedChange: (expanded: boolean) => void;
-  readonly onInsetChange: (px: number) => void;
+  /** Desktop only: the card is folded down to its head. */
+  readonly collapsed: boolean;
+  readonly onInsetsChange: (insets: MapInsets) => void;
   readonly children: ReactNode;
 }) {
   const isDesktop = useMediaQuery(DESKTOP_QUERY);
@@ -49,7 +57,7 @@ export function PanelShell({
   const sheetRef = useRef<HTMLElement>(null);
   const headRef = useRef<HTMLDivElement>(null);
   const dragged = useRef(false);
-  const [size, setSize] = useState({ sheet: 0, peek: 0 });
+  const [size, setSize] = useState({ sheet: 0, peek: 0, right: 0, headBottom: 0 });
   const collapsedY = Math.max(0, size.sheet - size.peek);
   const y = useMotionValue(0);
   const target = expanded ? 0 : collapsedY;
@@ -76,6 +84,9 @@ export function PanelShell({
       setSize({
         sheet: sheet.offsetHeight,
         peek: headEl.offsetTop + headEl.offsetHeight,
+        // Desktop edges, in viewport px (the map fills the viewport).
+        right: Math.round(sheet.getBoundingClientRect().right),
+        headBottom: Math.round(headEl.getBoundingClientRect().bottom),
       }),
     );
     observer.observe(sheet);
@@ -83,9 +94,23 @@ export function PanelShell({
     return () => observer.disconnect();
   }, []);
 
+  // Collapsed, the card covers only a strip as tall as its head: measured
+  // from the head (not the animating body) so the map re-fits once.
+  const { sheet, peek, right, headBottom } = size;
   useEffect(() => {
-    onInsetChange(CARD_GAP + (expanded ? size.sheet : size.peek));
-  }, [expanded, size, onInsetChange]);
+    if (!isDesktop) onInsetsChange({ bottom: CARD_GAP + (expanded ? sheet : peek) });
+    else if (collapsed) onInsetsChange({ top: headBottom });
+    else onInsetsChange({ left: right });
+  }, [
+    isDesktop,
+    expanded,
+    collapsed,
+    sheet,
+    peek,
+    right,
+    headBottom,
+    onInsetsChange,
+  ]);
 
   const onDragEnd = (_: unknown, { offset, velocity }: PanInfo) => {
     const up = offset.y < -SNAP_DISTANCE || velocity.y < -SNAP_VELOCITY;
@@ -111,7 +136,7 @@ export function PanelShell({
       onDragStart={() => (dragged.current = true)}
       onDragEnd={onDragEnd}
       style={{ y }}
-      className="atlas-card fixed inset-x-3 bottom-3 z-40 flex h-[60dvh] flex-col lg:inset-x-auto lg:top-5 lg:bottom-auto lg:left-5 lg:h-auto lg:max-h-[calc(100dvh-2.5rem)] lg:w-[380px] lg:transform-none!"
+      className="atlas-card fixed inset-x-3 bottom-3 z-40 flex h-[60dvh] flex-col lg:inset-x-auto lg:top-5 lg:bottom-auto lg:left-5 lg:h-auto lg:max-h-[calc(100dvh-2.5rem)] lg:w-(--card-w) lg:transform-none!"
     >
       <button
         type="button"
@@ -132,12 +157,18 @@ export function PanelShell({
       <div ref={headRef} className="shrink-0">
         {head}
       </div>
-      <div
-        inert={!isDesktop && !expanded}
-        className="min-h-0 flex-1 overflow-y-auto overscroll-contain"
+      <motion.div
+        id={bodyId}
+        inert={isDesktop ? collapsed : !expanded}
+        initial={false}
+        animate={{ height: isDesktop && collapsed ? 0 : "auto" }}
+        transition={
+          reducedMotion ? { duration: 0 } : { duration: 0.4, ease: EASE_ATLAS }
+        }
+        className="min-h-0 flex-1 overflow-y-auto overscroll-contain lg:flex-initial"
       >
         {children}
-      </div>
+      </motion.div>
     </motion.section>
   );
 }
