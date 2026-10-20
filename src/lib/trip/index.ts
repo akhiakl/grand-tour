@@ -9,6 +9,7 @@ export * from "./dates";
 export * from "./draft";
 export * from "./fingerprint";
 export * from "./geo";
+export * from "./history";
 export * from "./ics";
 export * from "./leg-estimate";
 export * from "./local-store";

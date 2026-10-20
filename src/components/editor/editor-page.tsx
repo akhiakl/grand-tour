@@ -28,7 +28,6 @@ import {
   updateTitle,
   type City,
   type DraftIssues,
-  type DraftTrip,
   type Leg,
   type Trip,
 } from "@/lib/trip";
@@ -40,6 +39,7 @@ import {
 } from "./editor-header";
 import { EditorMapPreview } from "./editor-map-preview";
 import { StopList } from "./stop-list";
+import { useDraftHistory } from "./use-draft-history";
 
 const AUTOSAVE_DEBOUNCE_MS = 600;
 
@@ -50,6 +50,10 @@ function fieldIdFor(key: string): string | null {
   const match = /^cities\.(\d+)\.(name|nights)$/.exec(key);
   return match ? `stop-${match[1]}-${match[2]}` : null;
 }
+
+/** Undo group for an edit to one stop's or leg's fields, e.g. "city-2-name". */
+const fieldGroup = (kind: string, index: number, patch: object) =>
+  `${kind}-${index}-${Object.keys(patch).sort().join(",")}`;
 
 function focusFirstIssue(issues: DraftIssues) {
   for (const key of Object.keys(issues)) {
@@ -111,7 +115,9 @@ function EditorWorkspace() {
   // not re-read storage or the already-consumed AI handoff.
   const [initial] = useState(() => resolveInitialState(searchParams));
 
-  const [draft, setDraft] = useState<DraftTrip>(initial.draft);
+  const { draft, update, undo, redo, canUndo, canRedo } = useDraftHistory(
+    initial.draft,
+  );
   const [localId, setLocalId] = useState(initial.localId);
   const [upsellOpen, setUpsellOpen] = useState(false);
   const [createdAt] = useState(initial.createdAt);
@@ -150,8 +156,6 @@ function EditorWorkspace() {
     return () => clearTimeout(timer);
   }, [draft, createdAt, persist]);
 
-  const update = (fn: (draft: DraftTrip) => DraftTrip) => setDraft(fn);
-
   const issues = draftIssues(draft);
   const lastShare = localId ? getLocalTrip(localId)?.shared : undefined;
   const currentTrip = draftToTrip(draft, createdAt);
@@ -175,14 +179,17 @@ function EditorWorkspace() {
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
       <EditorHeader
         title={draft.title}
-        onTitleChange={(title) => update((d) => updateTitle(d, title))}
+        onTitleChange={(title) => update((d) => updateTitle(d, title), "title")}
         onShare={handleShare}
         canShare={isShareable(draft)}
         sharing={sharing}
         titleError={issues.title}
         shareStale={shareStale}
         startDate={draft.startDate ?? ""}
-        onStartDateChange={(value) => update((d) => updateStartDate(d, value))}
+        onStartDateChange={(value) =>
+          update((d) => updateStartDate(d, value), "startDate")
+        }
+        history={{ canUndo, canRedo, onUndo: undo, onRedo: redo }}
         startDateError={issues.startDate}
       />
 
@@ -197,10 +204,16 @@ function EditorWorkspace() {
           onRemoveCity={(index) => update((d) => removeCityAt(d, index))}
           onMoveCity={(from, to) => update((d) => moveCity(d, from, to))}
           onUpdateCity={(index, patch) =>
-            update((d) => updateCityAt(d, index, patch))
+            update(
+              (d) => updateCityAt(d, index, patch),
+              fieldGroup("city", index, patch),
+            )
           }
           onUpdateLeg={(index, patch: Partial<Leg>) =>
-            update((d) => updateLegAt(d, index, patch))
+            update(
+              (d) => updateLegAt(d, index, patch),
+              fieldGroup("leg", index, patch),
+            )
           }
         />
 

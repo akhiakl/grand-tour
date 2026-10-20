@@ -6,8 +6,10 @@ import {
   CircleAlert,
   Loader2,
   Map,
+  Redo2,
   RefreshCw,
   Share2,
+  Undo2,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -78,6 +80,7 @@ export function EditorHeader({
   startDate,
   onStartDateChange,
   startDateError,
+  history,
 }: {
   readonly title: string;
   readonly onTitleChange: (title: string) => void;
@@ -90,6 +93,12 @@ export function EditorHeader({
   readonly startDate: string;
   readonly onStartDateChange: (value: string) => void;
   readonly startDateError?: string;
+  readonly history: {
+    readonly canUndo: boolean;
+    readonly canRedo: boolean;
+    readonly onUndo: () => void;
+    readonly onRedo: () => void;
+  };
 }) {
   return (
     <header className="flex flex-wrap items-start justify-between gap-4 border-b border-line pb-5">
@@ -125,6 +134,32 @@ export function EditorHeader({
             Edited since you shared it. Share again to update the link.
           </p>
         )}
+        <div className="flex">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            aria-label="Undo"
+            title="Undo (Ctrl+Z)"
+            aria-keyshortcuts="Control+Z Meta+Z"
+            disabled={!history.canUndo}
+            onClick={history.onUndo}
+          >
+            <Undo2 />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            aria-label="Redo"
+            title="Redo (Ctrl+Shift+Z)"
+            aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z Control+Y"
+            disabled={!history.canRedo}
+            onClick={history.onRedo}
+          >
+            <Redo2 />
+          </Button>
+        </div>
         <Button asChild variant="outline">
           <Link href="/maps">
             <Map /> My Maps
