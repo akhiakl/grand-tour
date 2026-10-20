@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import type { GhostStop } from "@/lib/ai";
 import type { DraftTrip, Trip } from "@/lib/trip";
 
 import { TripMap } from "../trip/trip-map";
@@ -24,7 +25,15 @@ function useDebouncedDraft(draft: DraftTrip): DraftTrip {
  * `legs` at render time, so a draft with 1+ cities can drive it directly
  * without passing the full `TripSchema` gate that `draftToTrip` enforces.
  */
-export function EditorMapPreview({ draft }: { readonly draft: DraftTrip }) {
+export function EditorMapPreview({
+  draft,
+  ghosts,
+  onGhostSelect,
+}: {
+  readonly draft: DraftTrip;
+  readonly ghosts?: readonly GhostStop[];
+  readonly onGhostSelect?: () => void;
+}) {
   const debounced = useDebouncedDraft(draft);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
@@ -52,6 +61,8 @@ export function EditorMapPreview({ draft }: { readonly draft: DraftTrip }) {
       trip={previewTrip}
       selectedIndex={selectedIndex}
       onCitySelect={setSelectedIndex}
+      ghosts={ghosts}
+      onGhostSelect={onGhostSelect}
     />
   );
 }

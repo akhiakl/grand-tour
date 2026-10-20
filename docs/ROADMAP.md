@@ -40,8 +40,8 @@ in `docs/RELEASE.md`. Do not wire any host to auto-deploy `main`.
 | 3.5  | Monitoring (Sentry), SonarQube, CI checks          | ✅ done |
 | 4    | Manual editor + Nominatim + localStorage + My Maps | ✅ done |
 | 5    | /t/[id] shared view + OG image + remix             | ✅ done |
-| 6    | AI chat UI + ghost-stops upsell                    | ⬜ next |
-| 7    | Landing page + polish pass                         | ⬜      |
+| 6    | AI chat UI + ghost-stops upsell                    | ✅ done |
+| 7    | Landing page + polish pass                         | ⬜ next |
 | 8    | Playwright e2e                                     | ⬜      |
 
 ---

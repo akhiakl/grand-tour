@@ -24,7 +24,7 @@ const LOCKED_FEATURES = [
 /**
  * Guest-limit upsell — a Phase 2 teaser, not a real signup flow (see
  * CLAUDE.md Phase 2 non-goals). Fires wherever a guest hits a locked
- * ceiling: the editor's 5th-stop add, My Maps, and (later) ghost stops.
+ * ceiling: the editor's 5th-stop add, My Maps, and AI ghost stops.
  */
 export function UpsellModal({
   open,

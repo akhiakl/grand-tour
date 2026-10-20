@@ -288,6 +288,31 @@ input[type="range"] {
   color: var(--brass);
 }
 
+/* Ghost stops: locked AI suggestions past the guest limit. */
+.marker-ghost {
+  opacity: 0.4;
+  cursor: pointer;
+}
+
+.marker-ghost .marker-dot {
+  background: transparent;
+  box-shadow: 0 0 0 2px var(--ink-soft);
+}
+
+.marker-ghost .marker-lbl {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px dashed var(--ink-soft);
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink-soft);
+}
+
+.marker-ghost:hover {
+  opacity: 0.7;
+}
+
 .marker-pulse {
   position: absolute;
   top: -8px;

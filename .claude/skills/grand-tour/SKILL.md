@@ -48,9 +48,17 @@ status table before starting work. Visual truth: `reference/grand-tour.html`.
   JSON, schema-validated), `service` (server-only Redis: saveTrip/
   getTrip/incrViews, 60-day GETEX TTL).
 - `lib/ai`: `schema` (GenerateRequest, AiTrip + suggestedExtra),
-  `prompt`, `generate` (server-only OpenAI-compatible call, one validation-feedback retry).
+  `prompt`, `generate` (server-only OpenAI-compatible call, one validation-feedback retry),
+  `handoff` (chat → editor localStorage), `ghosts` (approximate positions
+  for `suggestedExtra`).
+- `lib/geo-search`: Photon city search behind `searchCities`.
+- `components/ai`: `ai-chat` (`/plan`, 3 questions → one `/api/generate`
+  via `hooks/use-generate-trip` → `/new?from=ai`), `chat-steps`,
+  `chat-bubble`. Ghost stops render via `trip/ghost-markers` and open the
+  UpsellModal.
 - `lib/http`: per-IP sliding-window rate limiters (trips 10/h,
-  generate 5/h) + `getClientIp`.
+  generate 5/h) + `getClientIp`; `security-headers` (CSP etc., used by
+  `next.config.ts`).
 - `components/trip`: `trip-experience` (orchestrator), `trip-map` →
   `map-canvas` (`vector-basemap`/markers/flyTo) + `route-layer` (staged curved
   draw), `timeline-rail`, `city-drawer` + `drawer-sections` (5 tabs incl.
