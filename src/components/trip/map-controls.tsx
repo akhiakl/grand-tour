@@ -5,7 +5,7 @@ import { Maximize, Minus, Plus } from "lucide-react";
 import type { ReactNode } from "react";
 import { useMap } from "react-leaflet";
 
-import { fitPadding } from "./fit-padding";
+import { fitPadding, type MapInsets } from "./fit-padding";
 import { MapOverlay } from "./map-overlay";
 
 function ControlButton({
@@ -33,10 +33,10 @@ function ControlButton({
 /** Zoom and "fit route": the only controls floating on the map. */
 export function MapControls({
   bounds,
-  bottomInset,
+  insets,
 }: {
   readonly bounds: LatLngBounds;
-  readonly bottomInset: number;
+  readonly insets: MapInsets;
 }) {
   const map = useMap();
 
@@ -52,7 +52,7 @@ export function MapControls({
         label="Fit the whole route"
         onClick={() =>
           map.flyToBounds(bounds, {
-            ...fitPadding(bottomInset, map.getSize().y),
+            ...fitPadding(insets, map.getSize().y),
             duration: 0.8,
           })
         }

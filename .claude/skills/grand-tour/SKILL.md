@@ -8,9 +8,9 @@ description: The product skill for the Grand Tour travel-route-map app — data 
 ## What this app is
 
 Shareable AI travel route maps. Guest-first: no accounts. A trip = ordered
-cities + connecting legs, rendered as a trip panel (title, actions, 2×2
-stats, vertical itinerary, city detail; a sidebar from `lg`, a bottom sheet
-below) beside an uncluttered Leaflet map. Share = immutable
+cities + connecting legs, rendered as a full-bleed Leaflet map with one
+floating atlas card (title, actions, 2×2 stats, vertical itinerary, city
+detail; top-left from `lg`, a draggable bottom card below). Share = immutable
 Redis snapshot at `/t/{id}` (60-day sliding TTL); creator's editable copies
 live in localStorage; a canvas-drawn Instagram poster shares the route as
 an image. `docs/ROADMAP.md` says what's built and what's next — check the
@@ -67,8 +67,8 @@ status table before starting work. Visual truth: `reference/grand-tour.html`.
   `next.config.ts`).
 - `components/trip`: `trip-experience` (orchestrator: panel + map grid),
   `trip-panel` (views: route / city / packing / notes; ESC steps back) in
-  `panel-shell` (sidebar from `lg`, draggable bottom sheet below; reports
-  the inset it covers), `panel-head` (eyebrow per variant, title, theme),
+  `panel-shell` (the floating `.atlas-card`: top-left from `lg`, draggable
+  bottom card below; reports the inset it covers), `panel-head` (eyebrow per variant, title, theme),
   `panel-actions` (`ExperienceVariant`, primary + labeled secondary
   tools), `route-overview` (2×2 stats, vertical itinerary), `city-detail`
   - `drawer-sections` (5 tabs incl. budget calculator), `trip-tools`

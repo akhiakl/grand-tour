@@ -10,6 +10,7 @@ import { saveLocalTrip, tripStats, type Trip } from "@/lib/trip";
 
 import { IntroSplash } from "./intro-splash";
 import type { ExperienceVariant } from "./panel-actions";
+import { CARD_RIGHT_EDGE } from "./panel-shell";
 import { PosterDialog } from "./poster-dialog";
 import { TripMap } from "./trip-map";
 import { TripPanel } from "./trip-panel";
@@ -17,8 +18,8 @@ import { TripPanel } from "./trip-panel";
 const noop = () => {};
 
 /**
- * The product view: the trip panel (sidebar from `lg`, bottom sheet
- * below) beside an uncluttered map. Receives the trip via props; no data
+ * The product view: a full-bleed map with one floating atlas card (the
+ * trip panel: top-left from `lg`, a bottom sheet below) over it. Receives the trip via props; no data
  * fetching happens below this line. Hosted by three pages, each passing
  * its own `actions` variant (see `ExperienceVariant`): the example route
  * (`/`), a Shared View (`/t/[id]`), and Map View (`/maps/[id]`).
@@ -72,7 +73,7 @@ export function TripExperience({
   };
 
   return (
-    <div className="relative isolate h-dvh w-full overflow-hidden lg:grid lg:grid-cols-[minmax(360px,26rem)_1fr] lg:grid-rows-[minmax(0,1fr)]">
+    <div className="relative isolate h-dvh w-full overflow-hidden">
       <TripPanel
         trip={trip}
         variant={actions}
@@ -88,13 +89,14 @@ export function TripExperience({
         onExpandedChange={setSheetOpen}
       />
 
-      <main aria-label="Route map" className="absolute inset-0 z-0 lg:relative">
+      <main aria-label="Route map" className="absolute inset-0 z-0">
         <TripMap
           trip={trip}
           selectedIndex={selected}
           onCitySelect={selectCity}
           onBackgroundClick={() => setSheetOpen(false)}
           bottomInset={isDesktop ? 0 : sheetInset}
+          leftInset={isDesktop ? CARD_RIGHT_EDGE : 0}
         />
       </main>
 

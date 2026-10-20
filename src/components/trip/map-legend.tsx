@@ -41,7 +41,7 @@ export function MapLegend({
   const modes = [...new Set(legs.map((leg) => leg.mode))];
 
   return (
-    <MapOverlay className="bottom-[calc(var(--map-inset-bottom,0px)+12px)] left-3">
+    <MapOverlay className="bottom-[calc(var(--map-inset-bottom,0px)+12px)] left-[calc(var(--map-inset-left,0px)+12px)]">
       {open && (
         <div
           id={id}

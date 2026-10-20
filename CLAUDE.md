@@ -75,12 +75,14 @@ Follow exactly; tokens live in `src/app/globals.css`:
   for WCAG AA contrast; brass buttons take ink text. Use the Tailwind
   utilities (`bg-paper`, `text-ink`, `text-brass-text`,
   `border-line`, …) — never hardcode hex values in components.
-- Layout: trip views are a solid `bg-paper` panel beside the map (sidebar
-  from `lg`, draggable bottom sheet below); the map carries only zoom /
-  fit-route controls and a legend. Never float content cards over the map.
+- Layout: trip views are a full-bleed map with ONE floating atlas card
+  (`.atlas-card`: dense frost, radius 22px) holding all trip content —
+  top-left from `lg`, a draggable floating bottom card below. The map
+  carries only zoom / fit-route controls and a legend; never scatter
+  other content cards over it.
 - Surfaces: `.frost` (backdrop-blur 18px, 1px `--line` border, radius
-  14–20px, soft long shadow) for dialogs and overlays; map overlays use
-  solid `bg-card-solid`. Labels: `.eyebrow` (10px, tracking .28em,
+  14–20px, soft long shadow) for dialogs; small map overlays use solid
+  `bg-card-solid`. Labels: `.eyebrow` (10px, tracking .28em,
   uppercase, brass).
 - Motion: Framer Motion with `cubic-bezier(.32,.72,.24,1)` (`--ease-atlas`);
   always respect `prefers-reduced-motion`.

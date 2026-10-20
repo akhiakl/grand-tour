@@ -199,6 +199,17 @@ input[type="range"] {
   );
 }
 
+/* The floating atlas card: frost, but dense enough that map labels
+   behind it blur away instead of bleeding through. */
+.atlas-card {
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--paper) 90%, transparent);
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  box-shadow: var(--shadow-soft);
+}
+
 /* ——— Map chrome (Leaflet) ——— */
 
 .atlas-map.leaflet-container {

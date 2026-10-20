@@ -10,18 +10,22 @@ describe("fitPadding", () => {
     });
   });
 
-  it("clears the mobile sheet along the bottom", () => {
-    expect(fitPadding(180).paddingBottomRight).toEqual([120, 236]);
+  it("clears the mobile card along the bottom", () => {
+    expect(fitPadding({ bottom: 180 }).paddingBottomRight).toEqual([120, 236]);
+  });
+
+  it("clears the desktop card along the left", () => {
+    expect(fitPadding({ left: 400 }).paddingTopLeft).toEqual([456, 56]);
   });
 
   it("tightens vertical margins when the sheet leaves a strip of map", () => {
-    expect(fitPadding(500, 870)).toEqual({
+    expect(fitPadding({ bottom: 500 }, 870)).toEqual({
       paddingTopLeft: [56, 16],
       paddingBottomRight: [120, 516],
     });
   });
 
-  it("ignores a negative inset", () => {
-    expect(fitPadding(-20).paddingBottomRight).toEqual([120, 56]);
+  it("ignores negative insets", () => {
+    expect(fitPadding({ bottom: -20, left: -5 })).toEqual(fitPadding());
   });
 });

@@ -8,14 +8,23 @@ import { MODE_META } from "./mode";
 
 function Stat({
   value,
+  detail,
   caption,
 }: {
   readonly value: string | number;
+  readonly detail?: string;
   readonly caption: string;
 }) {
   return (
     <div className="rounded-xl border border-line px-3.5 py-2.5">
-      <b className="block font-display text-lg leading-tight font-medium">{value}</b>
+      <b className="block font-display text-lg leading-tight font-medium">
+        {value}
+        {detail && (
+          <span className="ml-1.5 font-sans text-xs font-normal text-ink-soft">
+            {detail}
+          </span>
+        )}
+      </b>
       <span className="text-[10px] tracking-[0.16em] text-ink-soft uppercase">
         {caption}
       </span>
@@ -32,7 +41,8 @@ export function StatsGrid({ trip }: { readonly trip: Trip }) {
       <Stat value={stats.nights} caption="Nights" />
       <Stat
         value={stats.cities}
-        caption={`Cities · ${stats.countries} countr${stats.countries === 1 ? "y" : "ies"}`}
+        detail={`in ${stats.countries} countr${stats.countries === 1 ? "y" : "ies"}`}
+        caption="Cities"
       />
       <Stat
         value={`~${stats.totalKm.toLocaleString("en-US")} km`}

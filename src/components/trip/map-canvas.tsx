@@ -3,7 +3,7 @@
 import "leaflet/dist/leaflet.css";
 
 import L from "leaflet";
-import { useEffect, useMemo, type CSSProperties } from "react";
+import { useEffect, useMemo } from "react";
 import { MapContainer, Marker, useMap, useMapEvents } from "react-leaflet";
 
 import type { GhostStop } from "@/lib/ai";
@@ -27,6 +27,8 @@ export interface TripMapProps {
   readonly onGhostSelect?: () => void;
   /** Pixels the mobile bottom sheet covers; fits and overlays clear it. */
   readonly bottomInset?: number;
+  /** Pixels the desktop atlas card covers along the left edge. */
+  readonly leftInset?: number;
   /** A tap on the map itself (not a marker), e.g. to lower the sheet. */
   readonly onBackgroundClick?: () => void;
 }
@@ -39,32 +41,58 @@ function MapFocus({
   selectedIndex,
   bounds,
   bottomInset,
+  leftInset,
 }: {
   readonly cities: City[];
   readonly selectedIndex: number | null;
   readonly bounds: L.LatLngBounds;
   readonly bottomInset: number;
+  readonly leftInset: number;
 }) {
   const map = useMap();
 
   useEffect(() => {
-    map.setMaxBounds(bounds.pad(2));
+    // Fence panning one screen beyond the route (measured at the minimum
+    // zoom), so a fit can always slide the route clear of the atlas card
+    // while the route can never be dragged out of reach.
+    const fence = () => {
+      const zoom = map.getMinZoom();
+      const { x, y } = map.getSize();
+      const sw = map.project(bounds.getSouthWest(), zoom).add([-x, y]);
+      const ne = map.project(bounds.getNorthEast(), zoom).add([x, -y]);
+      map.setMaxBounds(
+        L.latLngBounds(map.unproject(sw, zoom), map.unproject(ne, zoom)),
+      );
+    };
+    fence();
+    map.on("resize", fence);
+    return () => {
+      map.off("resize", fence);
+    };
   }, [map, bounds]);
+
+  useEffect(() => {
+    // MapContainer only applies `style` on mount, so set the insets the
+    // overlays (legend, attribution) offset by on the live container.
+    const container = map.getContainer();
+    container.style.setProperty("--map-inset-bottom", `${bottomInset}px`);
+    container.style.setProperty("--map-inset-left", `${leftInset}px`);
+  }, [map, bottomInset, leftInset]);
 
   useEffect(() => {
     if (selectedIndex === null) {
       map.flyToBounds(bounds, {
-        ...fitPadding(bottomInset, map.getSize().y),
+        ...fitPadding({ bottom: bottomInset, left: leftInset }, map.getSize().y),
         duration: 1,
       });
     } else {
       // Centre the stop in the part of the map the sheet leaves visible.
       const point = map
         .project(cities[selectedIndex].ll as LatLng, CITY_ZOOM)
-        .add([0, bottomInset / 2]);
+        .add([-leftInset / 2, bottomInset / 2]);
       map.flyTo(map.unproject(point, CITY_ZOOM), CITY_ZOOM, { duration: 1.2 });
     }
-  }, [map, bounds, cities, selectedIndex, bottomInset]);
+  }, [map, bounds, cities, selectedIndex, bottomInset, leftInset]);
 
   return null;
 }
@@ -113,6 +141,7 @@ export default function MapCanvas({
   ghosts = [],
   onGhostSelect = () => undefined,
   bottomInset = 0,
+  leftInset = 0,
   onBackgroundClick,
 }: TripMapProps) {
   const bounds = useMemo(
@@ -130,7 +159,6 @@ export default function MapCanvas({
       zoomControl={false}
       scrollWheelZoom
       className="atlas-map h-full w-full"
-      style={{ "--map-inset-bottom": `${bottomInset}px` } as CSSProperties}
     >
       <VectorBasemap />
       <MapFocus
@@ -138,6 +166,7 @@ export default function MapCanvas({
         selectedIndex={selectedIndex}
         bounds={bounds}
         bottomInset={bottomInset}
+        leftInset={leftInset}
       />
       <RouteLayer trip={trip} />
       {trip.cities.map((city, index) => (
@@ -152,7 +181,10 @@ export default function MapCanvas({
       <GhostMarkers ghosts={ghosts} onSelect={onGhostSelect} />
       <MapDeclutter />
       {onBackgroundClick && <BackgroundClick onClick={onBackgroundClick} />}
-      <MapControls bounds={bounds} bottomInset={bottomInset} />
+      <MapControls
+        bounds={bounds}
+        insets={{ bottom: bottomInset, left: leftInset }}
+      />
       <MapLegend legs={trip.legs} hasGhosts={ghosts.length > 0} />
     </MapContainer>
   );

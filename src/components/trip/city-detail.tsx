@@ -76,7 +76,7 @@ export function CityDetail({
 
       {/* Remount tabs per city so the active tab and planner reset. */}
       <Tabs key={`${city.name}-${index}`} defaultValue="overview">
-        <TabsList className="w-full justify-between">
+        <TabsList className="w-full justify-between gap-2">
           {TABS.map((tab) => (
             <TabsTrigger key={tab.value} value={tab.value}>
               {tab.label}

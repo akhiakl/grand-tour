@@ -12,14 +12,19 @@ import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "re
 
 import { DESKTOP_QUERY, useMediaQuery } from "@/hooks/use-media-query";
 
+/** Desktop card: `lg:left-5` + `lg:w-[380px]`; the map fits clear of it. */
+export const CARD_RIGHT_EDGE = 20 + 380;
+/** Mobile card floats this far above the bottom edge (`bottom-3`). */
+const CARD_GAP = 12;
+
 const EASE_ATLAS = [0.32, 0.72, 0.24, 1] as const;
 /** Drag distance (px) or flick speed (px/s) that commits a snap. */
 const SNAP_DISTANCE = 48;
 const SNAP_VELOCITY = 400;
 
 /**
- * The trip panel's frame: a docked sidebar from `lg` up, a bottom sheet
- * below it. The sheet rests showing just `head` and expands (handle click,
+ * The trip panel's frame: one frosted "atlas card" floating over the
+ * full-bleed map, top-left from `lg` up and along the bottom below it. The sheet rests showing just `head` and expands (handle click,
  * drag, or flick) to reveal `children`; `onInsetChange` reports how much
  * of the screen it covers in either state, so the map aims above it.
  */
@@ -79,7 +84,7 @@ export function PanelShell({
   }, []);
 
   useEffect(() => {
-    onInsetChange(expanded ? size.sheet : size.peek);
+    onInsetChange(CARD_GAP + (expanded ? size.sheet : size.peek));
   }, [expanded, size, onInsetChange]);
 
   const onDragEnd = (_: unknown, { offset, velocity }: PanInfo) => {
@@ -106,7 +111,7 @@ export function PanelShell({
       onDragStart={() => (dragged.current = true)}
       onDragEnd={onDragEnd}
       style={{ y }}
-      className="fixed inset-x-0 bottom-0 z-40 flex h-[60dvh] flex-col rounded-t-[22px] border-t border-line bg-paper shadow-soft lg:static lg:z-auto lg:h-full lg:transform-none! lg:rounded-none lg:border-t-0 lg:border-r lg:shadow-none"
+      className="atlas-card fixed inset-x-3 bottom-3 z-40 flex h-[60dvh] flex-col lg:inset-x-auto lg:top-5 lg:bottom-auto lg:left-5 lg:h-auto lg:max-h-[calc(100dvh-2.5rem)] lg:w-[380px] lg:transform-none!"
     >
       <button
         type="button"
