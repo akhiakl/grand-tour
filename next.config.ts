@@ -1,7 +1,23 @@
 import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {};
+import { securityHeaders } from "./src/lib/http/security-headers";
+
+const nextConfig: NextConfig = {
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: securityHeaders({
+          dev: process.env.NODE_ENV === "development",
+          mapStyleUrl: process.env.NEXT_PUBLIC_MAP_STYLE_URL,
+          sentryDsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+          vercelPreview: process.env.VERCEL_ENV === "preview",
+        }),
+      },
+    ];
+  },
+};
 
 // Source-map upload only runs when SENTRY_AUTH_TOKEN is present (CI);
 // local and tokenless builds are unaffected.

@@ -104,6 +104,14 @@ Do NOT create the workspace until a second consumer actually exists.
   via its GitHub App; scope in `.sonarcloud.properties`. Coverage is
   gated by vitest only.
 
+## Security headers
+
+`next.config.ts` sends a static CSP plus Referrer-Policy, nosniff,
+frame denial, Permissions-Policy and HSTS, built by
+`src/lib/http/security-headers.ts`. `connect-src` allowlists only the map
+style origin, Photon and the Sentry DSN host; add any new third-party
+host there. No nonces, so pages stay static (inline scripts allowed).
+
 ## Observability
 
 - Sentry via `@sentry/nextjs`, wired in `src/instrumentation.ts`
