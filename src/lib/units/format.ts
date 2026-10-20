@@ -40,7 +40,7 @@ export function formatMoney(
     convertFromBase(amount, currency, rates),
   );
 
-  if (converted.some((value) => value === null)) {
+  if (converted.includes(null)) {
     return amounts.map((amount) => money(amount, BASE_CURRENCY)).join("–");
   }
   const exact = currency === BASE_CURRENCY;

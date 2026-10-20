@@ -112,9 +112,9 @@ export function UnitsDialog() {
             </SelectContent>
           </Select>
           {ratesStatus === "unavailable" && (
-            <p role="status" className="text-xs text-ink-soft">
+            <output className="block text-xs text-ink-soft">
               Live rates are out of reach right now, so amounts show in US dollars.
-            </p>
+            </output>
           )}
         </div>
       </DialogContent>
