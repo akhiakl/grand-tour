@@ -35,6 +35,8 @@ export function VectorBasemap() {
       // A shared id keeps a burst of tile errors down to one toast.
       toast.error("The basemap is out of reach. Your route is still here.", {
         id: OFFLINE_TOAST_ID,
+        // Stays until retried or the map unmounts; the outage is ongoing.
+        duration: Infinity,
         action: {
           label: "Retry",
           onClick: () => basemap.setStyle(MAP_STYLE.url),
