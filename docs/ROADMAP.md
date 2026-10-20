@@ -42,7 +42,7 @@ in `docs/RELEASE.md`. Do not wire any host to auto-deploy `main`.
 | 5    | /t/[id] shared view + OG image + remix             | ✅ done |
 | 6    | AI chat UI + ghost-stops upsell                    | ✅ done |
 | 7    | Landing page + polish pass                         | ✅ done |
-| 8    | Playwright e2e                                     | ⬜ next |
+| 8    | Playwright e2e                                     | ✅ done |
 
 ---
 
@@ -189,11 +189,19 @@ Branch: `feature/e2e`
    `playwright install`.
 2. Mock network at the edge: route-intercept `/api/generate` (fixture
    trip) and `/api/trips` (fake id) — no real LLM/Redis in e2e.
+   `/t/{id}` reads Redis on the server, so `e2e/fake-upstash.ts` (an
+   in-memory Upstash REST stub started by Playwright) serves it; tests
+   seed snapshots with `seedSharedTrip`. OpenFreeMap, Photon and
+   `/api/rates` are stubbed per test.
 3. Four core journeys:
    1. manual create → share → open `/t/{id}` → remix
    2. AI create flow (mocked generate) → editor prefilled
    3. guest 5-city limit → upsell modal (editor + ghost stop)
    4. expired trip page (`getTrip` → null path).
+   5. (added) units: switch to miles + another currency, persists.
+   6. (added) atlas card: stop detail from itinerary and marker, ESC
+      back, packing state, legend, landing CTAs, Customize → My maps;
+      mobile sheet rest/open/map-tap and marker tap.
 4. Wire `test:e2e` into CI as a separate job (build → start → test
    against `localhost:3000`; cache browsers).
 

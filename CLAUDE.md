@@ -10,6 +10,7 @@ route maps — populated by AI chat or manually — shared via short links
 - `pnpm lint` / `pnpm typecheck` / `pnpm test` — quality gates; all must be
   green before any commit
 - `pnpm test:coverage` — coverage with enforced thresholds (lib + api)
+- `pnpm test:e2e` — Playwright journeys against a production build (`pnpm build` first)
 - `pnpm build` — production build
 - `pnpm format` — Prettier
 

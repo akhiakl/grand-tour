@@ -21,15 +21,16 @@ pnpm dev
 
 ## Scripts
 
-| Script               | Purpose                                     |
-| -------------------- | ------------------------------------------- |
-| `pnpm dev`           | Dev server (Turbopack)                      |
-| `pnpm build`         | Production build                            |
-| `pnpm lint`          | ESLint (incl. 300-line max rule)            |
-| `pnpm typecheck`     | TypeScript, no emit                         |
-| `pnpm test`          | Vitest unit tests                           |
-| `pnpm test:coverage` | Unit tests + coverage (thresholds enforced) |
-| `pnpm format`        | Prettier write                              |
+| Script               | Purpose                                      |
+| -------------------- | -------------------------------------------- |
+| `pnpm dev`           | Dev server (Turbopack)                       |
+| `pnpm build`         | Production build                             |
+| `pnpm lint`          | ESLint (incl. 300-line max rule)             |
+| `pnpm typecheck`     | TypeScript, no emit                          |
+| `pnpm test`          | Vitest unit tests                            |
+| `pnpm test:coverage` | Unit tests + coverage (thresholds enforced)  |
+| `pnpm test:e2e`      | Playwright journeys (run `pnpm build` first) |
+| `pnpm format`        | Prettier write                               |
 
 Pre-commit hooks (husky + lint-staged) run lint, related tests and
 typecheck; commit messages must follow

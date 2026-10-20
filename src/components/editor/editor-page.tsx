@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { ShareDialog } from "@/components/share/share-dialog";
 import { UpsellModal } from "@/components/upsell/upsell-modal";
 import { useShareTrip } from "@/hooks/use-share-trip";
-import { readAndClearAiHandoff } from "@/lib/ai";
+import { clearAiHandoff, readAiHandoff } from "@/lib/ai";
 import {
   addCity,
   canAddCity,
@@ -47,7 +47,7 @@ function resolveInitialState(searchParams: URLSearchParams) {
   }
 
   if (searchParams.get("from") === "ai") {
-    const aiTrip = readAndClearAiHandoff();
+    const aiTrip = readAiHandoff();
     if (aiTrip) {
       return {
         draft: { title: aiTrip.title, cities: aiTrip.cities, legs: aiTrip.legs },
@@ -75,6 +75,13 @@ export function EditorPage() {
   const [localId, setLocalId] = useState(initial.localId);
   const [upsellOpen, setUpsellOpen] = useState(false);
   const [createdAt] = useState(initial.createdAt);
+
+  // The AI draft is now in state; consume the handoff so a later visit to
+  // /new?from=ai starts blank. Cleared here, not while rendering (see
+  // readAiHandoff).
+  useEffect(() => {
+    if (searchParams.get("from") === "ai") clearAiHandoff();
+  }, [searchParams]);
 
   const { share, sharing, shareId, dialogOpen, setDialogOpen } = useShareTrip({
     onCityLimit: () => setUpsellOpen(true),
