@@ -56,6 +56,36 @@ const slug = (title: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "") || "grand-tour";
 
+function PosterPreview({
+  url,
+  failed,
+  title,
+}: {
+  readonly url: string | null;
+  readonly failed: boolean;
+  readonly title: string;
+}) {
+  if (url) {
+    return (
+      // Freshly drawn on a canvas — a plain img is the right tool here.
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={url}
+        alt={`Route poster for ${title}`}
+        className="max-h-[55dvh] w-auto rounded-lg border border-line shadow-soft"
+      />
+    );
+  }
+  if (failed) {
+    return (
+      <p role="alert" className="max-w-xs text-center text-sm text-ink-soft">
+        The press jammed on this one. Close and open the poster again to retry.
+      </p>
+    );
+  }
+  return <div className="h-64 w-52 animate-pulse rounded-lg bg-muted" />;
+}
+
 export function PosterDialog({
   trip,
   open,
@@ -68,20 +98,22 @@ export function PosterDialog({
   const [blob, setBlob] = useState<Blob | null>(null);
   const [url, setUrl] = useState<string | null>(null);
   const [canShare, setCanShare] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     if (!open) return;
     let cancelled = false;
     let objectUrl: string | null = null;
 
-    (async () => {
+    const render = async () => {
       const fonts = await readFonts();
       const canvas = document.createElement("canvas");
       await drawPoster(canvas, trip, readTheme(), fonts);
       const rendered = await new Promise<Blob | null>((resolve) =>
         canvas.toBlob(resolve, "image/png"),
       );
-      if (cancelled || !rendered) return;
+      if (cancelled) return;
+      if (!rendered) throw new Error("poster encoding failed");
 
       objectUrl = URL.createObjectURL(rendered);
       setBlob(rendered);
@@ -91,13 +123,18 @@ export function PosterDialog({
         type: "image/png",
       });
       setCanShare(navigator.canShare?.({ files: [file] }) ?? false);
-    })();
+    };
+
+    render().catch(() => {
+      if (!cancelled) setFailed(true);
+    });
 
     return () => {
       cancelled = true;
       if (objectUrl) URL.revokeObjectURL(objectUrl);
       setBlob(null);
       setUrl(null);
+      setFailed(false);
     };
   }, [open, trip]);
 
@@ -131,17 +168,7 @@ export function PosterDialog({
         </DialogHeader>
 
         <div className="grid min-h-64 place-items-center">
-          {url ? (
-            // Freshly drawn on a canvas — a plain img is the right tool here.
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={url}
-              alt={`Route poster for ${trip.title}`}
-              className="max-h-[55dvh] w-auto rounded-lg border border-line shadow-soft"
-            />
-          ) : (
-            <div className="h-64 w-52 animate-pulse rounded-lg bg-muted" />
-          )}
+          <PosterPreview url={url} failed={failed} title={trip.title} />
         </div>
 
         <DialogFooter>
