@@ -102,3 +102,19 @@ AND dark (toggle via the theme chip) since tokens flip per theme.
 `pnpm test` must be green and `pnpm test:coverage` above thresholds
 before any commit; CI blocks below 85% overall. If coverage drops, the
 fix is a missing test, never a threshold edit.
+
+## Playwright e2e
+
+- `pnpm build && pnpm test:e2e` — runs against `next start` on :3000.
+  In this remote environment pass
+  `PLAYWRIGHT_CHROMIUM_PATH=/opt/pw-browsers/chromium` (never run
+  `playwright install`); CI installs and caches Chromium itself.
+- `e2e/fixtures.ts` exports `test` (OpenFreeMap style stubbed for every
+  page), `expect` and `seedSharedTrip(id, trip)`. Server-side Redis is the
+  in-memory `e2e/fake-upstash.ts`; browser-side calls (`/api/generate`,
+  `/api/trips`, `/api/rates`, Photon) are `page.route` mocks fed from
+  `src/test/fixtures/`.
+- Locale matters: Desktop Chrome defaults to en-US (miles, USD). Pin
+  `test.use({ locale })` when a journey depends on units.
+- Leaflet markers are 0×0 anchors; click `.marker-dot` (or the label),
+  never the `.marker` wrapper.

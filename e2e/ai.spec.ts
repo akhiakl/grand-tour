@@ -26,6 +26,9 @@ test("a ghost stop past the guest limit opens the upsell", async ({ page }) => {
   await planWithAi(page, makeGeneratedDraft(["Ljubljana"], 5));
 
   await expect(page.getByText("5/5 stops")).toBeVisible();
-  await page.locator(".marker-ghost", { hasText: "Ljubljana" }).click();
+  await page
+    .locator(".marker-ghost", { hasText: "Ljubljana" })
+    .locator(".marker-dot")
+    .click();
   await expect(page.getByRole("dialog", { name: "5 stops, for now" })).toBeVisible();
 });

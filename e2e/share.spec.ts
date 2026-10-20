@@ -27,7 +27,7 @@ test("manual create → share → open the link → remix", async ({ page }) => 
   await page.goto("/new");
   await page.getByLabel("Trip title").fill("Danube Days");
   for (const city of Object.keys(PLACES)) {
-    await page.getByRole("combobox").fill(city);
+    await page.getByPlaceholder("Search for a city…").fill(city);
     await page.getByRole("option", { name: new RegExp(city) }).click();
   }
   await expect(page.getByText("2/5 stops")).toBeVisible();

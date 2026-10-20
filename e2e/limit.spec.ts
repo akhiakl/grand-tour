@@ -7,7 +7,7 @@ test("the editor stops at 5 cities and offers the upsell", async ({ page }) => {
 
   await expect(page.getByText("5/5 stops")).toBeVisible();
   await expect(addBlank).toBeHidden();
-  await expect(page.getByRole("combobox")).toBeHidden();
+  await expect(page.getByPlaceholder("Search for a city…")).toBeHidden();
 
   await page.getByRole("button", { name: "See what unlocks" }).click();
   const upsell = page.getByRole("dialog", { name: "5 stops, for now" });
