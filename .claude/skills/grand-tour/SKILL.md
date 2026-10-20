@@ -36,7 +36,7 @@ status table before starting work. Visual truth: `reference/grand-tour.html`.
    Redis/fetch directly.
 4. Default trip title "Grand Tour" (`DEFAULT_TRIP_TITLE`); custom titles
    max 80 chars.
-5. Secrets (`GROQ_API_KEY`, Upstash) never reach client bundles.
+5. Secrets (`AI_API_KEY`, Upstash) never reach client bundles.
 6. No monitoring calls in components — Sentry is wired via
    instrumentation hooks and gated on `NEXT_PUBLIC_SENTRY_DSN`.
 
@@ -48,11 +48,11 @@ status table before starting work. Visual truth: `reference/grand-tour.html`.
   JSON, schema-validated), `service` (server-only Redis: saveTrip/
   getTrip/incrViews, 60-day GETEX TTL).
 - `lib/ai`: `schema` (GenerateRequest, AiTrip + suggestedExtra),
-  `prompt`, `generate` (server-only Groq, one validation-feedback retry).
+  `prompt`, `generate` (server-only OpenAI-compatible call, one validation-feedback retry).
 - `lib/http`: per-IP sliding-window rate limiters (trips 10/h,
   generate 5/h) + `getClientIp`.
 - `components/trip`: `trip-experience` (orchestrator), `trip-map` →
-  `map-canvas` (tiles/markers/flyTo) + `route-layer` (staged curved
+  `map-canvas` (`vector-basemap`/markers/flyTo) + `route-layer` (staged curved
   draw), `timeline-rail`, `city-drawer` + `drawer-sections` (5 tabs incl.
   budget calculator), `top-bar` (chips: Packing/Notes/Poster/theme),
   `stats-strip`, `panels`, `intro-splash`, `poster-dialog` +
@@ -64,7 +64,7 @@ status table before starting work. Visual truth: `reference/grand-tour.html`.
 
 - `POST /api/trips` — ratelimit → 50KB cap (413) → city-limit 403
   contract → Zod (400 with issue paths) → `saveTrip` → 201 `{ id }`.
-- `POST /api/generate` — ratelimit → Zod request → Groq JSON mode →
+- `POST /api/generate` — ratelimit → Zod request → model JSON mode →
   retry once with validation errors → `{ trip, suggestedExtra }` (never
   saved). 503 `generation_unavailable` / 502 `generation_failed`.
 - `GET /t/[id]` (roadmap step 5) — `getTrip` + `incrViews`; expired →
@@ -82,13 +82,15 @@ status table before starting work. Visual truth: `reference/grand-tour.html`.
   `useReducedMotion` for anything that moves a distance.
 - Buttons: `variant="brass"` for the signature CTA, `default` (ink)
   standard, `outline`/`ghost` secondary.
-- Map: Voyager `nolabels` + `only_labels` tiles themed by `--map-filter`;
+- Map: OpenFreeMap positron vector style (`map-style.ts`) rendered by
+  MapLibre inside Leaflet's tile pane (`vector-basemap`), themed by `--map-filter`;
   dashed brass route with marching-ants drift; pulse+dot+label-pill
   markers; zoom 5–12, `maxBoundsViscosity: 1.0`; Leaflet only via
   `next/dynamic` `ssr: false` inside an `isolate` frame (its z-indexes
   leak otherwise).
-- Poster: 1080×1350, tiles + route share one Mercator view; OSM/CARTO
-  attribution is drawn into the image whenever tiles render.
+- Poster: 1080×1350, basemap (offscreen MapLibre via `mercatorCamera`) +
+  route share one Mercator view; OpenFreeMap/OSM attribution is drawn
+  into the image whenever the basemap renders.
 
 ## Before committing
 
