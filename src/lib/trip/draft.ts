@@ -1,3 +1,4 @@
+import { suggestLeg } from "./leg-estimate";
 import {
   DEFAULT_TRIP_TITLE,
   GUEST_MAX_CITIES,
@@ -24,12 +25,16 @@ export type DraftTrip = {
 
 const MAX_NIGHTS = 30;
 
-const defaultLeg = (): Leg => ({ mode: "train", label: "", duration: "" });
-
-/** Rebuilds legs to `cities.length - 1`, reusing existing legs positionally. */
+/**
+ * Rebuilds legs to `cities.length - 1`, reusing existing legs positionally;
+ * a newly needed leg is drafted from the distance between its stops.
+ */
 function rebuildLegs(cities: City[], legs: Leg[]): Leg[] {
   const targetLength = Math.max(cities.length - 1, 0);
-  return Array.from({ length: targetLength }, (_, i) => legs[i] ?? defaultLeg());
+  return Array.from(
+    { length: targetLength },
+    (_, i) => legs[i] ?? suggestLeg(cities[i], cities[i + 1]),
+  );
 }
 
 export function createBlankDraft(): DraftTrip {

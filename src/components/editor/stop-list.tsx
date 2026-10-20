@@ -9,6 +9,7 @@ import {
   GUEST_MAX_CITIES,
   indexAfterMove,
   indexAfterRemove,
+  legDistanceKm,
   type City,
   type DraftIssues,
   type Leg,
@@ -120,6 +121,7 @@ export function StopList({
             <LegRow
               leg={legs[index]}
               index={index}
+              km={legDistanceKm(city, cities[index + 1])}
               onChange={(patch) => onUpdateLeg(index, patch)}
             />
           )}

@@ -9,20 +9,52 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Leg } from "@/lib/trip";
+import { useUnits } from "@/components/units/units-provider";
+import { estimateLegDuration, type Leg } from "@/lib/trip";
 
 import { MODE_META } from "../trip/mode";
 
 const MODES = Object.keys(MODE_META) as Leg["mode"][];
 
+/** Straight-line distance and a one-tap duration estimate for the mode. */
+function LegEstimate({
+  km,
+  leg,
+  onChange,
+}: {
+  readonly km: number;
+  readonly leg: Leg;
+  readonly onChange: (patch: Partial<Leg>) => void;
+}) {
+  const { distance } = useUnits();
+  const estimate = estimateLegDuration(leg.mode, km);
+  return (
+    <p className="flex w-full flex-wrap items-center gap-x-2 text-xs text-ink-soft">
+      <span>≈ {distance(Math.round(km))} as the crow flies</span>
+      {estimate !== leg.duration && (
+        <button
+          type="button"
+          onClick={() => onChange({ duration: estimate })}
+          className="rounded text-brass-text underline underline-offset-2 outline-none hover:text-ink focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          Use estimate ({estimate} by {MODE_META[leg.mode].label.toLowerCase()})
+        </button>
+      )}
+    </p>
+  );
+}
+
 /** Editable connector between two stop rows: mode, label, duration. */
 export function LegRow({
   leg,
   index,
+  km,
   onChange,
 }: {
   readonly leg: Leg;
   readonly index: number;
+  /** Straight-line distance between its stops, once both are placed. */
+  readonly km: number | null;
   readonly onChange: (patch: Partial<Leg>) => void;
 }) {
   return (
@@ -67,6 +99,7 @@ export function LegRow({
           onChange={(e) => onChange({ duration: e.target.value })}
         />
       </div>
+      {km !== null && <LegEstimate km={km} leg={leg} onChange={onChange} />}
     </div>
   );
 }

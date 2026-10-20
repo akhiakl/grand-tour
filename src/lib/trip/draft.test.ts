@@ -55,6 +55,15 @@ describe("addCity", () => {
     expect(withSecond.legs).toHaveLength(1);
   });
 
+  it("drafts the new leg from the distance between the stops", () => {
+    const draft = addCity(
+      addCity(createBlankDraft(), makeCity({ ll: [48.2082, 16.3738] })),
+      makeCity({ ll: [38.7223, -9.1393] }),
+    );
+    expect(draft.legs[0].mode).toBe("flight");
+    expect(draft.legs[0].duration).toMatch(/^~\d+h/);
+  });
+
   it("refuses to add past the guest ceiling", () => {
     let draft: DraftTrip = createBlankDraft();
     for (let i = 0; i < GUEST_MAX_CITIES; i++) {
