@@ -21,7 +21,7 @@ describe("CityDetail", () => {
     renderDrawer();
     expect(screen.getByRole("heading", { name: city.name })).toBeInTheDocument();
     expect(screen.getByText(/Stop 1 of 5/)).toBeInTheDocument();
-    expect(screen.getByText(/€90–160 per day/)).toBeInTheDocument();
+    expect(screen.getByText(/\$90–\$160 per day/)).toBeInTheDocument();
   });
 
   it("opens on the overview tab with why and must-sees", () => {
@@ -41,8 +41,8 @@ describe("CityDetail", () => {
     renderDrawer();
     await userEvent.click(screen.getByRole("tab", { name: "Planner" }));
 
-    // Default slider midpoint: €(90 + (160-90)/2) = €125/day × 3 nights.
-    expect(screen.getByText(/€375/)).toBeInTheDocument();
+    // Default slider midpoint: $(90 + (160-90)/2) = $125/day × 3 nights.
+    expect(screen.getByText(/\$375/)).toBeInTheDocument();
     expect(screen.getByText("Comfortable")).toBeInTheDocument();
   });
 

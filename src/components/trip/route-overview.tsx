@@ -1,6 +1,7 @@
 import { ChevronRight } from "lucide-react";
 import { Fragment } from "react";
 
+import { useUnits } from "@/components/units/units-provider";
 import { tripStats, type Leg, type Trip } from "@/lib/trip";
 import { cn } from "@/lib/utils";
 
@@ -34,7 +35,7 @@ function Stat({
 
 export function StatsGrid({ trip }: { readonly trip: Trip }) {
   const stats = tripStats(trip);
-  const [low, high] = stats.budget;
+  const { money, distance } = useUnits();
 
   return (
     <div className="grid grid-cols-2 gap-2">
@@ -44,14 +45,8 @@ export function StatsGrid({ trip }: { readonly trip: Trip }) {
         detail={`in ${stats.countries} countr${stats.countries === 1 ? "y" : "ies"}`}
         caption="Cities"
       />
-      <Stat
-        value={`~${stats.totalKm.toLocaleString("en-US")} km`}
-        caption="Total route"
-      />
-      <Stat
-        value={`€${low.toLocaleString("en-US")}–${high.toLocaleString("en-US")}`}
-        caption="Budget / person"
-      />
+      <Stat value={distance(stats.totalKm)} caption="Total route" />
+      <Stat value={money(stats.budget)} caption="Budget / person" />
     </div>
   );
 }

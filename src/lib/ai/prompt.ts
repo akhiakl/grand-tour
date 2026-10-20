@@ -15,7 +15,7 @@ const TRIP_JSON_SHAPE = `{
       "gems": ["≤6 strings ≤80 — real lesser-known finds"],
       "food": [["dish ≤60", "where/why ≤120"], "… ≤6 pairs"],
       "days": [["Day 1", "theme ≤60", "plan ≤300"], "… ≤10 triples"],
-      "budget": [minPerDayEUR, maxPerDayEUR],
+      "budget": [minPerDayUSD, maxPerDayUSD],
       "transport": "string ≤120 — getting around this city",
       "stay": "string ≤300 — neighbourhood advice",
       "tips": ["≤6 strings ≤200"]
@@ -42,7 +42,7 @@ export function buildSystemPrompt(): string {
     "- Use real coordinates as [latitude, longitude] with 4 decimal places.",
     "- legs.length must equal cities.length - 1; each leg connects consecutive cities with a realistic mode and duration.",
     "- Only real, verifiable attractions, restaurants and neighbourhoods — never invent places.",
-    "- budget is a €/day [min, max] range for a mid-range traveller.",
+    "- budget is a US-dollar-per-day [min, max] range for a mid-range traveller.",
     "- Total nights across cities should match the requested trip length.",
   ].join("\n");
 }

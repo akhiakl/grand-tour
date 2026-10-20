@@ -4,6 +4,8 @@ import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import type { ReactNode } from "react";
 
+import { UnitsDialog } from "@/components/units/units-dialog";
+import { useUnits } from "@/components/units/units-provider";
 import { useMounted } from "@/hooks/use-mounted";
 import { tripStats, type Trip } from "@/lib/trip";
 
@@ -47,6 +49,7 @@ export function PanelHead({
   readonly actions: ReactNode;
 }) {
   const stats = tripStats(trip);
+  const { distance } = useUnits();
 
   return (
     <header className="flex flex-col gap-3 px-5 pt-2 pb-4 lg:px-7 lg:pt-7">
@@ -57,11 +60,13 @@ export function PanelHead({
             <TitleWithAccent title={trip.title} />
           </h1>
           <p className="mt-0.5 text-xs text-ink-soft lg:hidden">
-            {stats.nights} nights · {stats.cities} cities · ~
-            {stats.totalKm.toLocaleString("en-US")} km
+            {stats.nights} nights · {stats.cities} cities · {distance(stats.totalKm)}
           </p>
         </div>
-        <ThemeToggle />
+        <div className="flex shrink-0 gap-2">
+          <UnitsDialog />
+          <ThemeToggle />
+        </div>
       </div>
       {actions}
     </header>

@@ -56,6 +56,10 @@ route maps — populated by AI chat or manually — shared via short links
   (`trips:index`, `trips:{id}`); shared snapshots immutable in Redis with
   60-day sliding TTL (GETEX refresh). Editing after sharing = share again.
 - Trip payloads are capped at 50KB (`MAX_TRIP_PAYLOAD_BYTES`).
+- **Units**: trips store distances in km and budgets in USD. Viewers pick
+  km/mi and a display currency (`@/lib/units`, `useUnits()`); amounts are
+  converted at live rates from `/api/rates` — never hardcode `$`, `€` or
+  `km` in UI copy.
 - **Monitoring**: Sentry (`@sentry/nextjs`) via the instrumentation hooks;
   fully gated on `NEXT_PUBLIC_SENTRY_DSN` — never add monitoring calls in
   components; error boundaries and `onRequestError` cover capture.
