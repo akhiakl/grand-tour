@@ -89,7 +89,7 @@ the two documented server entries.
 
 Create a new `src/lib/<domain>` folder (with `index.ts`) only when the
 code has its own vocabulary AND its own dependency set AND a plausible
-independent consumer — e.g. the planned `geo-search` (Nominatim) domain:
+independent consumer — e.g. the `geo-search` (Photon) domain:
 different provider, swappable, nothing to do with trip persistence.
 Otherwise add a file to the closest existing domain and export it
 through the barrel.
