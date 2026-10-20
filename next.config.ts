@@ -15,6 +15,14 @@ const nextConfig: NextConfig = {
           vercelPreview: process.env.VERCEL_ENV === "preview",
         }),
       },
+      {
+        // The worker must update promptly; never serve it from HTTP cache.
+        source: "/sw.js",
+        headers: [
+          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
+          { key: "Content-Type", value: "application/javascript; charset=utf-8" },
+        ],
+      },
     ];
   },
 };
