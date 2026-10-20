@@ -1,16 +1,26 @@
 "use client";
 
-import { ChevronDown, GripVertical, MoveDown, MoveUp, Trash2 } from "lucide-react";
+import {
+  ChevronDown,
+  CircleAlert,
+  GripVertical,
+  MoveDown,
+  MoveUp,
+  Trash2,
+} from "lucide-react";
 import type { DragEventHandler } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { City } from "@/lib/trip";
+import { clampNights, type City } from "@/lib/trip";
 import { cn } from "@/lib/utils";
 
 import { StopRowDetails } from "./stop-row-details";
+
+/** Inline validation messages for the always-visible fields. */
+export type StopRowErrors = { readonly name?: string; readonly nights?: string };
 
 /** One stop: always-visible identity fields, expandable full detail form. */
 export function StopRow({
@@ -29,6 +39,7 @@ export function StopRow({
   onDrop,
   onDragEnd,
   dragging,
+  errors = {},
 }: {
   readonly city: City;
   readonly index: number;
@@ -45,7 +56,11 @@ export function StopRow({
   readonly onDrop: DragEventHandler<HTMLDivElement>;
   readonly onDragEnd: DragEventHandler<HTMLDivElement>;
   readonly dragging: boolean;
+  readonly errors?: StopRowErrors;
 }) {
+  const nameErrorId = `stop-${index}-name-error`;
+  const nightsErrorId = `stop-${index}-nights-error`;
+
   return (
     <Card
       draggable={draggable}
@@ -79,6 +94,8 @@ export function StopRow({
             id={`stop-${index}-name`}
             value={city.name}
             maxLength={60}
+            aria-invalid={errors.name ? true : undefined}
+            aria-describedby={errors.name ? nameErrorId : undefined}
             onChange={(e) => onChange({ name: e.target.value })}
           />
         </div>
@@ -101,7 +118,11 @@ export function StopRow({
             min={0}
             max={30}
             value={city.nights}
-            onChange={(e) => onChange({ nights: Number(e.target.value) })}
+            aria-invalid={errors.nights ? true : undefined}
+            aria-describedby={errors.nights ? nightsErrorId : undefined}
+            onChange={(e) =>
+              onChange({ nights: clampNights(Number(e.target.value)) })
+            }
           />
         </div>
 
@@ -150,7 +171,26 @@ export function StopRow({
         </div>
       </div>
 
+      <FieldError id={nameErrorId} message={errors.name} />
+      <FieldError id={nightsErrorId} message={errors.nights} />
+
       {expanded && <StopRowDetails city={city} index={index} onChange={onChange} />}
     </Card>
+  );
+}
+
+function FieldError({
+  id,
+  message,
+}: {
+  readonly id: string;
+  readonly message?: string;
+}) {
+  if (!message) return null;
+  return (
+    <p id={id} className="flex items-center gap-1.5 text-xs text-destructive">
+      <CircleAlert className="size-3.5 shrink-0" aria-hidden />
+      {message}
+    </p>
   );
 }

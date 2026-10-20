@@ -5,8 +5,12 @@ import { makeCity, makeLeg, makeTrip } from "@/test/fixtures/trip";
 import {
   addCity,
   canAddCity,
+  clampNights,
   createBlankDraft,
   draftFromTrip,
+  draftIssues,
+  indexAfterMove,
+  indexAfterRemove,
   draftToTrip,
   isShareable,
   moveCity,
@@ -125,11 +129,11 @@ describe("updateCityAt / updateLegAt / updateTitle", () => {
 });
 
 describe("isShareable", () => {
-  it("requires at least 2 cities and a non-blank title", () => {
+  it("requires at least 2 cities; field problems are left to draftIssues", () => {
     expect(isShareable(createBlankDraft())).toBe(false);
     expect(isShareable(draftFromTrip(makeTrip(1)))).toBe(false);
     expect(isShareable(draftFromTrip(makeTrip(2)))).toBe(true);
-    expect(isShareable(updateTitle(draftFromTrip(makeTrip(2)), "   "))).toBe(false);
+    expect(isShareable(updateTitle(draftFromTrip(makeTrip(2)), "   "))).toBe(true);
   });
 });
 
@@ -146,5 +150,68 @@ describe("draftToTrip", () => {
   it("returns null while the draft doesn't meet the schema yet", () => {
     expect(draftToTrip(createBlankDraft(), Date.now())).toBeNull();
     expect(draftToTrip(draftFromTrip(makeTrip(1)), Date.now())).toBeNull();
+  });
+});
+
+describe("clampNights", () => {
+  it("keeps whole nights inside 0–30", () => {
+    expect(clampNights(4)).toBe(4);
+    expect(clampNights(2.7)).toBe(2);
+    expect(clampNights(-3)).toBe(0);
+    expect(clampNights(99)).toBe(30);
+    expect(clampNights(Number.NaN)).toBe(0);
+  });
+});
+
+describe("draftIssues", () => {
+  it("is empty for a valid draft", () => {
+    expect(draftIssues(draftFromTrip(makeTrip(2)))).toEqual({});
+  });
+
+  it("points at a blank title and blank stop names in plain words", () => {
+    const draft = updateCityAt(updateTitle(draftFromTrip(makeTrip(3)), "  "), 1, {
+      name: " ",
+    });
+    expect(draftIssues(draft)).toEqual({
+      title: "Give your map a title.",
+      "cities.1.name": "Give this stop a name.",
+    });
+  });
+
+  it("flags out-of-range nights on the right stop", () => {
+    const draft = updateCityAt(draftFromTrip(makeTrip(2)), 0, { nights: 31 });
+    expect(draftIssues(draft)).toEqual({
+      "cities.0.nights": "Nights run from 0 to 30.",
+    });
+  });
+
+  it("ignores trip-wide count rules that have no single field", () => {
+    expect(draftIssues(createBlankDraft())).toEqual({});
+    expect(draftIssues(draftFromTrip(makeTrip(1)))).toEqual({});
+  });
+
+  it("falls back to the schema message for other fields", () => {
+    const draft = updateLegAt(draftFromTrip(makeTrip(2)), 0, {
+      duration: "x".repeat(21),
+    });
+    expect(Object.keys(draftIssues(draft))).toEqual(["legs.0.duration"]);
+  });
+});
+
+describe("indexAfterMove / indexAfterRemove", () => {
+  it("follows the moved stop and shifts the ones it passed", () => {
+    expect(indexAfterMove(1, 1, 3)).toBe(3);
+    expect(indexAfterMove(2, 1, 3)).toBe(1);
+    expect(indexAfterMove(3, 1, 3)).toBe(2);
+    expect(indexAfterMove(2, 3, 1)).toBe(3);
+    expect(indexAfterMove(1, 3, 1)).toBe(2);
+    expect(indexAfterMove(0, 3, 1)).toBe(0);
+    expect(indexAfterMove(4, 1, 3)).toBe(4);
+  });
+
+  it("drops the removed stop and shifts later ones up", () => {
+    expect(indexAfterRemove(2, 2)).toBeNull();
+    expect(indexAfterRemove(3, 2)).toBe(2);
+    expect(indexAfterRemove(1, 2)).toBe(1);
   });
 });

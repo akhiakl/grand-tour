@@ -10,7 +10,7 @@ export const MAX_TRIP_PAYLOAD_BYTES = 50 * 1024;
 export const DEFAULT_TRIP_TITLE = "Grand Tour";
 
 export const CitySchema = z.object({
-  name: z.string().max(60),
+  name: z.string().trim().min(1).max(60),
   country: z.string().max(60),
   flag: z.string().max(8), // emoji
   ll: z.tuple([z.number(), z.number()]),
@@ -37,7 +37,7 @@ export const LegSchema = z.object({
 export const TripSchema = z
   .object({
     v: z.literal(1),
-    title: z.string().min(1).max(80),
+    title: z.string().trim().min(1).max(80),
     cities: z.array(CitySchema).min(2).max(GUEST_MAX_CITIES),
     legs: z.array(LegSchema),
     createdBy: z.enum(["guest", "user"]).default("guest"),

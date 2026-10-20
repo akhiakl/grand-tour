@@ -20,6 +20,8 @@ export type DraftTrip = {
   legs: Leg[];
 };
 
+const MAX_NIGHTS = 30;
+
 const defaultLeg = (): Leg => ({ mode: "train", label: "", duration: "" });
 
 /** Rebuilds legs to `cities.length - 1`, reusing existing legs positionally. */
@@ -67,6 +69,20 @@ export function moveCity(draft: DraftTrip, from: number, to: number): DraftTrip 
   return { ...draft, cities, legs: rebuildLegs(cities, draft.legs) };
 }
 
+/** Where a stop at `index` sits after the stop at `from` moves to `to`. */
+export function indexAfterMove(index: number, from: number, to: number): number {
+  if (index === from) return to;
+  if (from < to && index > from && index <= to) return index - 1;
+  if (from > to && index >= to && index < from) return index + 1;
+  return index;
+}
+
+/** Where a stop at `index` sits after `removed` is deleted; null if it was the one. */
+export function indexAfterRemove(index: number, removed: number): number | null {
+  if (index === removed) return null;
+  return index > removed ? index - 1 : index;
+}
+
 export function updateCityAt(
   draft: DraftTrip,
   index: number,
@@ -89,13 +105,61 @@ export function updateLegAt(
   return { ...draft, legs };
 }
 
+/** Coerces raw nights input (empty, fractional, out of range) into 0–30. */
+export function clampNights(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  return Math.min(MAX_NIGHTS, Math.max(0, Math.trunc(value)));
+}
+
 export function updateTitle(draft: DraftTrip, title: string): DraftTrip {
   return { ...draft, title };
 }
 
-/** Cities ≥ 2 is the only gate the editor cares about — schema re-checks the rest. */
+/**
+ * Cities ≥ 2 is the only gate that disables Share — field-level problems
+ * are reported by {@link draftIssues} so the editor can point at them.
+ */
 export function isShareable(draft: DraftTrip): boolean {
-  return draft.cities.length >= 2 && draft.title.trim().length > 0;
+  return draft.cities.length >= 2;
+}
+
+/** Field paths the editor renders inline, keyed like `cities.0.name`. */
+export type DraftIssues = Record<string, string>;
+
+const FRIENDLY_MESSAGES: Record<string, string> = {
+  title: "Give your map a title.",
+  name: "Give this stop a name.",
+  nights: "Nights run from 0 to 30.",
+};
+
+/**
+ * Field-level schema problems in a draft, first message per field. Skips
+ * the trip-wide count/legs rules: the stop counter and Share gate already
+ * cover those, and they have no single field to point at.
+ */
+export function draftIssues(draft: DraftTrip): DraftIssues {
+  const parsed = TripSchema.safeParse(toCandidate(draft, 0));
+  if (parsed.success) return {};
+
+  const issues: DraftIssues = {};
+  for (const issue of parsed.error.issues) {
+    if (issue.path.length === 1 && issue.path[0] !== "title") continue;
+    const key = issue.path.join(".");
+    const field = String(issue.path.at(-1));
+    issues[key] ??= FRIENDLY_MESSAGES[field] ?? issue.message;
+  }
+  return issues;
+}
+
+function toCandidate(draft: DraftTrip, createdAt: number) {
+  return {
+    v: 1 as const,
+    title: draft.title,
+    cities: draft.cities,
+    legs: draft.legs,
+    createdBy: "guest" as const,
+    createdAt,
+  };
 }
 
 /**
@@ -106,14 +170,6 @@ export function isShareable(draft: DraftTrip): boolean {
  * `Date.now()` for a brand-new draft) so repeat autosaves don't drift it.
  */
 export function draftToTrip(draft: DraftTrip, createdAt: number): Trip | null {
-  const candidate = {
-    v: 1 as const,
-    title: draft.title,
-    cities: draft.cities,
-    legs: draft.legs,
-    createdBy: "guest" as const,
-    createdAt,
-  };
-  const parsed = TripSchema.safeParse(candidate);
+  const parsed = TripSchema.safeParse(toCandidate(draft, createdAt));
   return parsed.success ? parsed.data : null;
 }

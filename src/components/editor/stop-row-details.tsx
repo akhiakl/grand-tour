@@ -21,24 +21,27 @@ export function StopRowDetails({
     <div className="flex flex-col gap-5 border-t border-line pt-4">
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="flex flex-col gap-1.5">
-          <Label>Latitude</Label>
+          <Label htmlFor={`stop-${index}-lat`}>Latitude</Label>
           <Input
+            id={`stop-${index}-lat`}
             type="number"
             value={city.ll[0]}
             onChange={(e) => onChange({ ll: [Number(e.target.value), city.ll[1]] })}
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label>Longitude</Label>
+          <Label htmlFor={`stop-${index}-lng`}>Longitude</Label>
           <Input
+            id={`stop-${index}-lng`}
             type="number"
             value={city.ll[1]}
             onChange={(e) => onChange({ ll: [city.ll[0], Number(e.target.value)] })}
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label>Budget low (USD/day)</Label>
+          <Label htmlFor={`stop-${index}-budget-low`}>Budget low (USD/day)</Label>
           <Input
+            id={`stop-${index}-budget-low`}
             type="number"
             min={0}
             value={city.budget[0]}
@@ -48,8 +51,9 @@ export function StopRowDetails({
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label>Budget high (USD/day)</Label>
+          <Label htmlFor={`stop-${index}-budget-high`}>Budget high (USD/day)</Label>
           <Input
+            id={`stop-${index}-budget-high`}
             type="number"
             min={0}
             value={city.budget[1]}

@@ -43,6 +43,7 @@ in `docs/RELEASE.md`. Do not wire any host to auto-deploy `main`.
 | 6    | AI chat UI + ghost-stops upsell                    | ✅ done |
 | 7    | Landing page + polish pass                         | ✅ done |
 | 8    | Playwright e2e                                     | ✅ done |
+| 9    | UX & a11y hardening (design-review follow-ups)     | 🟨 wip  |
 
 ---
 
@@ -209,6 +210,28 @@ Branch: `feature/e2e`
 
 ---
 
+## Step 9 — UX & a11y hardening
+
+Follow-ups from a heuristic design review, triaged against the code
+(generic or already-handled points dropped). Three PRs:
+
+1. `fix/editor-state` — editor resolves its draft after mount (no
+   hydration mismatch on `/new?remix=`); inline validation via
+   `draftIssues` (blank title / city name, nights clamped 0–30) and Share
+   focuses the first invalid field; the open detail panel follows its
+   stop through reorders and deletes; every detail input is labelled.
+2. `feature/editor-a11y` — reorder/delete announced in an `aria-live`
+   region, grip-only drag with a drop indicator, Undo toast on delete,
+   visible focus on the title input, editor map follows the active stop.
+3. `feature/trip-view-a11y` — marker focus ring and keyboard-focused
+   markers panned clear of the atlas card, hover sync row ↔ marker,
+   `title` on truncated names, fluid card width, desktop collapse.
+
+**Definition of done**: gates + e2e green; browser-verified light/dark at
+desktop and mobile; Lighthouse a11y ≥ 95 on `/`, `/new`, `/maps/[id]`.
+
+---
+
 ## One-time human tasks (not agent work)
 
 - [ ] Upstash Redis created; `UPSTASH_REDIS_REST_URL` / `_TOKEN` in
@@ -230,5 +253,6 @@ Branch: `feature/e2e`
 
 Auth (NextAuth), Postgres, premium tier (15 cities, `PERSIST`ed
 permanent links, PDF export, custom themes, no watermark), views
-dashboard, GraphQL/tRPC transport. The trip service stays plain
+dashboard, GraphQL/tRPC transport, editing inside the floating atlas
+card (one layout for view and edit, instead of the split editor). The trip service stays plain
 functions so a different transport can wrap it later.

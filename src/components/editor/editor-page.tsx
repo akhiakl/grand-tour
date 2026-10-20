@@ -2,9 +2,11 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 import { ShareDialog } from "@/components/share/share-dialog";
 import { UpsellModal } from "@/components/upsell/upsell-modal";
+import { useMounted } from "@/hooks/use-mounted";
 import { useShareTrip } from "@/hooks/use-share-trip";
 import { clearAiHandoff, readAiHandoff } from "@/lib/ai";
 import {
@@ -12,6 +14,7 @@ import {
   canAddCity,
   createBlankDraft,
   draftFromTrip,
+  draftIssues,
   draftToTrip,
   getLocalTrip,
   isShareable,
@@ -22,15 +25,34 @@ import {
   updateLegAt,
   updateTitle,
   type City,
+  type DraftIssues,
   type DraftTrip,
   type Leg,
 } from "@/lib/trip";
 
-import { EditorHeader } from "./editor-header";
+import { EditorHeader, TRIP_TITLE_INPUT_ID } from "./editor-header";
 import { EditorMapPreview } from "./editor-map-preview";
 import { StopList } from "./stop-list";
 
 const AUTOSAVE_DEBOUNCE_MS = 600;
+
+/** The input id for an issue key, for fields the editor always shows. */
+function fieldIdFor(key: string): string | null {
+  if (key === "title") return TRIP_TITLE_INPUT_ID;
+  const match = /^cities\.(\d+)\.(name|nights)$/.exec(key);
+  return match ? `stop-${match[1]}-${match[2]}` : null;
+}
+
+function focusFirstIssue(issues: DraftIssues) {
+  for (const key of Object.keys(issues)) {
+    const id = fieldIdFor(key);
+    const field = id ? document.getElementById(id) : null;
+    if (field) {
+      field.focus();
+      return;
+    }
+  }
+}
 
 function resolveInitialState(searchParams: URLSearchParams) {
   const remixId = searchParams.get("remix");
@@ -66,9 +88,19 @@ function resolveInitialState(searchParams: URLSearchParams) {
   };
 }
 
+/**
+ * The draft comes from localStorage or the AI handoff, which only exist in
+ * the browser — resolve it after mount so server and client HTML agree.
+ */
 export function EditorPage() {
+  return useMounted() ? <EditorWorkspace /> : null;
+}
+
+function EditorWorkspace() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  // Resolved once: later URL changes (the autosave's ?remix= replace) must
+  // not re-read storage or the already-consumed AI handoff.
   const [initial] = useState(() => resolveInitialState(searchParams));
 
   const [draft, setDraft] = useState<DraftTrip>(initial.draft);
@@ -105,7 +137,14 @@ export function EditorPage() {
 
   const update = (fn: (draft: DraftTrip) => DraftTrip) => setDraft(fn);
 
+  const issues = draftIssues(draft);
+
   const handleShare = () => {
+    if (Object.keys(issues).length > 0) {
+      focusFirstIssue(issues);
+      toast.error("A few fields need fixing before this map can be shared.");
+      return;
+    }
     const trip = draftToTrip(draft, createdAt);
     if (trip) void share(trip);
   };
@@ -118,6 +157,7 @@ export function EditorPage() {
         onShare={handleShare}
         canShare={isShareable(draft)}
         sharing={sharing}
+        titleError={issues.title}
       />
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_26rem]">
@@ -126,6 +166,7 @@ export function EditorPage() {
           legs={draft.legs}
           canAddCity={canAddCity(draft)}
           onLimitReached={() => setUpsellOpen(true)}
+          issues={issues}
           onAddCity={(city: City) => update((d) => addCity(d, city))}
           onRemoveCity={(index) => update((d) => removeCityAt(d, index))}
           onMoveCity={(from, to) => update((d) => moveCity(d, from, to))}
