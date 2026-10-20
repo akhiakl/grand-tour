@@ -72,7 +72,7 @@ the two documented server entries.
   does. (The checklist logic existing in two places is a real signal;
   a "maybe someday" second theme is not.)
 - Don't add dependencies for what ~20 lines of tested code does —
-  the Groq client is plain `fetch`; the poster is plain canvas.
+  the AI client is plain `fetch`; the poster is plain canvas.
 - When tempted to generalize mid-task, ship the concrete version and
   note the idea in the PR description instead.
 

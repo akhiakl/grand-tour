@@ -1,9 +1,6 @@
-import {
-  pickTileZoom,
-  tilesInView,
-  type MercatorView,
-  type TilePlacement,
-} from "@/lib/trip";
+import { mercatorCamera, type MercatorView } from "@/lib/trip";
+
+import { MAP_STYLE_URL } from "./map-style";
 
 export interface TileWindow {
   x: number;
@@ -12,79 +9,86 @@ export interface TileWindow {
   height: number;
 }
 
-const SUBDOMAINS = ["a", "b", "c", "d"];
-const MAX_TILES = 40;
+const RENDER_TIMEOUT_MS = 10_000;
 
-const tileUrl = (z: number, x: number, y: number, i: number) =>
-  `https://${SUBDOMAINS[i % SUBDOMAINS.length]}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/${z}/${x}/${y}@2x.png`;
+/**
+ * Renders the OpenFreeMap style offscreen at the poster window's size and
+ * resolves to its canvas once every tile has drawn, or null on timeout or
+ * load failure (offline etc.).
+ */
+async function renderBasemap(
+  view: MercatorView,
+  window: TileWindow,
+): Promise<HTMLCanvasElement | null> {
+  const { maplibregl } = await import("./maplibre");
+  const container = document.createElement("div");
+  container.style.cssText = `position:fixed;left:-99999px;top:0;width:${window.width}px;height:${window.height}px;`;
+  document.body.appendChild(container);
 
-function loadImage(url: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    // CARTO serves CORS-enabled tiles; anonymous keeps the canvas clean.
-    img.crossOrigin = "anonymous";
-    img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error(`tile failed: ${url}`));
-    img.src = url;
+  const { center, zoom } = mercatorCamera(view, window);
+  const map = new maplibregl.Map({
+    container,
+    style: MAP_STYLE_URL,
+    center,
+    zoom,
+    interactive: false,
+    attributionControl: false,
+    fadeDuration: 0,
+    pixelRatio: 1,
+    // Keeps the WebGL frame readable after it is presented.
+    canvasContextAttributes: { preserveDrawingBuffer: true },
   });
-}
 
-function placements(view: MercatorView, window: TileWindow) {
-  // Tile math runs in box space (window-local origin).
-  const local = { x: 0, y: 0, width: window.width, height: window.height };
-  let zoom = pickTileZoom(view.worldPx);
-  let tiles = tilesInView(view, local, zoom);
-  while (tiles.length > MAX_TILES && zoom > 2) {
-    zoom -= 1;
-    tiles = tilesInView(view, local, zoom);
+  try {
+    const ready = await new Promise<boolean>((resolve) => {
+      const timer = setTimeout(() => resolve(false), RENDER_TIMEOUT_MS);
+      map.once("idle", () => {
+        clearTimeout(timer);
+        resolve(map.loaded());
+      });
+    });
+    if (!ready) return null;
+    // Copy out before the map (and its GL context) is torn down.
+    const snapshot = document.createElement("canvas");
+    snapshot.width = window.width;
+    snapshot.height = window.height;
+    snapshot
+      .getContext("2d")
+      ?.drawImage(map.getCanvas(), 0, 0, window.width, window.height);
+    return snapshot;
+  } catch {
+    return null;
+  } finally {
+    map.remove();
+    container.remove();
   }
-  return { zoom, tiles };
 }
 
 /**
  * Draws the themed basemap into the poster's map window. Resolves to
- * false when no tile could be fetched (offline etc.) so the caller can
- * keep the plain-paper fallback.
+ * false when the basemap could not render (offline etc.) so the caller
+ * can keep the plain-paper fallback.
  */
-export async function drawTileLayer(
+export async function drawBasemap(
   ctx: CanvasRenderingContext2D,
   view: MercatorView,
   window: TileWindow,
   mapFilter: string,
   paper: string,
 ): Promise<boolean> {
-  const { zoom, tiles } = placements(view, window);
-
-  const settled = await Promise.allSettled(
-    tiles.map((tile, i) => loadImage(tileUrl(zoom, tile.x, tile.y, i))),
-  );
-  const loaded: { tile: TilePlacement; img: HTMLImageElement }[] = [];
-  settled.forEach((result, i) => {
-    if (result.status === "fulfilled") {
-      loaded.push({ tile: tiles[i], img: result.value });
-    }
-  });
-  if (loaded.length === 0) return false;
+  const basemap = await renderBasemap(view, window).catch(() => null);
+  if (!basemap) return false;
 
   ctx.save();
   ctx.beginPath();
   ctx.rect(window.x, window.y, window.width, window.height);
   ctx.clip();
 
-  // Theme the tiles like the live map; Safari lacks ctx.filter, so fall
+  // Theme the basemap like the live map; Safari lacks ctx.filter, so fall
   // back to a paper wash that keeps the poster harmonious.
   ctx.filter = mapFilter;
   const filterApplied = ctx.filter !== "none";
-  for (const { tile, img } of loaded) {
-    // +0.5 hides sub-pixel seams between scaled tiles.
-    ctx.drawImage(
-      img,
-      window.x + tile.px,
-      window.y + tile.py,
-      tile.size + 0.5,
-      tile.size + 0.5,
-    );
-  }
+  ctx.drawImage(basemap, window.x, window.y, window.width, window.height);
   ctx.filter = "none";
 
   if (!filterApplied) {

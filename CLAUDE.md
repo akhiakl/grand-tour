@@ -24,7 +24,7 @@ route maps — populated by AI chat or manually — shared via short links
   hand-write version numbers into package.json.
 - **Conventional Commits** (feat/fix/chore/refactor/test/docs) — enforced by
   commitlint on the commit-msg hook.
-- **Server-side secrets only**: `GROQ_API_KEY` and Upstash credentials must
+- **Server-side secrets only**: `AI_API_KEY` and Upstash credentials must
   never reach client bundles.
 - Unit tests are written alongside code (colocated `foo.ts` + `foo.test.ts`),
   not deferred. Schema, service layer, and utils always have coverage;
@@ -78,7 +78,8 @@ Follow exactly; tokens live in `src/app/globals.css`:
   uppercase, brass).
 - Motion: Framer Motion with `cubic-bezier(.32,.72,.24,1)` (`--ease-atlas`);
   always respect `prefers-reduced-motion`.
-- Map: CartoDB Voyager tiles, desaturated (light) / inverted + hue-rotated
+- Map: OpenFreeMap positron vector tiles (MapLibre in Leaflet; open source,
+  no API key), desaturated (light) / inverted + hue-rotated
   (dark); animated brass route path (SVG `pathLength`); transport emoji
   badges at leg midpoints; bounds fit to cities, `maxBoundsViscosity: 1.0`,
   zoom 5–12.

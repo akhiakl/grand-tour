@@ -42,7 +42,7 @@ docs instead of trusting memory — Next majors move fast.
 ## Gotchas
 
 - `suppressHydrationWarning` stays on `<html>` (next-themes mutates class).
-- Never import server-only modules (Redis client, Groq key usage) from
+- Never import server-only modules (Redis client, AI key usage) from
   client components; keep them under `src/lib` and import only in route
   handlers/server components.
 - Prefer `redirect()`/`notFound()` over client-side navigation for server

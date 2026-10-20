@@ -68,7 +68,7 @@ export function labelSide(
   return point.y <= centroidY ? "above" : "below";
 }
 
-/* ——— Web-Mercator view (route + slippy-map tiles share one projection) ——— */
+/* ——— Web-Mercator view (route + basemap share one projection) ——— */
 
 const TILE_SIZE = 256;
 
@@ -95,7 +95,7 @@ export interface MercatorView {
 
 /**
  * Contain-fits the stops in Web-Mercator space so route geometry and
- * standard map tiles can be drawn with the same transform.
+ * the basemap can be rendered with the same transform.
  */
 export function makeMercatorView(
   stops: readonly LatLng[],
@@ -135,49 +135,31 @@ export function makeMercatorView(
   };
 }
 
-/** Slippy-map zoom whose tiles render at ≤ native size for this view. */
-export function pickTileZoom(worldPx: number, maxZoom = 8): number {
-  return Math.min(maxZoom, Math.max(2, Math.ceil(Math.log2(worldPx / TILE_SIZE))));
+/** Inverse of `latToMercY`. */
+export function mercYToLat(y: number): number {
+  return (Math.atan(Math.sinh(Math.PI * (1 - 2 * y))) * 180) / Math.PI;
 }
 
-export interface TilePlacement {
-  x: number;
-  y: number;
-  px: number;
-  py: number;
-  size: number;
+/** MapLibre's world size at zoom 0 (512px vector tiles). */
+const MAPLIBRE_WORLD_PX = 512;
+
+export interface MapCamera {
+  center: { lat: number; lng: number };
+  zoom: number;
 }
 
-/** Tiles at zoom `z` intersecting a window given in box coordinates. */
-export function tilesInView(
+/**
+ * Camera that makes a MapLibre map of `size` show exactly this view, so
+ * the vector basemap lines up with the canvas-drawn route.
+ */
+export function mercatorCamera(
   view: MercatorView,
-  window: { x: number; y: number; width: number; height: number },
-  z: number,
-): TilePlacement[] {
-  const count = 2 ** z;
-  const size = view.worldPx / count;
-
-  const firstIndex = (edge: number, origin: number) =>
-    Math.max(0, Math.floor((edge - origin) / size));
-  const lastIndex = (edge: number, origin: number) =>
-    Math.min(count - 1, Math.floor((edge - origin) / size));
-
-  const tiles: TilePlacement[] = [];
-  const yStart = firstIndex(window.y, view.originPx.y);
-  const yEnd = lastIndex(window.y + window.height, view.originPx.y);
-  const xStart = firstIndex(window.x, view.originPx.x);
-  const xEnd = lastIndex(window.x + window.width, view.originPx.x);
-
-  for (let ty = yStart; ty <= yEnd; ty += 1) {
-    for (let tx = xStart; tx <= xEnd; tx += 1) {
-      tiles.push({
-        x: tx,
-        y: ty,
-        px: view.originPx.x + tx * size,
-        py: view.originPx.y + ty * size,
-        size,
-      });
-    }
-  }
-  return tiles;
+  size: { width: number; height: number },
+): MapCamera {
+  const x = (size.width / 2 - view.originPx.x) / view.worldPx;
+  const y = (size.height / 2 - view.originPx.y) / view.worldPx;
+  return {
+    center: { lat: mercYToLat(y), lng: x * 360 - 180 },
+    zoom: Math.log2(view.worldPx / MAPLIBRE_WORLD_PX),
+  };
 }

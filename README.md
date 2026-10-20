@@ -10,13 +10,13 @@ and share it with a single link. Guest-first: no accounts, no user database.
 ## Stack
 
 Next.js (App Router) · TypeScript strict · Tailwind CSS v4 · shadcn/ui ·
-Framer Motion · react-leaflet · next-themes · Upstash Redis · Zod · Groq
+Framer Motion · react-leaflet · next-themes · Upstash Redis · Zod · MapLibre + OpenFreeMap · any OpenAI-compatible LLM
 
 ## Getting started
 
 ```bash
 pnpm install
-cp .env.example .env.local   # fill in Groq + Upstash credentials
+cp .env.example .env.local   # fill in AI endpoint + Upstash credentials
 pnpm dev
 ```
 
@@ -53,7 +53,9 @@ typecheck; commit messages must follow
 
 | Variable                   | Purpose                                   |
 | -------------------------- | ----------------------------------------- |
-| `GROQ_API_KEY`             | AI trip generation (server only)          |
+| `AI_BASE_URL`              | OpenAI-compatible endpoint (server only)  |
+| `AI_MODEL`                 | Model id for trip generation              |
+| `AI_API_KEY`               | Endpoint key, optional (server only)      |
 | `UPSTASH_REDIS_REST_URL`   | Shared trip snapshots                     |
 | `UPSTASH_REDIS_REST_TOKEN` | Shared trip snapshots                     |
 | `NEXT_PUBLIC_SENTRY_DSN`   | Sentry monitoring (optional; no-op unset) |

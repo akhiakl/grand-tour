@@ -5,9 +5,6 @@ import { TripSchema, type Trip } from "@/lib/trip";
 import { buildRetryPrompt, buildSystemPrompt, buildUserPrompt } from "./prompt";
 import { AiTripSchema, type GenerateRequest } from "./schema";
 
-const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
-const GROQ_MODEL = "llama-3.3-70b-versatile";
-
 export type GenerationFailure = "unavailable" | "upstream" | "invalid_output";
 
 export class GenerationError extends Error {
@@ -28,15 +25,36 @@ interface ChatMessage {
   content: string;
 }
 
-async function callGroq(messages: ChatMessage[], apiKey: string): Promise<string> {
-  const response = await fetch(GROQ_URL, {
+/** Any OpenAI-compatible chat endpoint (Ollama, vLLM, llama.cpp, ...). */
+interface ModelConfig {
+  url: string;
+  model: string;
+  apiKey?: string;
+}
+
+function modelConfig(): ModelConfig | null {
+  const baseUrl = process.env.AI_BASE_URL;
+  const model = process.env.AI_MODEL;
+  if (!baseUrl || !model) return null;
+  return {
+    url: `${baseUrl.replace(/\/+$/, "")}/chat/completions`,
+    model,
+    apiKey: process.env.AI_API_KEY || undefined,
+  };
+}
+
+async function callModel(
+  messages: ChatMessage[],
+  config: ModelConfig,
+): Promise<string> {
+  const response = await fetch(config.url, {
     method: "POST",
     headers: {
-      authorization: `Bearer ${apiKey}`,
+      ...(config.apiKey && { authorization: `Bearer ${config.apiKey}` }),
       "content-type": "application/json",
     },
     body: JSON.stringify({
-      model: GROQ_MODEL,
+      model: config.model,
       response_format: { type: "json_object" },
       temperature: 0.6,
       messages,
@@ -87,25 +105,25 @@ function tryParse(content: string): { trip: GeneratedTrip } | { issues: string }
 export async function generateTrip(
   request: GenerateRequest,
 ): Promise<GeneratedTrip> {
-  const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey) throw new GenerationError("unavailable");
+  const config = modelConfig();
+  if (!config) throw new GenerationError("unavailable");
 
   const base: ChatMessage[] = [
     { role: "system", content: buildSystemPrompt() },
     { role: "user", content: buildUserPrompt(request) },
   ];
 
-  const first = await callGroq(base, apiKey);
+  const first = await callModel(base, config);
   const firstResult = tryParse(first);
   if ("trip" in firstResult) return firstResult.trip;
 
-  const second = await callGroq(
+  const second = await callModel(
     [
       ...base,
       { role: "assistant", content: first },
       { role: "user", content: buildRetryPrompt(firstResult.issues) },
     ],
-    apiKey,
+    config,
   );
   const secondResult = tryParse(second);
   if ("trip" in secondResult) return secondResult.trip;

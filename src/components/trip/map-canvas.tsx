@@ -4,19 +4,13 @@ import "leaflet/dist/leaflet.css";
 
 import L from "leaflet";
 import { useEffect, useMemo } from "react";
-import { MapContainer, Marker, TileLayer, useMap } from "react-leaflet";
+import { MapContainer, Marker, useMap } from "react-leaflet";
 
 import { routeBounds, type City, type LatLng, type Trip } from "@/lib/trip";
 import { escapeHtml } from "@/lib/utils";
 
 import { RouteLayer } from "./route-layer";
-
-const TILE_BASE =
-  "https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png";
-const TILE_LABELS =
-  "https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png";
-const ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>';
+import { VectorBasemap } from "./vector-basemap";
 
 export interface TripMapProps {
   readonly trip: Trip;
@@ -102,8 +96,7 @@ export default function MapCanvas({
       scrollWheelZoom
       className="atlas-map h-full w-full"
     >
-      <TileLayer url={TILE_BASE} attribution={ATTRIBUTION} subdomains="abcd" />
-      <TileLayer url={TILE_LABELS} subdomains="abcd" opacity={0.85} />
+      <VectorBasemap />
       <MapFocus cities={trip.cities} selectedIndex={selectedIndex} />
       <RouteLayer trip={trip} />
       {trip.cities.map((city, index) => (

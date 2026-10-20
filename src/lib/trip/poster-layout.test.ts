@@ -6,8 +6,8 @@ import {
   lngToMercX,
   makeMercatorView,
   makeProjector,
-  pickTileZoom,
-  tilesInView,
+  mercatorCamera,
+  mercYToLat,
   type PosterPoint,
 } from "./poster-layout";
 
@@ -116,55 +116,29 @@ describe("makeMercatorView", () => {
   });
 });
 
-describe("pickTileZoom", () => {
-  it("picks the zoom whose native tiles are not upscaled", () => {
-    expect(pickTileZoom(256 * 2 ** 7)).toBe(7);
-    expect(pickTileZoom(256 * 2 ** 7 + 1)).toBe(8);
-  });
-
-  it("clamps to the allowed range", () => {
-    expect(pickTileZoom(1)).toBe(2);
-    expect(pickTileZoom(256 * 2 ** 15)).toBe(8);
-    expect(pickTileZoom(256 * 2 ** 15, 10)).toBe(10);
+describe("mercYToLat", () => {
+  it("inverts latToMercY", () => {
+    for (const lat of [-60, -12.5, 0, 41.9, 48.86, 70]) {
+      expect(mercYToLat(latToMercY(lat))).toBeCloseTo(lat, 9);
+    }
   });
 });
 
-describe("tilesInView", () => {
+describe("mercatorCamera", () => {
   const stops: [number, number][] = [
     [48.86, 2.35],
     [41.9, 12.5],
   ];
   const view = makeMercatorView(stops, BOX);
-  const z = pickTileZoom(view.worldPx);
-  const tiles = tilesInView(
-    view,
-    { x: 0, y: 0, width: BOX.width, height: BOX.height },
-    z,
-  );
+  const camera = mercatorCamera(view, BOX);
 
-  it("covers the window with adjacent tiles", () => {
-    expect(tiles.length).toBeGreaterThan(0);
-    const size = view.worldPx / 2 ** z;
-    for (const tile of tiles) {
-      expect(tile.size).toBeCloseTo(size, 6);
-      expect(tile.px).toBeCloseTo(view.originPx.x + tile.x * size, 6);
-      expect(tile.py).toBeCloseTo(view.originPx.y + tile.y * size, 6);
-    }
-    // Every tile intersects the window.
-    for (const tile of tiles) {
-      expect(tile.px + tile.size).toBeGreaterThan(0);
-      expect(tile.px).toBeLessThan(BOX.width);
-      expect(tile.py + tile.size).toBeGreaterThan(0);
-      expect(tile.py).toBeLessThan(BOX.height);
-    }
+  it("centers on the box midpoint", () => {
+    const mid = view.project([camera.center.lat, camera.center.lng]);
+    expect(mid.x).toBeCloseTo(BOX.width / 2, 6);
+    expect(mid.y).toBeCloseTo(BOX.height / 2, 6);
   });
 
-  it("clamps indices to the tile grid", () => {
-    for (const tile of tiles) {
-      expect(tile.x).toBeGreaterThanOrEqual(0);
-      expect(tile.x).toBeLessThan(2 ** z);
-      expect(tile.y).toBeGreaterThanOrEqual(0);
-      expect(tile.y).toBeLessThan(2 ** z);
-    }
+  it("matches the view scale with 512px world tiles", () => {
+    expect(512 * 2 ** camera.zoom).toBeCloseTo(view.worldPx, 6);
   });
 });

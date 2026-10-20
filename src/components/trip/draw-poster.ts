@@ -9,8 +9,9 @@ import {
   type Trip,
 } from "@/lib/trip";
 
+import { MAP_ATTRIBUTION_TEXT } from "./map-style";
 import { MODE_META } from "./mode";
-import { drawTileLayer, fadeTileEdges, type TileWindow } from "./poster-tiles";
+import { drawBasemap, fadeTileEdges, type TileWindow } from "./poster-tiles";
 
 export const POSTER_WIDTH = 1080;
 export const POSTER_HEIGHT = 1350;
@@ -173,7 +174,7 @@ function drawAttribution(
   ctx.textBaseline = "alphabetic";
   ctx.globalAlpha = 0.85;
   ctx.fillText(
-    "Map © OpenStreetMap · © CARTO",
+    MAP_ATTRIBUTION_TEXT,
     WIN.x + WIN.width - 14,
     WIN.y + WIN.height - 14,
   );
@@ -246,7 +247,7 @@ export async function drawPoster(
   };
 
   drawBackground(ctx, theme);
-  const hasTiles = await drawTileLayer(ctx, view, WIN, theme.mapFilter, theme.paper);
+  const hasTiles = await drawBasemap(ctx, view, WIN, theme.mapFilter, theme.paper);
   if (hasTiles) fadeTileEdges(ctx, WIN, theme.paper);
   drawFrame(ctx, theme);
   drawHeader(ctx, trip, theme, fonts);
