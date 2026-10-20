@@ -43,4 +43,33 @@ describe("Itinerary", () => {
     await userEvent.click(screen.getByRole("button", { name: /Stop 3/ }));
     expect(onSelect).toHaveBeenCalledWith(2);
   });
+
+  it("reports hover and focus on a row, and lights up the hovered row", async () => {
+    const onHover = vi.fn();
+    render(
+      <Itinerary
+        trip={trip}
+        selectedIndex={null}
+        onSelect={vi.fn()}
+        hoveredIndex={0}
+        onHover={onHover}
+      />,
+    );
+    const second = screen.getByRole("button", { name: /Stop 2/ });
+
+    expect(screen.getByRole("button", { name: /Vienna/ })).toHaveAttribute(
+      "data-hovered",
+    );
+    await userEvent.hover(second);
+    expect(onHover).toHaveBeenLastCalledWith(1);
+    await userEvent.unhover(second);
+    expect(onHover).toHaveBeenLastCalledWith(null);
+    await userEvent.tab();
+    expect(onHover).toHaveBeenLastCalledWith(0);
+  });
+
+  it("titles each stop name so a truncated one can still be read", () => {
+    render(<Itinerary trip={trip} selectedIndex={null} onSelect={vi.fn()} />);
+    expect(screen.getByTitle("Vienna")).toBeInTheDocument();
+  });
 });

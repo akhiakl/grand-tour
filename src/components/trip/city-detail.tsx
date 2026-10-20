@@ -55,6 +55,7 @@ export function CityDetail({
           </p>
           <h2
             id={titleId}
+            title={city.name}
             className="truncate font-display text-3xl font-medium tracking-tight"
           >
             {city.name}

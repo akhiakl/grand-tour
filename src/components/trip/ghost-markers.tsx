@@ -32,7 +32,8 @@ function GhostMarker({
     <Marker
       position={ghost.ll}
       icon={icon}
-      alt={`${ghost.name}, locked suggestion`}
+      title={`${ghost.name}, locked suggestion`}
+      autoPanOnFocus={false}
       eventHandlers={{ click: onSelect }}
     />
   );

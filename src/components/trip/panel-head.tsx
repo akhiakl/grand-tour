@@ -1,6 +1,6 @@
 "use client";
 
-import { Moon, Sun } from "lucide-react";
+import { ChevronUp, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import type { ReactNode } from "react";
 
@@ -8,6 +8,7 @@ import { UnitsDialog } from "@/components/units/units-dialog";
 import { useUnits } from "@/components/units/units-provider";
 import { useMounted } from "@/hooks/use-mounted";
 import { tripStats, type Trip } from "@/lib/trip";
+import { cn } from "@/lib/utils";
 
 import { TitleWithAccent } from "./intro-splash";
 import type { ExperienceVariant } from "./panel-actions";
@@ -35,6 +36,37 @@ function ThemeToggle() {
   );
 }
 
+/** Desktop only: folds the atlas card down to this head, and back. */
+function CollapseToggle({
+  collapsed,
+  controls,
+  onToggle,
+}: {
+  readonly collapsed: boolean;
+  readonly controls: string;
+  readonly onToggle: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-expanded={!collapsed}
+      aria-controls={controls}
+      aria-label={collapsed ? "Expand trip card" : "Collapse trip card"}
+      title={collapsed ? "Expand" : "Collapse"}
+      onClick={onToggle}
+      className="hidden size-9 shrink-0 place-items-center rounded-full border border-line text-ink-soft transition-colors outline-none hover:bg-accent hover:text-ink focus-visible:ring-2 focus-visible:ring-ring lg:grid [&_svg]:size-4"
+    >
+      <ChevronUp
+        aria-hidden
+        className={cn(
+          "transition-transform duration-300 ease-atlas motion-reduce:transition-none",
+          collapsed && "rotate-180",
+        )}
+      />
+    </button>
+  );
+}
+
 /**
  * Always-visible top of the panel (the resting mobile sheet shows only
  * this): what the map is, the route at a glance, and the main actions.
@@ -43,10 +75,17 @@ export function PanelHead({
   trip,
   variant,
   actions,
+  collapsed,
+  bodyId,
+  onCollapsedChange,
 }: {
   readonly trip: Trip;
   readonly variant: ExperienceVariant;
   readonly actions: ReactNode;
+  /** Desktop card fold state, and the body element it hides. */
+  readonly collapsed: boolean;
+  readonly bodyId: string;
+  readonly onCollapsedChange: (collapsed: boolean) => void;
 }) {
   const stats = tripStats(trip);
   const { distance } = useUnits();
@@ -66,6 +105,11 @@ export function PanelHead({
         <div className="flex shrink-0 gap-2">
           <UnitsDialog />
           <ThemeToggle />
+          <CollapseToggle
+            collapsed={collapsed}
+            controls={bodyId}
+            onToggle={() => onCollapsedChange(!collapsed)}
+          />
         </div>
       </div>
       {actions}
