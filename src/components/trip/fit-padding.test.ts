@@ -14,6 +14,13 @@ describe("fitPadding", () => {
     expect(fitPadding(180).paddingBottomRight).toEqual([120, 236]);
   });
 
+  it("tightens vertical margins when the sheet leaves a strip of map", () => {
+    expect(fitPadding(500, 870)).toEqual({
+      paddingTopLeft: [56, 16],
+      paddingBottomRight: [120, 516],
+    });
+  });
+
   it("ignores a negative inset", () => {
     expect(fitPadding(-20).paddingBottomRight).toEqual([120, 56]);
   });

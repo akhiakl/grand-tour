@@ -51,7 +51,10 @@ export function MapControls({
       <ControlButton
         label="Fit the whole route"
         onClick={() =>
-          map.flyToBounds(bounds, { ...fitPadding(bottomInset), duration: 0.8 })
+          map.flyToBounds(bounds, {
+            ...fitPadding(bottomInset, map.getSize().y),
+            duration: 0.8,
+          })
         }
       >
         <Maximize />

@@ -31,12 +31,19 @@ vi.mock("@/hooks/use-share-trip", () => ({
 vi.mock("./trip-map", () => ({
   TripMap: ({
     onCitySelect,
+    onBackgroundClick,
   }: {
     readonly onCitySelect: (index: number) => void;
+    readonly onBackgroundClick: () => void;
   }) => (
-    <button type="button" onClick={() => onCitySelect(1)}>
-      map marker
-    </button>
+    <>
+      <button type="button" onClick={() => onCitySelect(1)}>
+        map marker
+      </button>
+      <button type="button" onClick={onBackgroundClick}>
+        map background
+      </button>
+    </>
   ),
 }));
 
@@ -147,5 +154,17 @@ describe("TripExperience", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "Packing" }));
     expect(screen.getByRole("checkbox", { name: "Power bank" })).toBeChecked();
+  });
+
+  it("picking a stop opens the sheet; tapping the map lowers it", async () => {
+    render(<TripExperience trip={routeTrip()} actions="shared" />);
+    const handle = () => screen.getByRole("button", { name: /trip details/i });
+    expect(handle()).toHaveAttribute("aria-expanded", "false");
+
+    await userEvent.click(screen.getByRole("button", { name: "map marker" }));
+    expect(handle()).toHaveAttribute("aria-expanded", "true");
+
+    await userEvent.click(screen.getByRole("button", { name: "map background" }));
+    expect(handle()).toHaveAttribute("aria-expanded", "false");
   });
 });

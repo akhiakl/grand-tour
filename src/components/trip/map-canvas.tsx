@@ -4,7 +4,7 @@ import "leaflet/dist/leaflet.css";
 
 import L from "leaflet";
 import { useEffect, useMemo, type CSSProperties } from "react";
-import { MapContainer, Marker, useMap } from "react-leaflet";
+import { MapContainer, Marker, useMap, useMapEvents } from "react-leaflet";
 
 import type { GhostStop } from "@/lib/ai";
 import { routeBounds, type City, type LatLng, type Trip } from "@/lib/trip";
@@ -27,6 +27,8 @@ export interface TripMapProps {
   readonly onGhostSelect?: () => void;
   /** Pixels the mobile bottom sheet covers; fits and overlays clear it. */
   readonly bottomInset?: number;
+  /** A tap on the map itself (not a marker), e.g. to lower the sheet. */
+  readonly onBackgroundClick?: () => void;
 }
 
 const CITY_ZOOM = 9;
@@ -46,13 +48,13 @@ function MapFocus({
   const map = useMap();
 
   useEffect(() => {
-    map.setMaxBounds(bounds.pad(1));
+    map.setMaxBounds(bounds.pad(2));
   }, [map, bounds]);
 
   useEffect(() => {
     if (selectedIndex === null) {
       map.flyToBounds(bounds, {
-        ...fitPadding(bottomInset),
+        ...fitPadding(bottomInset, map.getSize().y),
         duration: 1,
       });
     } else {
@@ -64,6 +66,11 @@ function MapFocus({
     }
   }, [map, bounds, cities, selectedIndex, bottomInset]);
 
+  return null;
+}
+
+function BackgroundClick({ onClick }: { readonly onClick: () => void }) {
+  useMapEvents({ click: onClick });
   return null;
 }
 
@@ -106,6 +113,7 @@ export default function MapCanvas({
   ghosts = [],
   onGhostSelect = () => undefined,
   bottomInset = 0,
+  onBackgroundClick,
 }: TripMapProps) {
   const bounds = useMemo(
     () => L.latLngBounds(routeBounds(trip.cities)),
@@ -143,6 +151,7 @@ export default function MapCanvas({
       ))}
       <GhostMarkers ghosts={ghosts} onSelect={onGhostSelect} />
       <MapDeclutter />
+      {onBackgroundClick && <BackgroundClick onClick={onBackgroundClick} />}
       <MapControls bounds={bounds} bottomInset={bottomInset} />
       <MapLegend legs={trip.legs} hasGhosts={ghosts.length > 0} />
     </MapContainer>

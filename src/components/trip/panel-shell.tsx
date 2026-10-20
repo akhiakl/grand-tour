@@ -106,7 +106,7 @@ export function PanelShell({
       onDragStart={() => (dragged.current = true)}
       onDragEnd={onDragEnd}
       style={{ y }}
-      className="fixed inset-x-0 bottom-0 z-40 flex h-[75dvh] flex-col rounded-t-[22px] border-t border-line bg-paper shadow-soft lg:static lg:z-auto lg:h-full lg:transform-none! lg:rounded-none lg:border-t-0 lg:border-r lg:shadow-none"
+      className="fixed inset-x-0 bottom-0 z-40 flex h-[60dvh] flex-col rounded-t-[22px] border-t border-line bg-paper shadow-soft lg:static lg:z-auto lg:h-full lg:transform-none! lg:rounded-none lg:border-t-0 lg:border-r lg:shadow-none"
     >
       <button
         type="button"

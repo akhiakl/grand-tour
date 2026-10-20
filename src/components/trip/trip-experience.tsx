@@ -42,6 +42,13 @@ export function TripExperience({
   const [selected, setSelected] = useState<number | null>(null);
   const [posterOpen, setPosterOpen] = useState(false);
   const [sheetInset, setSheetInset] = useState(0);
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  // Picking a stop (map or itinerary) opens the sheet to show its detail.
+  const selectCity = (index: number | null) => {
+    setSelected(index);
+    if (index !== null) setSheetOpen(true);
+  };
 
   const stats = tripStats(trip);
   const route = trip.cities.map((city) => city.name).join(" → ");
@@ -71,19 +78,22 @@ export function TripExperience({
         variant={actions}
         cta={cta}
         selected={selected}
-        onSelect={setSelected}
+        onSelect={selectCity}
         onEditRoute={handleEditRoute}
         onShare={() => void share(trip)}
         sharing={sharing}
         onPoster={() => setPosterOpen(true)}
         onInsetChange={setSheetInset}
+        expanded={sheetOpen}
+        onExpandedChange={setSheetOpen}
       />
 
       <main aria-label="Route map" className="absolute inset-0 z-0 lg:relative">
         <TripMap
           trip={trip}
           selectedIndex={selected}
-          onCitySelect={setSelected}
+          onCitySelect={selectCity}
+          onBackgroundClick={() => setSheetOpen(false)}
           bottomInset={isDesktop ? 0 : sheetInset}
         />
       </main>

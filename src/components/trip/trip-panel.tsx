@@ -33,6 +33,8 @@ export function TripPanel({
   sharing,
   onPoster,
   onInsetChange,
+  expanded,
+  onExpandedChange,
 }: {
   readonly trip: Trip;
   readonly variant: ExperienceVariant;
@@ -44,21 +46,20 @@ export function TripPanel({
   readonly sharing?: boolean;
   readonly onPoster: () => void;
   readonly onInsetChange: (px: number) => void;
+  /** Mobile sheet state; picking a stop opens it (see TripExperience). */
+  readonly expanded: boolean;
+  readonly onExpandedChange: (expanded: boolean) => void;
 }) {
   const [tool, setTool] = useState<ToolId | null>(null);
-  const [expanded, setExpanded] = useState(false);
   const city = selected === null ? null : trip.cities[selected];
 
   // A newly picked stop (from the map or the itinerary) takes over the
-  // panel, so the sheet opens to show it. Adjusted during render, React's
-  // pattern for state that follows a prop.
+  // panel from any open tool. Adjusted during render, React's pattern for
+  // state that follows a prop.
   const [shownSelection, setShownSelection] = useState(selected);
   if (selected !== shownSelection) {
     setShownSelection(selected);
-    if (selected !== null) {
-      setTool(null);
-      setExpanded(true);
-    }
+    if (selected !== null) setTool(null);
   }
 
   useEffect(() => {
@@ -68,23 +69,23 @@ export function TripPanel({
       if ((event.target as Element | null)?.closest?.('[role="dialog"]')) return;
       if (selected !== null) onSelect(null);
       else if (tool) setTool(null);
-      else setExpanded(false);
+      else onExpandedChange(false);
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, [selected, tool, onSelect]);
+  }, [selected, tool, onSelect, onExpandedChange]);
 
   const openTool = (next: ToolId) => {
     onSelect(null);
     setTool((current) => (current === next ? null : next));
-    setExpanded(true);
+    onExpandedChange(true);
   };
 
   return (
     <PanelShell
       label="Trip details"
       expanded={expanded}
-      onExpandedChange={setExpanded}
+      onExpandedChange={onExpandedChange}
       onInsetChange={onInsetChange}
       head={
         <PanelHead
