@@ -48,8 +48,8 @@ Naming: lowercase, kebab-case, scoped to one deliverable —
 
 Branch protection on `main` should require:
 
-- the CI checks — Lint, Typecheck, Unit tests & coverage, Build,
-  SonarQube — plus the "Conventional title" check and the SonarQube
+- the CI checks — Lint, Typecheck, Unit tests & coverage, Build — plus
+  the "Conventional title" check and the SonarQube Cloud
   quality-gate check, all green before merge
 - at least one review (CODEOWNERS auto-requests @akhiakl)
 - linear history (squash or rebase merges only)
@@ -57,21 +57,16 @@ Branch protection on `main` should require:
 Coverage appears as a PR comment and in the job summary on every PR.
 Overall coverage must stay above 85%: vitest thresholds (90% lines /
 functions / statements, 85% branches over lib + API routes) fail the test
-check when breached. To have SonarQube enforce the same overall floor,
-copy "Sonar way" into a custom gate and add an overall-coverage ≥ 85%
-condition (Sonar-side setting; the built-in gate only checks new code).
+check when breached. SonarQube does not see coverage (Automatic Analysis
+cannot import reports); vitest is the coverage gate.
 
 SonarQube Cloud one-time setup (project admin):
 
-1. Project Administration → Analysis Method → turn OFF Automatic Analysis
-   (CI-based analysis with coverage replaces it; the two conflict).
-2. Generate a project analysis token and save it as the `SONAR_TOKEN`
-   repository secret (done). Self-hosted SonarQube Server only: add a
-   `SONAR_HOST_URL` env to the scan step.
-3. Keep the default "Sonar way" quality gate; set New Code definition to
+1. Project Administration → Analysis Method → Automatic Analysis ON
+   (done). It scans via the SonarQube Cloud GitHub App: no CI job and no
+   `SONAR_TOKEN`. Scope and exclusions live in `.sonarcloud.properties`.
+2. Keep the default "Sonar way" quality gate; set New Code definition to
    "Previous version" (or reference branch `main`).
-4. Verify `sonar.projectKey` / `sonar.organization` in
-   `sonar-project.properties` match the project's Information page.
 
 ## Releases
 

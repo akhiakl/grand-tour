@@ -208,10 +208,9 @@ Branch: `feature/e2e`
 - [ ] `AI_BASE_URL` / `AI_MODEL` (+ `AI_API_KEY` if needed) in `.env.local` + deploy host env.
 - [ ] Sentry project created; `NEXT_PUBLIC_SENTRY_DSN` set (optional
       `SENTRY_ORG/PROJECT/AUTH_TOKEN` in CI for source maps).
-- [x] `SONAR_TOKEN` repo secret.
-- [ ] SonarQube: Automatic Analysis OFF; New Code = previous version.
+- [x] SonarQube: Automatic Analysis ON (no token); New Code = previous version.
 - [ ] Branch protection on `main`: Lint, Typecheck, Unit tests &
-      coverage, Build, SonarQube, Conventional title + quality gate;
+      coverage, Build, Conventional title + SonarQube quality gate;
       1 review; linear history (see `docs/BRANCHING.md`).
 - [ ] Optional: allowlist `ui.shadcn.com` in the remote environment's
       network policy so `shadcn add` works in cloud sessions.

@@ -58,8 +58,8 @@ checked before merging the `1.0.0` release PR.
 ### Quality
 
 - [ ] All CI checks green on `main` (Lint, Typecheck, Tests & coverage,
-      Build, SonarQube, e2e)
-- [ ] Coverage ≥ 85% overall; SonarQube quality gate passing
+      Build, e2e) and SonarQube quality gate passing
+- [ ] Coverage ≥ 85% overall
 - [ ] Keyboard audit: ESC closes drawer/modals, focus trapped & restored,
       full tab-through of editor and chat
 - [ ] Lighthouse: a11y ≥ 95, performance ≥ 85 on `/`, `/new`, `/t/[id]`
