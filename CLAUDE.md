@@ -66,6 +66,11 @@ route maps — populated by AI chat or manually — shared via short links
   components; error boundaries and `onRequestError` cover capture.
 - Default trip title is "Grand Tour" (`DEFAULT_TRIP_TITLE`); users can set a
   custom title per trip.
+- **Copy**: every UI string lives in `src/i18n/messages/en.json` (next-intl,
+  single locale, typed keys) — never hardcode copy in components; `lib`
+  returns message keys, not text. See `docs/ARCHITECTURE.md` → Copy and i18n.
+- **Viewer state** (packing ticks, own items, notes) is per trip in
+  localStorage (`trip-tools:*`), never in the shared snapshot.
 
 ## Design system — "field atlas", minimal luxury
 

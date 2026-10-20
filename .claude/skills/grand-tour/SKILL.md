@@ -47,7 +47,14 @@ status table before starting work. Visual truth: `reference/grand-tour.html`.
   path), `stats` (nights/countries/km/budget), `poster-layout`
   (equirect + Web-Mercator projectors, tile math), `sample` (demo trip
   JSON, schema-validated), `service` (server-only Redis: saveTrip/
-  getTrip/incrViews, 60-day GETEX TTL).
+  getTrip/incrViews, 60-day GETEX TTL), `draft` (editor transforms;
+  `draftIssues` returns message keys), `history` (undo/redo, coalesced
+  per field), `leg-estimate` (mode + duration from distance), `dates`
+  (optional `startDate` → per-stop days), `ics` (calendar export),
+  `packing` (trip-shaped packing items as keys; `plug-types`),
+  `tools-store` (viewer's packing/notes per trip in localStorage),
+  `local-store` (+ last-share tracking, duplicate, import),
+  `fingerprint` (stale-share detection), `trip-file` (JSON backups).
 - `lib/ai`: `schema` (GenerateRequest, AiTrip + suggestedExtra),
   `prompt`, `generate` (server-only OpenAI-compatible call, one validation-feedback retry),
   `handoff` (chat → editor localStorage), `ghosts` (approximate positions
@@ -86,6 +93,11 @@ status table before starting work. Visual truth: `reference/grand-tour.html`.
     (zoom, fit route), `map-legend`, `map-declutter` + `declutter` (label
     flip/hide, badge hide), `map-overlay`. Also `intro-splash`,
     `poster-dialog` + `draw-poster` + `poster-tiles`, `mode`.
+- `i18n`: next-intl, single English locale; ALL copy in
+  `i18n/messages/en.json` (typed keys). Components use
+  `useTranslations`; tests get real copy via mocks in `vitest.setup.ts`.
+- Offline: `public/sw.js` + `components/service-worker` (prod only);
+  `/offline` fallback page. Print: `trip/print-itinerary` (print-only).
 - `components/ui`: button, sheet, tabs, dialog, checkbox, badge,
   separator — vendored shadcn shape.
 
