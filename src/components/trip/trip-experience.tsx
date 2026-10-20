@@ -16,6 +16,7 @@ import type { MapInsets } from "./fit-padding";
 import { IntroSplash } from "./intro-splash";
 import type { ExperienceVariant } from "./panel-actions";
 import { PosterDialog } from "./poster-dialog";
+import { PrintItinerary } from "./print-itinerary";
 import { TripMap } from "./trip-map";
 import { TripPanel } from "./trip-panel";
 
@@ -106,53 +107,56 @@ export function TripExperience({
   };
 
   return (
-    <div className="relative isolate h-dvh w-full overflow-hidden">
-      <TripPanel
-        trip={trip}
-        toolsScope={toolsScope}
-        views={views}
-        variant={actions}
-        cta={cta}
-        selected={selected}
-        onSelect={selectCity}
-        hovered={hovered}
-        onHover={setHovered}
-        onEditRoute={handleEditRoute}
-        onShare={() => void share(trip, localId)}
-        sharing={sharing}
-        onPoster={() => setPosterOpen(true)}
-        onInsetsChange={setInsets}
-        expanded={sheetOpen}
-        onExpandedChange={setSheetOpen}
-      />
-
-      <main aria-label="Route map" className="absolute inset-0 z-0">
-        <TripMap
+    <>
+      <div className="relative isolate h-dvh w-full overflow-hidden print:hidden">
+        <TripPanel
           trip={trip}
-          selectedIndex={selected}
-          onCitySelect={selectCity}
-          hoveredIndex={hovered}
-          onCityHover={setHovered}
-          onBackgroundClick={() => setSheetOpen(false)}
-          insets={insets}
+          toolsScope={toolsScope}
+          views={views}
+          variant={actions}
+          cta={cta}
+          selected={selected}
+          onSelect={selectCity}
+          hovered={hovered}
+          onHover={setHovered}
+          onEditRoute={handleEditRoute}
+          onShare={() => void share(trip, localId)}
+          sharing={sharing}
+          onPoster={() => setPosterOpen(true)}
+          onInsetsChange={setInsets}
+          expanded={sheetOpen}
+          onExpandedChange={setSheetOpen}
         />
-      </main>
 
-      <PosterDialog trip={trip} open={posterOpen} onOpenChange={setPosterOpen} />
-      {actions === "own" && (
-        <ShareDialog
-          shareId={sharedId}
-          title={sharedTitle}
-          open={dialogOpen}
-          onOpenChange={setDialogOpen}
+        <main aria-label="Route map" className="absolute inset-0 z-0">
+          <TripMap
+            trip={trip}
+            selectedIndex={selected}
+            onCitySelect={selectCity}
+            hoveredIndex={hovered}
+            onCityHover={setHovered}
+            onBackgroundClick={() => setSheetOpen(false)}
+            insets={insets}
+          />
+        </main>
+
+        <PosterDialog trip={trip} open={posterOpen} onOpenChange={setPosterOpen} />
+        {actions === "own" && (
+          <ShareDialog
+            shareId={sharedId}
+            title={sharedTitle}
+            open={dialogOpen}
+            onOpenChange={setDialogOpen}
+          />
+        )}
+
+        <IntroSplash
+          title={trip.title}
+          eyebrow={`${stats.nights} nights · ${stats.cities} cities · ${stats.countries} countries`}
+          route={route}
         />
-      )}
-
-      <IntroSplash
-        title={trip.title}
-        eyebrow={`${stats.nights} nights · ${stats.cities} cities · ${stats.countries} countries`}
-        route={route}
-      />
-    </div>
+      </div>
+      <PrintItinerary trip={trip} />
+    </>
   );
 }

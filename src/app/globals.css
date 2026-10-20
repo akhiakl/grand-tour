@@ -438,6 +438,43 @@ input[type="range"] {
   box-shadow: 0 0 0 1.5px var(--ink-soft);
 }
 
+/*
+ * Print: paper is always light, whatever the screen theme, and the
+ * interactive map view gives way to the print-only itinerary
+ * (`PrintItinerary`, `hidden print:block`).
+ */
+@media print {
+  .dark {
+    --paper: #ffffff;
+    --ink: #16233a;
+    --ink-soft: #4a5568;
+    --brass: #b98a2f;
+    --brass-text: #8a6420;
+    --azure: #3e7cb1;
+    --line: rgba(22, 35, 58, 0.12);
+  }
+
+  :root {
+    --paper: #ffffff;
+  }
+
+  body {
+    transition: none;
+  }
+
+  /* Overlays never belong on paper, even if one is open while printing. */
+  [data-slot$="-overlay"],
+  [data-slot$="dialog-content"],
+  [data-slot="sheet-content"],
+  [data-sonner-toaster] {
+    display: none !important;
+  }
+
+  @page {
+    margin: 16mm 14mm;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

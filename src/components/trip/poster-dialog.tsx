@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, Share2 } from "lucide-react";
+import { Download, Printer, Share2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -159,7 +159,7 @@ export function PosterDialog({
           <DialogTitle>Share your route</DialogTitle>
           <DialogDescription>
             A clean poster of the journey — sized for Instagram (4:5), no app chrome,
-            follows your theme.
+            follows your theme. Or print the full itinerary for the road.
           </DialogDescription>
         </DialogHeader>
 
@@ -168,6 +168,9 @@ export function PosterDialog({
         </div>
 
         <DialogFooter>
+          <Button variant="ghost" onClick={() => window.print()}>
+            <Printer /> Print itinerary
+          </Button>
           {canShare && (
             <Button variant="outline" onClick={share} disabled={!blob}>
               <Share2 /> Share…
