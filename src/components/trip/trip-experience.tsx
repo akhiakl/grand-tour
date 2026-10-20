@@ -45,6 +45,7 @@ export function TripExperience({
   actions = "demo",
   localId,
   shareId,
+  views,
   cta,
 }: {
   readonly trip: Trip;
@@ -54,6 +55,8 @@ export function TripExperience({
   readonly localId?: string;
   /** The snapshot id, when `actions="shared"` (`/t/{id}`). */
   readonly shareId?: string;
+  /** How many times the shared link has been opened, this visit included. */
+  readonly views?: number;
   /** The landing's own primary actions, shown in place of the variant's. */
   readonly cta?: ReactNode;
 }) {
@@ -81,6 +84,7 @@ export function TripExperience({
     share,
     sharing,
     shareId: sharedId,
+    sharedTitle,
     dialogOpen,
     setDialogOpen,
   } = useShareTrip({
@@ -106,6 +110,7 @@ export function TripExperience({
       <TripPanel
         trip={trip}
         toolsScope={toolsScope}
+        views={views}
         variant={actions}
         cta={cta}
         selected={selected}
@@ -113,7 +118,7 @@ export function TripExperience({
         hovered={hovered}
         onHover={setHovered}
         onEditRoute={handleEditRoute}
-        onShare={() => void share(trip)}
+        onShare={() => void share(trip, localId)}
         sharing={sharing}
         onPoster={() => setPosterOpen(true)}
         onInsetsChange={setInsets}
@@ -137,6 +142,7 @@ export function TripExperience({
       {actions === "own" && (
         <ShareDialog
           shareId={sharedId}
+          title={sharedTitle}
           open={dialogOpen}
           onOpenChange={setDialogOpen}
         />

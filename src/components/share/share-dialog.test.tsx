@@ -42,6 +42,33 @@ describe("ShareDialog", () => {
     ).toBeInTheDocument();
   });
 
+  it("offers the device share sheet when the browser has one", async () => {
+    const share = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { share });
+    render(
+      <ShareDialog
+        shareId="abc12345"
+        title="Alps"
+        open
+        onOpenChange={onOpenChange}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: /share via/i }));
+    expect(share).toHaveBeenCalledWith({
+      url: expect.stringContaining("/t/abc12345"),
+      title: "Alps",
+    });
+    Object.assign(navigator, { share: undefined });
+  });
+
+  it("hides the share sheet button where the browser has none", () => {
+    render(<ShareDialog shareId="abc12345" open onOpenChange={onOpenChange} />);
+    expect(
+      screen.queryByRole("button", { name: /share via/i }),
+    ).not.toBeInTheDocument();
+  });
+
   it("renders nothing when closed", () => {
     render(
       <ShareDialog shareId="abc12345" open={false} onOpenChange={onOpenChange} />,

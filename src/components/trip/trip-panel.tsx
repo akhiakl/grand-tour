@@ -15,6 +15,7 @@ import {
 import { PanelHead } from "./panel-head";
 import { PanelShell } from "./panel-shell";
 import { Itinerary, StatsGrid } from "./route-overview";
+import { SharedLinkNote } from "./shared-link-note";
 import { TripTools } from "./trip-tools";
 
 /**
@@ -26,6 +27,7 @@ import { TripTools } from "./trip-tools";
 export function TripPanel({
   trip,
   toolsScope,
+  views,
   variant,
   cta,
   selected,
@@ -43,6 +45,7 @@ export function TripPanel({
   readonly trip: Trip;
   /** Where this viewer's packing ticks and notes are saved. */
   readonly toolsScope: TripToolsScope;
+  readonly views?: number;
   readonly variant: ExperienceVariant;
   readonly cta?: ReactNode;
   readonly selected: number | null;
@@ -159,6 +162,7 @@ export function TripPanel({
                 onHover={onHover}
               />
             </section>
+            {variant === "shared" && <SharedLinkNote views={views} />}
           </>
         )}
       </div>

@@ -3,19 +3,27 @@
 import { useState } from "react";
 import { toast } from "sonner";
 
-import type { Trip } from "@/lib/trip";
+import { markLocalTripShared, type Trip } from "@/lib/trip";
 
 /**
  * POST /api/trips and surface its full error contract as toasts, except
  * `city_limit` (403) which the caller handles itself — that one opens the
- * UpsellModal instead of a toast.
+ * UpsellModal instead of a toast. Sharing a local trip (`localId`) records
+ * the share on it, so My Maps can tell when it has been edited since.
  */
-export function useShareTrip({ onCityLimit }: { readonly onCityLimit: () => void }) {
+export function useShareTrip({
+  onCityLimit,
+  onShared,
+}: {
+  readonly onCityLimit: () => void;
+  readonly onShared?: (shareId: string) => void;
+}) {
   const [sharing, setSharing] = useState(false);
   const [shareId, setShareId] = useState<string | null>(null);
+  const [sharedTitle, setSharedTitle] = useState<string | undefined>();
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const share = async (trip: Trip) => {
+  const share = async (trip: Trip, localId?: string) => {
     setSharing(true);
     try {
       const response = await fetch("/api/trips", {
@@ -26,8 +34,11 @@ export function useShareTrip({ onCityLimit }: { readonly onCityLimit: () => void
 
       if (response.status === 201) {
         const { id } = (await response.json()) as { id: string };
+        if (localId) markLocalTripShared(localId, id);
         setShareId(id);
+        setSharedTitle(trip.title);
         setDialogOpen(true);
+        onShared?.(id);
         return;
       }
 
@@ -54,5 +65,5 @@ export function useShareTrip({ onCityLimit }: { readonly onCityLimit: () => void
     }
   };
 
-  return { share, sharing, shareId, dialogOpen, setDialogOpen };
+  return { share, sharing, shareId, sharedTitle, dialogOpen, setDialogOpen };
 }

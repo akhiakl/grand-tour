@@ -123,7 +123,20 @@ describe("TripExperience", () => {
     render(<TripExperience trip={trip} actions="own" localId="existing1" />);
 
     await userEvent.click(screen.getByRole("button", { name: /^share$/i }));
-    expect(mocks.share).toHaveBeenCalledWith(trip);
+    expect(mocks.share).toHaveBeenCalledWith(trip, "existing1");
+  });
+
+  it("shared mode: tells viewers how often the link was opened and how long it lasts", () => {
+    render(
+      <TripExperience
+        trip={routeTrip()}
+        actions="shared"
+        shareId="abc12345"
+        views={12}
+      />,
+    );
+    expect(screen.getByText(/Opened 12 times\./)).toBeInTheDocument();
+    expect(screen.getByText(/stays live for 60 days/)).toBeInTheDocument();
   });
 
   it("shared mode: remix also forks a fresh copy (no localId)", async () => {

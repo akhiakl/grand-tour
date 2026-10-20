@@ -23,13 +23,14 @@ export function MapsPage() {
 
   const records: LocalTripRecord[] = mounted ? listLocalTrips() : [];
 
-  const { share, shareId, dialogOpen, setDialogOpen } = useShareTrip({
+  const { share, shareId, sharedTitle, dialogOpen, setDialogOpen } = useShareTrip({
     onCityLimit: () => setUpsellOpen(true),
+    onShared: () => forceRefresh((key) => key + 1),
   });
 
   const handleShare = async (record: LocalTripRecord) => {
     setSharingId(record.id);
-    await share(record.trip);
+    await share(record.trip, record.id);
     setSharingId(null);
   };
 
@@ -92,6 +93,7 @@ export function MapsPage() {
 
       <ShareDialog
         shareId={shareId}
+        title={sharedTitle}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
       />

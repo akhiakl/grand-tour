@@ -6,6 +6,7 @@
  * server-only entry point `@/lib/trip/service`.
  */
 export * from "./draft";
+export * from "./fingerprint";
 export * from "./geo";
 export * from "./local-store";
 export * from "./packing";

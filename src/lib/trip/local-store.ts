@@ -1,6 +1,7 @@
 import { nanoid } from "nanoid";
 import { z } from "zod";
 
+import { tripFingerprint } from "./fingerprint";
 import { TripSchema, type Trip } from "./schema";
 import { clearTripTools } from "./tools-store";
 
@@ -17,15 +18,26 @@ const recordKey = (id: string) => `trips:${id}`;
 
 const IndexSchema = z.array(z.string());
 
+/** The creator's last share of a local trip, and what it looked like then. */
+const SharedSchema = z.object({
+  id: z.string(),
+  at: z.number(),
+  fingerprint: z.string(),
+});
+
 const RecordSchema = z.object({
   trip: TripSchema,
   updatedAt: z.number(),
+  shared: SharedSchema.optional(),
 });
+
+export type LocalTripShare = z.infer<typeof SharedSchema>;
 
 export type LocalTripRecord = {
   id: string;
   trip: Trip;
   updatedAt: number;
+  shared?: LocalTripShare;
 };
 
 const hasStorage = () => typeof window !== "undefined";
@@ -91,13 +103,49 @@ export function saveLocalTrip(trip: Trip, id?: string): string {
   const targetId = id ?? nanoid(LOCAL_ID_LENGTH);
   if (!hasStorage()) return targetId;
 
-  const record: z.infer<typeof RecordSchema> = { trip, updatedAt: Date.now() };
-  window.localStorage.setItem(recordKey(targetId), JSON.stringify(record));
+  // Overwrites keep the share history so "edited since sharing" still shows.
+  const shared = id ? getLocalTrip(id)?.shared : undefined;
+  writeRecord(targetId, { trip, updatedAt: Date.now(), shared });
 
   const ids = readIndex();
   if (!ids.includes(targetId)) writeIndex([...ids, targetId]);
 
   return targetId;
+}
+
+function writeRecord(id: string, record: z.infer<typeof RecordSchema>) {
+  window.localStorage.setItem(recordKey(id), JSON.stringify(record));
+}
+
+/** Remember that this local trip was just shared as `shareId`. */
+export function markLocalTripShared(id: string, shareId: string): void {
+  const record = getLocalTrip(id);
+  if (!record) return;
+  writeRecord(id, {
+    trip: record.trip,
+    updatedAt: record.updatedAt,
+    shared: {
+      id: shareId,
+      at: Date.now(),
+      fingerprint: tripFingerprint(record.trip),
+    },
+  });
+}
+
+/** True when a shared local trip has been edited since that share. */
+export function isShareStale(record: LocalTripRecord): boolean {
+  return (
+    record.shared !== undefined &&
+    record.shared.fingerprint !== tripFingerprint(record.trip)
+  );
+}
+
+/** Copy a local trip into a new record titled "… (copy)"; returns its id. */
+export function duplicateLocalTrip(id: string): string | null {
+  const record = getLocalTrip(id);
+  if (!record) return null;
+  const title = `${record.trip.title} (copy)`.slice(0, 80);
+  return saveLocalTrip({ ...record.trip, title, createdAt: Date.now() });
 }
 
 /** Remove a local trip, its index entry and its packing/notes. No-op if missing. */

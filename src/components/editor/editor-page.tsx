@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { ShareDialog } from "@/components/share/share-dialog";
@@ -21,6 +21,7 @@ import {
   moveCity,
   removeCityAt,
   saveLocalTrip,
+  tripFingerprint,
   updateCityAt,
   updateLegAt,
   updateTitle,
@@ -28,6 +29,7 @@ import {
   type DraftIssues,
   type DraftTrip,
   type Leg,
+  type Trip,
 } from "@/lib/trip";
 
 import { EditorHeader, TRIP_TITLE_INPUT_ID } from "./editor-header";
@@ -115,29 +117,42 @@ function EditorWorkspace() {
     if (searchParams.get("from") === "ai") clearAiHandoff();
   }, [searchParams]);
 
-  const { share, sharing, shareId, dialogOpen, setDialogOpen } = useShareTrip({
-    onCityLimit: () => setUpsellOpen(true),
-  });
+  const { share, sharing, shareId, sharedTitle, dialogOpen, setDialogOpen } =
+    useShareTrip({
+      onCityLimit: () => setUpsellOpen(true),
+    });
+
+  // Saves the trip locally, adopting the new id (and URL) on first save.
+  const persist = useCallback(
+    (trip: Trip): string => {
+      const id = saveLocalTrip(trip, localId ?? undefined);
+      if (!localId) {
+        setLocalId(id);
+        router.replace(`/new?remix=${id}`, { scroll: false });
+      }
+      return id;
+    },
+    [localId, router],
+  );
 
   useEffect(() => {
     if (!isShareable(draft)) return;
     const trip = draftToTrip(draft, createdAt);
     if (!trip) return;
 
-    const timer = setTimeout(() => {
-      const id = saveLocalTrip(trip, localId ?? undefined);
-      if (!localId) {
-        setLocalId(id);
-        router.replace(`/new?remix=${id}`, { scroll: false });
-      }
-    }, AUTOSAVE_DEBOUNCE_MS);
-
+    const timer = setTimeout(() => persist(trip), AUTOSAVE_DEBOUNCE_MS);
     return () => clearTimeout(timer);
-  }, [draft, localId, createdAt, router]);
+  }, [draft, createdAt, persist]);
 
   const update = (fn: (draft: DraftTrip) => DraftTrip) => setDraft(fn);
 
   const issues = draftIssues(draft);
+  const lastShare = localId ? getLocalTrip(localId)?.shared : undefined;
+  const currentTrip = draftToTrip(draft, createdAt);
+  const shareStale =
+    lastShare !== undefined &&
+    currentTrip !== null &&
+    tripFingerprint(currentTrip) !== lastShare.fingerprint;
 
   const handleShare = () => {
     if (Object.keys(issues).length > 0) {
@@ -146,7 +161,8 @@ function EditorWorkspace() {
       return;
     }
     const trip = draftToTrip(draft, createdAt);
-    if (trip) void share(trip);
+    // Save first so the share is recorded against exactly what was shared.
+    if (trip) void share(trip, persist(trip));
   };
 
   return (
@@ -158,6 +174,7 @@ function EditorWorkspace() {
         canShare={isShareable(draft)}
         sharing={sharing}
         titleError={issues.title}
+        shareStale={shareStale}
       />
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_26rem]">
@@ -189,6 +206,7 @@ function EditorWorkspace() {
 
       <ShareDialog
         shareId={shareId}
+        title={sharedTitle}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
       />

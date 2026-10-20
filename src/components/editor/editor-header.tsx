@@ -1,6 +1,13 @@
 "use client";
 
-import { ArrowLeft, CircleAlert, Loader2, Map, Share2 } from "lucide-react";
+import {
+  ArrowLeft,
+  CircleAlert,
+  Loader2,
+  Map,
+  RefreshCw,
+  Share2,
+} from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -15,6 +22,7 @@ export function EditorHeader({
   canShare,
   sharing,
   titleError,
+  shareStale,
 }: {
   readonly title: string;
   readonly onTitleChange: (title: string) => void;
@@ -22,6 +30,8 @@ export function EditorHeader({
   readonly canShare: boolean;
   readonly sharing: boolean;
   readonly titleError?: string;
+  /** Edited since its last share: the link still shows the older version. */
+  readonly shareStale?: boolean;
 }) {
   return (
     <header className="flex flex-wrap items-start justify-between gap-4 border-b border-line pb-5">
@@ -53,7 +63,13 @@ export function EditorHeader({
         )}
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center justify-end gap-2">
+        {shareStale && (
+          <p className="flex w-full items-center justify-end gap-1.5 text-xs text-brass-text">
+            <RefreshCw className="size-3.5 shrink-0" aria-hidden />
+            Edited since you shared it. Share again to update the link.
+          </p>
+        )}
         <Button asChild variant="outline">
           <Link href="/maps">
             <Map /> My Maps

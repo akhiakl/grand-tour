@@ -29,7 +29,7 @@ describe("SharedTripPage", () => {
   it("renders TripExperience with the trip in shared mode and counts a view", async () => {
     const trip = makeTrip(2, { title: "Alpine Loop" });
     mocks.getTrip.mockResolvedValue(trip);
-    mocks.incrViews.mockResolvedValue(1);
+    mocks.incrViews.mockResolvedValue(7);
 
     const element = await SharedTripPage({
       params: Promise.resolve({ id: "abc12345" }),
@@ -37,6 +37,8 @@ describe("SharedTripPage", () => {
 
     expect(element.props.trip).toEqual(trip);
     expect(element.props.actions).toBe("shared");
+    expect(element.props.shareId).toBe("abc12345");
+    expect(element.props.views).toBe(7);
     expect(mocks.incrViews).toHaveBeenCalledWith("abc12345");
   });
 

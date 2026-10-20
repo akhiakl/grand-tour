@@ -4,8 +4,11 @@ import { makeTrip } from "@/test/fixtures/trip";
 
 import {
   deleteLocalTrip,
+  duplicateLocalTrip,
   getLocalTrip,
+  isShareStale,
   listLocalTrips,
+  markLocalTripShared,
   saveLocalTrip,
 } from "./local-store";
 
@@ -93,5 +96,41 @@ describe("local-store", () => {
   it("deleting an id that was never saved is a no-op", () => {
     expect(() => deleteLocalTrip("ghost123")).not.toThrow();
     expect(listLocalTrips()).toHaveLength(0);
+  });
+});
+
+describe("local-store sharing and copies", () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+  });
+
+  it("flags a shared trip as stale once it is edited, keeping the share", () => {
+    const id = saveLocalTrip(makeTrip(2));
+    expect(isShareStale(getLocalTrip(id)!)).toBe(false);
+
+    markLocalTripShared(id, "abc12345");
+    expect(getLocalTrip(id)?.shared?.id).toBe("abc12345");
+    expect(isShareStale(getLocalTrip(id)!)).toBe(false);
+
+    saveLocalTrip(makeTrip(2, { title: "Revised" }), id);
+    expect(getLocalTrip(id)?.shared?.id).toBe("abc12345");
+    expect(isShareStale(getLocalTrip(id)!)).toBe(true);
+  });
+
+  it("ignores share marks for missing trips", () => {
+    expect(() => markLocalTripShared("ghost123", "abc12345")).not.toThrow();
+    expect(getLocalTrip("ghost123")).toBeNull();
+  });
+
+  it("duplicates a trip under a new id without its share history", () => {
+    const id = saveLocalTrip(makeTrip(2, { title: "Alps" }));
+    markLocalTripShared(id, "abc12345");
+
+    const copyId = duplicateLocalTrip(id)!;
+    expect(copyId).not.toBe(id);
+    expect(getLocalTrip(copyId)?.trip.title).toBe("Alps (copy)");
+    expect(getLocalTrip(copyId)?.shared).toBeUndefined();
+    expect(listLocalTrips()).toHaveLength(2);
+    expect(duplicateLocalTrip("ghost123")).toBeNull();
   });
 });

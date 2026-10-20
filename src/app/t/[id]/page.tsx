@@ -39,7 +39,7 @@ export default async function SharedTripPage({
   const trip = await loadTrip(id);
   if (!trip) notFound();
 
-  await incrViews(id);
+  const views = await incrViews(id);
 
-  return <TripExperience trip={trip} actions="shared" shareId={id} />;
+  return <TripExperience trip={trip} actions="shared" shareId={id} views={views} />;
 }

@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { tripFingerprint } from "@/lib/trip";
 import { makeTrip } from "@/test/fixtures/trip";
 
 import { TripCard } from "./trip-card";
@@ -93,5 +94,44 @@ describe("TripCard", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "Delete" }));
     expect(onDelete).toHaveBeenCalledOnce();
+  });
+
+  it("links to the last share while it still matches the trip", () => {
+    const shared = {
+      ...record,
+      shared: {
+        id: "share123",
+        at: Date.now(),
+        fingerprint: tripFingerprint(record.trip),
+      },
+    };
+    render(
+      <TripCard
+        record={shared}
+        sharing={false}
+        onShare={onShare}
+        onDelete={onDelete}
+      />,
+    );
+    expect(screen.getByRole("link", { name: "open link" })).toHaveAttribute(
+      "href",
+      "/t/share123",
+    );
+  });
+
+  it("nudges to share again once the trip changed since sharing", () => {
+    const stale = {
+      ...record,
+      shared: { id: "share123", at: Date.now(), fingerprint: "outdated" },
+    };
+    render(
+      <TripCard
+        record={stale}
+        sharing={false}
+        onShare={onShare}
+        onDelete={onDelete}
+      />,
+    );
+    expect(screen.getByText(/Edited since you shared it/)).toBeInTheDocument();
   });
 });

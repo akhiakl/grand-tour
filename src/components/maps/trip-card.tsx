@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, Pencil, Share2, Trash2 } from "lucide-react";
+import { Link2, Loader2, Pencil, RefreshCw, Share2, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 import {
@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { tripStats, type LocalTripRecord } from "@/lib/trip";
+import { isShareStale, tripStats, type LocalTripRecord } from "@/lib/trip";
 
 import { RoutePreview } from "./route-preview";
 
@@ -34,6 +34,31 @@ function formatUpdated(updatedAt: number): string {
       return formatter.format(Math.round(deltaMs / ms), unit);
   }
   return formatter.format(0, "minute");
+}
+
+/** Whether the last shared link still shows this trip as it is now. */
+function ShareStatus({ record }: { readonly record: LocalTripRecord }) {
+  if (!record.shared) return null;
+  if (isShareStale(record)) {
+    return (
+      <p className="flex items-center gap-1.5 text-xs text-brass-text">
+        <RefreshCw className="size-3.5 shrink-0" aria-hidden />
+        Edited since you shared it. Share again for an up-to-date link.
+      </p>
+    );
+  }
+  return (
+    <p className="flex items-center gap-1.5 text-xs text-ink-soft">
+      <Link2 className="size-3.5 shrink-0" aria-hidden />
+      Shared {formatUpdated(record.shared.at)} ·{" "}
+      <Link
+        href={`/t/${record.shared.id}`}
+        className="underline underline-offset-2 hover:text-ink"
+      >
+        open link
+      </Link>
+    </p>
+  );
 }
 
 export function TripCard({
@@ -61,6 +86,7 @@ export function TripCard({
           {stats.cities} stops · {stats.nights} nights · Updated{" "}
           {formatUpdated(record.updatedAt)}
         </p>
+        <ShareStatus record={record} />
       </CardHeader>
 
       <CardFooter>

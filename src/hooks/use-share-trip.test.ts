@@ -1,6 +1,7 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { getLocalTrip, saveLocalTrip } from "@/lib/trip";
 import { makeTrip } from "@/test/fixtures/trip";
 
 import { useShareTrip } from "./use-share-trip";
@@ -29,8 +30,26 @@ describe("useShareTrip", () => {
     await act(() => result.current.share(makeTrip()));
 
     expect(result.current.shareId).toBe("abc12345");
+    expect(result.current.sharedTitle).toBe("Grand Tour");
     expect(result.current.dialogOpen).toBe(true);
     expect(result.current.sharing).toBe(false);
+  });
+
+  it("records the share on a local trip and reports it", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(jsonResponse({ id: "abc12345" }, 201)),
+    );
+    const localId = saveLocalTrip(makeTrip());
+    const onShared = vi.fn();
+    const { result } = renderHook(() =>
+      useShareTrip({ onCityLimit: vi.fn(), onShared }),
+    );
+
+    await act(() => result.current.share(makeTrip(), localId));
+
+    expect(getLocalTrip(localId)?.shared?.id).toBe("abc12345");
+    expect(onShared).toHaveBeenCalledWith("abc12345");
   });
 
   it("delegates the city_limit contract to the caller instead of a toast", async () => {
