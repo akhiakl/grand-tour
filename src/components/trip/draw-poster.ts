@@ -33,6 +33,12 @@ export interface PosterFonts {
   sans: string;
 }
 
+/** The viewer's units and currency, applied to the poster's stats line. */
+export interface PosterFormat {
+  money: (usd: readonly [number, number]) => string;
+  distance: (km: number) => string;
+}
+
 /** The basemap window (frame-inset, between header and footer). */
 const WIN: TileWindow = { x: 40, y: 288, width: POSTER_WIDTH - 80, height: 820 };
 const EDGE = 84;
@@ -186,6 +192,7 @@ function drawFooter(
   trip: Trip,
   theme: PosterTheme,
   fonts: PosterFonts,
+  format: PosterFormat,
 ) {
   const stats = tripStats(trip);
   ctx.textAlign = "center";
@@ -196,17 +203,13 @@ function drawFooter(
   ctx.fillText(
     `${stats.nights} nights · ${stats.cities} cities · ${stats.countries} ${
       stats.countries === 1 ? "country" : "countries"
-    } · ~${stats.totalKm.toLocaleString("en-US")} km`,
+    } · ${format.distance(stats.totalKm)}`,
     POSTER_WIDTH / 2,
     1158,
   );
   ctx.fillStyle = theme.inkSoft;
   ctx.font = `400 25px ${fonts.sans}`;
-  ctx.fillText(
-    `€${stats.budget[0].toLocaleString("en-US")}–${stats.budget[1].toLocaleString("en-US")} per person`,
-    POSTER_WIDTH / 2,
-    1198,
-  );
+  ctx.fillText(`${format.money(stats.budget)} per person`, POSTER_WIDTH / 2, 1198);
 
   ctx.strokeStyle = theme.brass;
   ctx.lineWidth = 2;
@@ -229,6 +232,7 @@ export async function drawPoster(
   trip: Trip,
   theme: PosterTheme,
   fonts: PosterFonts,
+  format: PosterFormat,
 ) {
   canvas.width = POSTER_WIDTH;
   canvas.height = POSTER_HEIGHT;
@@ -253,5 +257,5 @@ export async function drawPoster(
   drawHeader(ctx, trip, theme, fonts);
   drawRoute(ctx, trip, theme, fonts, toCanvas);
   if (hasTiles) drawAttribution(ctx, theme, fonts);
-  drawFooter(ctx, trip, theme, fonts);
+  drawFooter(ctx, trip, theme, fonts, format);
 }

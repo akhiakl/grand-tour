@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { Checkbox } from "@/components/ui/checkbox";
+import { useUnits } from "@/components/units/units-provider";
 import type { City } from "@/lib/trip";
 import { cn } from "@/lib/utils";
 
@@ -131,11 +132,11 @@ function InfoCard({
 }
 
 export function PracticalSection({ city }: { readonly city: City }) {
-  const [low, high] = city.budget;
+  const { money } = useUnits();
   return (
     <div className="space-y-7">
       <div className="grid grid-cols-2 gap-2.5">
-        <InfoCard label="Daily budget" value={`€${low}–${high} per person`} />
+        <InfoCard label="Daily budget" value={`${money(city.budget)} per person`} />
         <InfoCard label="Getting around" value={city.transport} />
         <InfoCard label="Where to stay" value={city.stay} wide />
       </div>
@@ -171,6 +172,7 @@ export function PlannerSection({ city }: { readonly city: City }) {
   const items = [...city.must, ...city.gems];
   const [checked, setChecked] = useState<ReadonlySet<string>>(new Set());
   const [spend, setSpend] = useState(50);
+  const { money } = useUnits();
 
   const [low, high] = city.budget;
   const perDay = Math.round(low + ((high - low) * spend) / 100);
@@ -210,9 +212,9 @@ export function PlannerSection({ city }: { readonly city: City }) {
             className="w-full"
           />
           <p className="mt-2 font-display text-2xl font-medium">
-            €{perDay * city.nights}{" "}
+            {money(perDay * city.nights)}{" "}
             <span className="font-sans text-[13px] font-normal text-muted-foreground">
-              total · €{perDay}/day × {city.nights} night
+              total · {money(perDay)}/day × {city.nights} night
               {city.nights === 1 ? "" : "s"}
             </span>
           </p>

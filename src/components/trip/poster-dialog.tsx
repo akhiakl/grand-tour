@@ -12,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useUnits } from "@/components/units/units-provider";
 import type { Trip } from "@/lib/trip";
 
 import { drawPoster, type PosterFonts, type PosterTheme } from "./draw-poster";
@@ -99,6 +100,7 @@ export function PosterDialog({
   const [url, setUrl] = useState<string | null>(null);
   const [canShare, setCanShare] = useState(false);
   const [failed, setFailed] = useState(false);
+  const { money, distance } = useUnits();
 
   useEffect(() => {
     if (!open) return;
@@ -108,7 +110,7 @@ export function PosterDialog({
     const render = async () => {
       const fonts = await readFonts();
       const canvas = document.createElement("canvas");
-      await drawPoster(canvas, trip, readTheme(), fonts);
+      await drawPoster(canvas, trip, readTheme(), fonts, { money, distance });
       const rendered = await new Promise<Blob | null>((resolve) =>
         canvas.toBlob(resolve, "image/png"),
       );
@@ -136,7 +138,7 @@ export function PosterDialog({
       setUrl(null);
       setFailed(false);
     };
-  }, [open, trip]);
+  }, [open, trip, money, distance]);
 
   const download = () => {
     if (!url) return;

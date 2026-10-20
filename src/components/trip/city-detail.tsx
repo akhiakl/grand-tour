@@ -3,6 +3,7 @@
 import { useId } from "react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useUnits } from "@/components/units/units-provider";
 import type { City } from "@/lib/trip";
 
 import {
@@ -35,6 +36,7 @@ export function CityDetail({
   readonly onBack: () => void;
 }) {
   const titleId = useId();
+  const { money } = useUnits();
 
   return (
     <article aria-labelledby={titleId} className="flex flex-col gap-4">
@@ -66,9 +68,7 @@ export function CityDetail({
             </span>
             <span>
               💶{" "}
-              <b className="font-semibold text-ink">
-                €{city.budget[0]}–{city.budget[1]} per day
-              </b>
+              <b className="font-semibold text-ink">{money(city.budget)} per day</b>
             </span>
           </p>
         </div>

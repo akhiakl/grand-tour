@@ -22,7 +22,7 @@ export const CitySchema = z.object({
   days: z
     .array(z.tuple([z.string().max(20), z.string().max(60), z.string().max(300)]))
     .max(10),
-  budget: z.tuple([z.number(), z.number()]), // €/day range
+  budget: z.tuple([z.number(), z.number()]), // USD/day range (display converts per viewer)
   transport: z.string().max(120),
   stay: z.string().max(300),
   tips: z.array(z.string().max(200)).max(6),

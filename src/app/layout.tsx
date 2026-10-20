@@ -3,6 +3,7 @@ import { Fraunces, Outfit } from "next/font/google";
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { UnitsProvider } from "@/components/units/units-provider";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -46,7 +47,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <UnitsProvider>{children}</UnitsProvider>
           <Toaster position="bottom-center" />
         </ThemeProvider>
       </body>

@@ -37,7 +37,7 @@ export function StopRowDetails({
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label>Budget low (€/day)</Label>
+          <Label>Budget low (USD/day)</Label>
           <Input
             type="number"
             min={0}
@@ -48,7 +48,7 @@ export function StopRowDetails({
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label>Budget high (€/day)</Label>
+          <Label>Budget high (USD/day)</Label>
           <Input
             type="number"
             min={0}

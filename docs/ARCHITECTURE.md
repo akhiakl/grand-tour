@@ -50,7 +50,7 @@ src/
 ## Module boundaries (ESLint-enforced)
 
 - Domains are consumed through their `index.ts` public API
-  (`@/lib/trip`, `@/lib/ai`, `@/lib/http`). Deep imports are rejected by
+  (`@/lib/trip`, `@/lib/ai`, `@/lib/http`, `@/lib/units`, …). Deep imports are rejected by
   `no-restricted-imports`, except the documented server entry points
   `@/lib/trip/service` and `@/lib/ai/generate`.
 - Public APIs stay isomorphic; anything touching secrets/IO carries

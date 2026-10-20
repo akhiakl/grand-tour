@@ -53,6 +53,14 @@ status table before starting work. Visual truth: `reference/grand-tour.html`.
   `handoff` (chat → editor localStorage), `ghosts` (approximate positions
   for `suggestedExtra`).
 - `lib/geo-search`: Photon city search behind `searchCities`.
+- `lib/units`: display units. Trips store km and USD budgets;
+  `formatDistance` (km/mi), `formatMoney` (USD → viewer currency via
+  `Rates`, "~" + rounded when converted, USD fallback), `defaultPrefs`
+  (browser locale), `SUPPORTED_CURRENCIES` (ECB set). `/api/rates` serves
+  live USD rates (Frankfurter, `RATES_API_URL` override, cached a day);
+  `components/units` holds `UnitsProvider`/`useUnits` (prefs in
+  localStorage `prefs:display`, rates fetched only for non-USD) and the
+  `UnitsDialog` picker in the atlas card head.
 - `components/landing`: `landing-cta` (Plan with AI / Build manually on
   `/`; passed to `TripExperience` via its `cta` slot as the example
   route's primary actions).
