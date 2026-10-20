@@ -1,12 +1,18 @@
 import type { MetadataRoute } from "next";
+import { getTranslations } from "next-intl/server";
+
+import { DEFAULT_LOCALE } from "@/i18n/config";
 
 /** Installable app metadata; colors are the light-theme paper and ink. */
-export default function manifest(): MetadataRoute.Manifest {
+export default async function manifest(): Promise<MetadataRoute.Manifest> {
+  const t = await getTranslations({ locale: DEFAULT_LOCALE, namespace: "Metadata" });
+  const name = (
+    await getTranslations({ locale: DEFAULT_LOCALE, namespace: "Common" })
+  )("appName");
   return {
-    name: "Grand Tour",
-    short_name: "Grand Tour",
-    description:
-      "Beautiful, interactive travel route maps, drawn by AI or by hand and shared with one link.",
+    name,
+    short_name: name,
+    description: t("manifestDescription"),
     start_url: "/",
     display: "standalone",
     background_color: "#F5F1E8",

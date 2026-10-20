@@ -137,19 +137,23 @@ export function isShareable(draft: DraftTrip): boolean {
   return draft.cities.length >= 2;
 }
 
-/** Field paths the editor renders inline, keyed like `cities.0.name`. */
-export type DraftIssues = Record<string, string>;
+/** Why a field is invalid, as a message key the editor translates. */
+export type DraftIssueKey =
+  "titleRequired" | "nameRequired" | "nightsRange" | "startDateInvalid" | "invalid";
 
-const FRIENDLY_MESSAGES: Record<string, string> = {
-  title: "Give your map a title.",
-  name: "Give this stop a name.",
-  nights: "Nights run from 0 to 30.",
-  startDate: "Pick a real calendar date.",
+/** Field paths the editor renders inline, keyed like `cities.0.name`. */
+export type DraftIssues = Record<string, DraftIssueKey>;
+
+const FIELD_ISSUES: Record<string, DraftIssueKey> = {
+  title: "titleRequired",
+  name: "nameRequired",
+  nights: "nightsRange",
+  startDate: "startDateInvalid",
 };
 
 /**
- * Field-level schema problems in a draft, first message per field. Skips
- * the trip-wide count/legs rules: the stop counter and Share gate already
+ * Field-level schema problems in a draft, one per field. Skips the
+ * trip-wide count/legs rules: the stop counter and Share gate already
  * cover those, and they have no single field to point at.
  */
 export function draftIssues(draft: DraftTrip): DraftIssues {
@@ -162,7 +166,7 @@ export function draftIssues(draft: DraftTrip): DraftIssues {
     if (issue.path.length === 1 && !topLevelField) continue;
     const key = issue.path.join(".");
     const field = String(issue.path.at(-1));
-    issues[key] ??= FRIENDLY_MESSAGES[field] ?? issue.message;
+    issues[key] ??= FIELD_ISSUES[field] ?? "invalid";
   }
   return issues;
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { Ruler } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { useId } from "react";
 
 import {
@@ -27,12 +28,7 @@ import { cn } from "@/lib/utils";
 
 import { useUnits } from "./units-provider";
 
-const DISTANCES: { value: DistanceUnit; label: string }[] = [
-  { value: "km", label: "Kilometres" },
-  { value: "mi", label: "Miles" },
-];
-
-const currencyNames = new Intl.DisplayNames(["en"], { type: "currency" });
+const DISTANCES: DistanceUnit[] = ["km", "mi"];
 
 /**
  * Round trigger + dialog for the viewer's distance unit and currency.
@@ -41,36 +37,35 @@ const currencyNames = new Intl.DisplayNames(["en"], { type: "currency" });
 export function UnitsDialog() {
   const { prefs, setPrefs, ratesStatus } = useUnits();
   const currencyId = useId();
+  const t = useTranslations("Units");
+  const currencyNames = new Intl.DisplayNames([useLocale()], { type: "currency" });
 
   return (
     <Dialog>
       <DialogTrigger
-        aria-label="Units and currency"
-        title="Units and currency"
+        aria-label={t("trigger")}
+        title={t("trigger")}
         className="grid size-9 shrink-0 place-items-center rounded-full border border-line text-ink-soft transition-colors outline-none hover:bg-accent hover:text-ink focus-visible:ring-2 focus-visible:ring-ring [&_svg]:size-4"
       >
         <Ruler />
       </DialogTrigger>
       <DialogContent className="max-w-sm">
         <DialogHeader>
-          <p className="eyebrow">Your view</p>
-          <DialogTitle>Units &amp; currency</DialogTitle>
-          <DialogDescription>
-            Changes how routes read to you only. Budgets are estimated in US dollars
-            and converted at today&apos;s rates.
-          </DialogDescription>
+          <p className="eyebrow">{t("eyebrow")}</p>
+          <DialogTitle>{t("title")}</DialogTitle>
+          <DialogDescription>{t("description")}</DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-2">
           <span id={`${currencyId}-distance`} className="text-sm font-medium">
-            Distance
+            {t("distance")}
           </span>
           <div
             role="radiogroup"
             aria-labelledby={`${currencyId}-distance`}
             className="grid grid-cols-2 gap-1 rounded-full border border-line p-1"
           >
-            {DISTANCES.map(({ value, label }) => (
+            {DISTANCES.map((value) => (
               <button
                 key={value}
                 type="button"
@@ -84,7 +79,7 @@ export function UnitsDialog() {
                     : "text-ink-soft hover:text-ink",
                 )}
               >
-                {label}
+                {t(value)}
               </button>
             ))}
           </div>
@@ -92,7 +87,7 @@ export function UnitsDialog() {
 
         <div className="flex flex-col gap-2">
           <label htmlFor={currencyId} className="text-sm font-medium">
-            Currency
+            {t("currency")}
           </label>
           <Select
             value={prefs.currency}
@@ -113,7 +108,7 @@ export function UnitsDialog() {
           </Select>
           {ratesStatus === "unavailable" && (
             <output className="block text-xs text-ink-soft">
-              Live rates are out of reach right now, so amounts show in US dollars.
+              {t("ratesUnavailable")}
             </output>
           )}
         </div>

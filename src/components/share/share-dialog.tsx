@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, Copy, Share2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -32,6 +33,7 @@ export function ShareDialog({
   readonly open: boolean;
   readonly onOpenChange: (open: boolean) => void;
 }) {
+  const t = useTranslations("Share");
   const [copied, setCopied] = useState(false);
   const canNativeShare = useMounted() && typeof navigator.share === "function";
   const url =
@@ -44,10 +46,10 @@ export function ShareDialog({
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
-      toast.success("Map shared — link copied");
+      toast.success(t("copiedToast"));
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      toast.error("Couldn't copy — select and copy the link manually.");
+      toast.error(t("copyFailed"));
     }
   };
 
@@ -61,11 +63,10 @@ export function ShareDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <p className="eyebrow">Ready to travel</p>
-          <DialogTitle>Your map is live</DialogTitle>
+          <p className="eyebrow">{t("eyebrow")}</p>
+          <DialogTitle>{t("title")}</DialogTitle>
           <DialogDescription>
-            Anyone with this link can view the route. It stays live for{" "}
-            {SHARE_TTL_DAYS} days after its last visit; share again after editing.
+            {t("description", { days: SHARE_TTL_DAYS })}
           </DialogDescription>
         </DialogHeader>
 
@@ -73,12 +74,12 @@ export function ShareDialog({
           <Input readOnly value={url} onFocus={(e) => e.target.select()} />
           <Button type="button" variant="brass" onClick={copy}>
             {copied ? <Check /> : <Copy />}
-            {copied ? "Copied" : "Copy"}
+            {copied ? t("copied") : t("copy")}
           </Button>
         </div>
         {canNativeShare && (
           <Button type="button" variant="outline" onClick={nativeShare}>
-            <Share2 /> Share via…
+            <Share2 /> {t("nativeShare")}
           </Button>
         )}
       </DialogContent>

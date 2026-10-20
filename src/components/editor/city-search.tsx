@@ -1,6 +1,7 @@
 "use client";
 
 import { Loader2, MapPin, Search } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
 import { Input } from "@/components/ui/input";
@@ -16,11 +17,12 @@ const DEBOUNCE_MS = 500;
  */
 export function CitySearch({
   onSelect,
-  placeholder = "Search for a city…",
+  placeholder,
 }: {
   readonly onSelect: (result: CitySearchResult) => void;
   readonly placeholder?: string;
 }) {
+  const t = useTranslations("Editor.search");
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<CitySearchResult[]>([]);
   const [loading, setLoading] = useState(false);
@@ -75,7 +77,7 @@ export function CitySearch({
               setOpen(false);
             }
           }}
-          placeholder={placeholder}
+          placeholder={placeholder ?? t("placeholder")}
           role="combobox"
           aria-expanded={open}
           aria-controls="city-search-results"
@@ -110,12 +112,12 @@ export function CitySearch({
         >
           {error && (
             <li className="px-3 py-2 text-sm text-muted-foreground">
-              Couldn&apos;t reach the map atlas — try again in a moment.
+              {t("unreachable")}
             </li>
           )}
           {!error && results.length === 0 && !loading && (
             <li className="px-3 py-2 text-sm text-muted-foreground">
-              No cities found.
+              {t("noResults")}
             </li>
           )}
           {results.map((result, index) => (

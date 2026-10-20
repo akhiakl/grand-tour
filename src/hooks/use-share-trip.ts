@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -18,6 +19,7 @@ export function useShareTrip({
   readonly onCityLimit: () => void;
   readonly onShared?: (shareId: string) => void;
 }) {
+  const t = useTranslations("Share.errors");
   const [sharing, setSharing] = useState(false);
   const [shareId, setShareId] = useState<string | null>(null);
   const [sharedTitle, setSharedTitle] = useState<string | undefined>();
@@ -48,18 +50,18 @@ export function useShareTrip({
       }
 
       if (response.status === 413) {
-        toast.error("That map is too big to share — trim a few details and retry.");
+        toast.error(t("tooLarge"));
         return;
       }
 
       if (response.status === 429) {
-        toast.error("The atlas needs a breather — try sharing again shortly.");
+        toast.error(t("rateLimited"));
         return;
       }
 
-      toast.error("Couldn't share that map — try again.");
+      toast.error(t("failed"));
     } catch {
-      toast.error("Couldn't reach the atlas — check your connection and retry.");
+      toast.error(t("offline"));
     } finally {
       setSharing(false);
     }

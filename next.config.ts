@@ -1,5 +1,6 @@
 import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
 
 import { securityHeaders } from "./src/lib/http/security-headers";
 
@@ -29,7 +30,9 @@ const nextConfig: NextConfig = {
 
 // Source-map upload only runs when SENTRY_AUTH_TOKEN is present (CI);
 // local and tokenless builds are unaffected.
-export default withSentryConfig(nextConfig, {
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
+
+export default withSentryConfig(withNextIntl(nextConfig), {
   // For all available options, see:
   // https://www.npmjs.com/package/@sentry/webpack-plugin#options
 

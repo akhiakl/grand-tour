@@ -1,6 +1,7 @@
 "use client";
 
 import { Plus, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -17,7 +18,7 @@ export function ListEditor<T>({
   max,
   newItem,
   renderRow,
-  addLabel = "Add",
+  addLabel,
 }: {
   readonly label: string;
   readonly items: T[];
@@ -27,6 +28,7 @@ export function ListEditor<T>({
   readonly renderRow: (item: T, onChange: (item: T) => void) => ReactNode;
   readonly addLabel?: string;
 }) {
+  const t = useTranslations("Editor.list");
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
@@ -47,7 +49,10 @@ export function ListEditor<T>({
             type="button"
             variant="ghost"
             size="icon"
-            aria-label={`Remove ${label.toLowerCase()} ${index + 1}`}
+            aria-label={t("remove", {
+              label: label.toLowerCase(),
+              number: index + 1,
+            })}
             onClick={() => onChange(items.filter((_, i) => i !== index))}
           >
             <Trash2 />
@@ -63,7 +68,7 @@ export function ListEditor<T>({
           className="self-start"
           onClick={() => onChange([...items, newItem()])}
         >
-          <Plus /> {addLabel}
+          <Plus /> {addLabel ?? t("add")}
         </Button>
       )}
     </div>

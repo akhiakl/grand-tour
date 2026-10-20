@@ -2,6 +2,7 @@
 
 import { ArrowLeft, Compass, Plus, Sparkles } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -27,6 +28,8 @@ import { TripCard } from "./trip-card";
 
 export function MapsPage() {
   const mounted = useMounted();
+  const t = useTranslations("Maps");
+  const common = useTranslations("Common");
   // Bumped to force a fresh `listLocalTrips()` read after a delete — the
   // store has no subscription mechanism, so this is a manual invalidation.
   const [, forceRefresh] = useState(0);
@@ -68,7 +71,7 @@ export function MapsPage() {
   const handleImport = (trip: Trip) => {
     importLocalTrip(trip);
     refresh();
-    toast.success(`Imported ${trip.title}`);
+    toast.success(t("imported", { title: trip.title }));
   };
 
   return (
@@ -79,17 +82,19 @@ export function MapsPage() {
             href="/"
             className="eyebrow inline-flex w-fit items-center gap-1 text-muted-foreground transition-colors hover:text-brass-text"
           >
-            <ArrowLeft className="size-3" /> Field Atlas
+            <ArrowLeft className="size-3" /> {common("backToAtlas")}
           </Link>
           <h1 className="font-display text-3xl font-medium tracking-tight">
-            My <em className="text-azure italic">Maps</em>
+            {t.rich("title", {
+              em: (chunks) => <em className="text-azure italic">{chunks}</em>,
+            })}
           </h1>
         </div>
         <div className="flex gap-2">
           <ImportTripButton onImport={handleImport} />
           <Button asChild variant="brass">
             <Link href="/new">
-              <Plus /> New map
+              <Plus /> {t("newMap")}
             </Link>
           </Button>
         </div>
@@ -98,17 +103,15 @@ export function MapsPage() {
       {mounted && records.length === 0 && (
         <div className="mt-16 flex flex-col items-center gap-3 text-center">
           <Compass className="size-10 text-muted-foreground" />
-          <p className="text-muted-foreground">
-            No maps yet. Draft one with the atlas, or draw it stop by stop.
-          </p>
+          <p className="text-muted-foreground">{t("empty")}</p>
           <div className="flex flex-wrap justify-center gap-2">
             <Button asChild variant="brass">
               <Link href="/plan">
-                <Sparkles /> Plan with AI
+                <Sparkles /> {t("planWithAi")}
               </Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href="/new">Build manually</Link>
+              <Link href="/new">{t("buildManually")}</Link>
             </Button>
           </div>
         </div>

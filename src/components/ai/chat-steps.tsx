@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -8,12 +9,6 @@ import { Input } from "@/components/ui/input";
 import { VIBES, type GenerateRequest } from "@/lib/ai";
 
 type Vibe = GenerateRequest["vibe"];
-
-export const VIBE_COPY: Record<Vibe, { label: string; hint: string }> = {
-  relaxed: { label: "Relaxed", hint: "Fewer stops, long lunches" },
-  balanced: { label: "Balanced", hint: "A steady rhythm" },
-  packed: { label: "Packed", hint: "See as much as possible" },
-};
 
 const MIN_DAYS = 2;
 const MAX_DAYS = 30;
@@ -24,6 +19,7 @@ export function DestinationStep({
 }: {
   readonly onAnswer: (value: string) => void;
 }) {
+  const t = useTranslations("Chat");
   const [value, setValue] = useState("");
   const trimmed = value.trim();
 
@@ -36,14 +32,14 @@ export function DestinationStep({
     <form onSubmit={submit} className="flex gap-2">
       <Input
         autoFocus
-        aria-label="Destination"
-        placeholder="Austria, the Dalmatian coast, Kyoto and around…"
+        aria-label={t("destinationLabel")}
+        placeholder={t("destinationPlaceholder")}
         maxLength={120}
         value={value}
         onChange={(e) => setValue(e.target.value)}
       />
       <Button type="submit" variant="brass" disabled={trimmed.length < 2}>
-        Next <ArrowRight />
+        {t("next")} <ArrowRight />
       </Button>
     </form>
   );
@@ -55,6 +51,7 @@ export function DaysStep({
 }: {
   readonly onAnswer: (value: number) => void;
 }) {
+  const t = useTranslations("Chat");
   const [value, setValue] = useState("7");
   const days = Number(value);
   const valid = Number.isInteger(days) && days >= MIN_DAYS && days <= MAX_DAYS;
@@ -68,7 +65,7 @@ export function DaysStep({
     <form onSubmit={submit} className="flex items-center gap-2">
       <Input
         autoFocus
-        aria-label="Number of days"
+        aria-label={t("daysLabel")}
         type="number"
         inputMode="numeric"
         min={MIN_DAYS}
@@ -77,9 +74,9 @@ export function DaysStep({
         onChange={(e) => setValue(e.target.value)}
         className="w-28"
       />
-      <span className="text-sm text-ink-soft">days</span>
+      <span className="text-sm text-ink-soft">{t("daysUnit")}</span>
       <Button type="submit" variant="brass" disabled={!valid} className="ml-auto">
-        Next <ArrowRight />
+        {t("next")} <ArrowRight />
       </Button>
     </form>
   );
@@ -91,8 +88,14 @@ export function VibeStep({
 }: {
   readonly onAnswer: (value: Vibe) => void;
 }) {
+  const t = useTranslations("Chat");
+  const vibes = useTranslations("Vibes");
   return (
-    <div role="group" aria-label="Pace" className="grid gap-2 sm:grid-cols-3">
+    <div
+      role="group"
+      aria-label={t("paceLabel")}
+      className="grid gap-2 sm:grid-cols-3"
+    >
       {VIBES.map((vibe, i) => (
         <button
           key={vibe}
@@ -102,9 +105,9 @@ export function VibeStep({
           className="frost flex flex-col items-start gap-1 rounded-2xl px-4 py-3 text-left transition-colors hover:border-brass focus-visible:border-brass focus-visible:outline-none"
         >
           <span className="font-display text-base font-medium text-ink">
-            {VIBE_COPY[vibe].label}
+            {vibes(`${vibe}.label`)}
           </span>
-          <span className="text-xs text-ink-soft">{VIBE_COPY[vibe].hint}</span>
+          <span className="text-xs text-ink-soft">{vibes(`${vibe}.hint`)}</span>
         </button>
       ))}
     </div>

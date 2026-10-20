@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import { OffTheMap } from "@/components/off-the-map";
 import { TripExperience } from "@/components/trip/trip-experience";
@@ -8,13 +9,10 @@ import { useMounted } from "@/hooks/use-mounted";
 import { getLocalTrip } from "@/lib/trip";
 
 function NotFoundOnThisDevice() {
+  const t = useTranslations("Errors.notOnDevice");
   return (
-    <OffTheMap
-      title="Not on this device"
-      action={{ href: "/maps", label: "Back to My Maps" }}
-    >
-      Local maps live in this browser only. If you saved it somewhere else, open it
-      from there, or start a new one here.
+    <OffTheMap title={t("title")} action={{ href: "/maps", label: t("action") }}>
+      {t("body")}
     </OffTheMap>
   );
 }

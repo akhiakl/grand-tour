@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -128,6 +129,7 @@ export function EditorPage() {
 function EditorWorkspace() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const t = useTranslations("Editor");
   // Resolved once: later URL changes (the autosave's ?remix= replace) must
   // not re-read storage or the already-consumed AI handoff.
   const [initial] = useState(() => resolveInitialState(searchParams));
@@ -190,13 +192,13 @@ function EditorWorkspace() {
     update((d) => ({ ...draftFromTrip(trip), startDate: d.startDate }));
     setGhostNames(suggestedExtra);
     setRequest(next);
-    toast.success("Route redrafted. Undo brings the previous one back.");
+    toast.success(t("redrafted"));
   };
 
   const handleShare = () => {
     if (Object.keys(issues).length > 0) {
       focusFirstIssue(issues);
-      toast.error("A few fields need fixing before this map can be shared.");
+      toast.error(t("fixBeforeShare"));
       return;
     }
     const trip = draftToTrip(draft, createdAt);
@@ -212,14 +214,14 @@ function EditorWorkspace() {
         onShare={handleShare}
         canShare={isShareable(draft)}
         sharing={sharing}
-        titleError={issues.title}
+        titleError={issues.title && t(`issues.${issues.title}`)}
         shareStale={shareStale}
         startDate={draft.startDate ?? ""}
         onStartDateChange={(value) =>
           update((d) => updateStartDate(d, value), "startDate")
         }
         history={{ canUndo, canRedo, onUndo: undo, onRedo: redo }}
-        startDateError={issues.startDate}
+        startDateError={issues.startDate && t(`issues.${issues.startDate}`)}
       />
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_26rem]">

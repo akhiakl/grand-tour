@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Outfit } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import { ServiceWorker } from "@/components/service-worker";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -22,24 +24,24 @@ const outfit = Outfit({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  metadataBase: siteUrl(),
-  applicationName: "Grand Tour",
-  title: {
-    default: "Grand Tour",
-    template: "%s · Grand Tour",
-  },
-  description:
-    "Craft a beautiful, interactive travel route map — drawn by AI or by hand — and share it with a single link.",
-  icons: {
-    icon: [
-      { url: "/icons/mark.svg", type: "image/svg+xml" },
-      { url: "/icons/32", sizes: "32x32", type: "image/png" },
-    ],
-    apple: { url: "/icons/180", sizes: "180x180" },
-  },
-  openGraph: { siteName: "Grand Tour", type: "website" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Metadata");
+  const appName = (await getTranslations("Common"))("appName");
+  return {
+    metadataBase: siteUrl(),
+    applicationName: appName,
+    title: { default: appName, template: t("titleTemplate") },
+    description: t("description"),
+    icons: {
+      icon: [
+        { url: "/icons/mark.svg", type: "image/svg+xml" },
+        { url: "/icons/32", sizes: "32x32", type: "image/png" },
+      ],
+      apple: { url: "/icons/180", sizes: "180x180" },
+    },
+    openGraph: { siteName: appName, type: "website" },
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: [
@@ -48,14 +50,15 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
   return (
     <html
-      lang="en"
+      lang={locale}
       suppressHydrationWarning
       className={`${fraunces.variable} ${outfit.variable} h-full antialiased`}
     >
@@ -66,9 +69,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <UnitsProvider>{children}</UnitsProvider>
-          <Toaster position="bottom-center" />
-          <ServiceWorker />
+          <NextIntlClientProvider>
+            <UnitsProvider>{children}</UnitsProvider>
+            <Toaster position="bottom-center" />
+            <ServiceWorker />
+          </NextIntlClientProvider>
         </ThemeProvider>
       </body>
     </html>

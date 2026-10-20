@@ -1,6 +1,7 @@
 "use client";
 
 import { Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -19,8 +20,8 @@ import { CitySearch } from "./city-search";
 import { LegRow } from "./leg-row";
 import { StopRow } from "./stop-row";
 
-const blankCity = (): City => ({
-  name: "New stop",
+const blankCity = (name: string): City => ({
+  name,
   country: "",
   flag: "",
   ll: [0, 0],
@@ -59,6 +60,8 @@ export function StopList({
   readonly onLimitReached: () => void;
   readonly issues?: DraftIssues;
 }) {
+  const t = useTranslations("Editor.stops");
+  const issueText = useTranslations("Editor.issues");
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
@@ -68,6 +71,11 @@ export function StopList({
     setExpandedIndex((current) =>
       current === null ? null : indexAfterMove(current, from, to),
     );
+  };
+
+  const issueAt = (path: string) => {
+    const key = issues[path];
+    return key ? issueText(key) : undefined;
   };
 
   const removeCity = (index: number) => {
@@ -80,9 +88,9 @@ export function StopList({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-lg font-medium">Stops</h2>
+        <h2 className="font-display text-lg font-medium">{t("heading")}</h2>
         <span className="eyebrow">
-          {cities.length}/{GUEST_MAX_CITIES} stops
+          {t("counter", { count: cities.length, max: GUEST_MAX_CITIES })}
         </span>
       </div>
 
@@ -113,8 +121,8 @@ export function StopList({
             }}
             onDragEnd={() => setDraggedIndex(null)}
             errors={{
-              name: issues[`cities.${index}.name`],
-              nights: issues[`cities.${index}.nights`],
+              name: issueAt(`cities.${index}.name`),
+              nights: issueAt(`cities.${index}.nights`),
             }}
           />
           {index < legs.length && (
@@ -131,13 +139,11 @@ export function StopList({
       <Card className="gap-3">
         {canAddCity ? (
           <>
-            <p className="text-sm text-muted-foreground">
-              Search for the next stop.
-            </p>
+            <p className="text-sm text-muted-foreground">{t("searchNext")}</p>
             <CitySearch
               onSelect={(result) =>
                 onAddCity({
-                  ...blankCity(),
+                  ...blankCity(t("newStopName")),
                   name: result.name,
                   country: result.country,
                   flag: result.flag,
@@ -150,15 +156,15 @@ export function StopList({
               variant="ghost"
               size="sm"
               className="self-start"
-              onClick={() => onAddCity(blankCity())}
+              onClick={() => onAddCity(blankCity(t("newStopName")))}
             >
-              <Plus /> Or add a blank stop
+              <Plus /> {t("addBlank")}
             </Button>
           </>
         ) : (
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm text-muted-foreground">
-              Guest maps top out at {GUEST_MAX_CITIES} stops.
+              {t("limit", { max: GUEST_MAX_CITIES })}
             </p>
             <Button
               type="button"
@@ -166,7 +172,7 @@ export function StopList({
               size="sm"
               onClick={onLimitReached}
             >
-              See what unlocks
+              {t("seeUnlocks")}
             </Button>
           </div>
         )}

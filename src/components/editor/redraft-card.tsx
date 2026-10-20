@@ -1,9 +1,9 @@
 "use client";
 
 import { Loader2, Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 
-import { VIBE_COPY } from "@/components/ai/chat-steps";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,11 +11,6 @@ import { Label } from "@/components/ui/label";
 import { useGenerateTrip, type GeneratedDraft } from "@/hooks/use-generate-trip";
 import { GenerateRequestSchema, VIBES, type GenerateRequest } from "@/lib/ai";
 import { cn } from "@/lib/utils";
-
-const STATUS_COPY = {
-  rate_limited: "The atlas needs a breather. Give it a minute and try again.",
-  failed: "That redraft didn't come together. Your route is untouched; try again.",
-} as const;
 
 /**
  * Ask the AI for a fresh take on the route (another pace, more or fewer
@@ -30,6 +25,8 @@ export function RedraftCard({
   readonly defaults: GenerateRequest;
   readonly onDrafted: (draft: GeneratedDraft, request: GenerateRequest) => void;
 }) {
+  const t = useTranslations("Editor.redraft");
+  const vibes = useTranslations("Vibes");
   // Untouched fields follow the defaults (which track the draft's stops).
   const [destinationInput, setDestination] = useState<string | null>(null);
   const [daysInput, setDays] = useState<string | null>(null);
@@ -61,16 +58,14 @@ export function RedraftCard({
       <form
         onSubmit={submit}
         className="flex flex-col gap-3"
-        aria-label="Redraft with AI"
+        aria-label={t("eyebrow")}
       >
         <div>
-          <p className="eyebrow">Redraft with AI</p>
-          <p className="text-xs text-ink-soft">
-            Replaces your stops in one step; undo brings them back.
-          </p>
+          <p className="eyebrow">{t("eyebrow")}</p>
+          <p className="text-xs text-ink-soft">{t("hint")}</p>
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="redraft-destination">Where</Label>
+          <Label htmlFor="redraft-destination">{t("where")}</Label>
           <Input
             id="redraft-destination"
             value={destination}
@@ -80,7 +75,7 @@ export function RedraftCard({
         </div>
         <div className="flex items-end gap-3">
           <div className="flex w-24 flex-col gap-1.5">
-            <Label htmlFor="redraft-days">Days</Label>
+            <Label htmlFor="redraft-days">{t("days")}</Label>
             <Input
               id="redraft-days"
               type="number"
@@ -91,21 +86,25 @@ export function RedraftCard({
               onChange={(e) => setDays(e.target.value)}
             />
           </div>
-          <div role="radiogroup" aria-label="Pace" className="flex flex-1 gap-1">
+          <div
+            role="radiogroup"
+            aria-label={t("pace")}
+            className="flex flex-1 gap-1"
+          >
             {VIBES.map((option) => (
               <button
                 key={option}
                 type="button"
                 role="radio"
                 aria-checked={vibe === option}
-                title={VIBE_COPY[option].hint}
+                title={vibes(`${option}.hint`)}
                 onClick={() => setVibe(option)}
                 className={cn(
                   "h-9 flex-1 rounded-md border border-line px-2 text-xs transition-colors outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring",
                   vibe === option && "border-brass bg-accent text-brass-text",
                 )}
               >
-                {VIBE_COPY[option].label}
+                {vibes(`${option}.label`)}
               </button>
             ))}
           </div>
@@ -116,11 +115,11 @@ export function RedraftCard({
           disabled={!request.success || drafting}
         >
           {drafting ? <Loader2 className="animate-spin" /> : <Sparkles />}
-          {drafting ? "Drafting your route…" : "Redraft route"}
+          {drafting ? t("drafting") : t("submit")}
         </Button>
         {(status === "rate_limited" || status === "failed") && (
           <p role="alert" className="text-xs text-destructive">
-            {STATUS_COPY[status]}
+            {status === "rate_limited" ? t("rateLimited") : t("failed")}
           </p>
         )}
       </form>

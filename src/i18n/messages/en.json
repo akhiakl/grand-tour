@@ -1,0 +1,277 @@
+{
+  "Common": {
+    "appName": "Grand Tour",
+    "backToAtlas": "Field Atlas",
+    "offTheMap": "Off the map"
+  },
+  "Metadata": {
+    "titleTemplate": "%s · Grand Tour",
+    "description": "Craft a beautiful, interactive travel route map — drawn by AI or by hand — and share it with a single link.",
+    "manifestDescription": "Beautiful, interactive travel route maps, drawn by AI or by hand and shared with one link.",
+    "plan": {
+      "title": "Plan with AI",
+      "description": "Three questions, one drafted route. Tell the atlas where, how long and what pace; then make it yours."
+    },
+    "new": {
+      "title": "Build a trip",
+      "description": "Draw your route stop by stop: cities, nights, legs and the notes that make each one yours."
+    },
+    "maps": {
+      "title": "My Maps",
+      "description": "Every route you have drawn on this device, ready to open, edit or share."
+    },
+    "mapView": {
+      "title": "Your map"
+    },
+    "offline": {
+      "title": "Offline"
+    },
+    "shared": {
+      "notFound": "Map not found",
+      "description": "{cities, plural, one {# city} other {# cities}} · {nights, plural, one {# night} other {# nights}} · {countries, plural, one {# country} other {# countries}} — a route drawn with Grand Tour."
+    }
+  },
+  "Plan": {
+    "title": "Plan with the <em>atlas</em>",
+    "lede": "Three questions, one drafted route. You edit everything after."
+  },
+  "Landing": {
+    "group": "Start your own route",
+    "planWithAi": "Plan with AI",
+    "buildManually": "Build manually"
+  },
+  "Errors": {
+    "notFound": {
+      "title": "No road leads here",
+      "body": "This page isn't on any map we've drawn. Head back and start a new route from the atlas.",
+      "action": "Back to the atlas"
+    },
+    "expired": {
+      "title": "This map has expired",
+      "body": "Shared routes stay live for {days} days after their last visit, and this one's trail has gone cold. You can always draw a new one.",
+      "action": "Create your own"
+    },
+    "notOnDevice": {
+      "title": "Not on this device",
+      "body": "Local maps live in this browser only. If you saved it somewhere else, open it from there, or start a new one here.",
+      "action": "Back to My Maps"
+    },
+    "offline": {
+      "title": "Out of signal",
+      "body": "This page wasn't saved before the connection dropped. Maps you have already opened on this device still work offline.",
+      "action": "Try the atlas again"
+    },
+    "global": {
+      "title": "We lost the trail for a moment.",
+      "body": "Something went wrong on our side. Your maps are safe — try picking up where you left off.",
+      "action": "Try again"
+    }
+  },
+  "Vibes": {
+    "relaxed": {
+      "label": "Relaxed",
+      "hint": "Fewer stops, long lunches"
+    },
+    "balanced": {
+      "label": "Balanced",
+      "hint": "A steady rhythm"
+    },
+    "packed": {
+      "label": "Packed",
+      "hint": "See as much as possible"
+    }
+  },
+  "Chat": {
+    "destinationLabel": "Destination",
+    "destinationPlaceholder": "Austria, the Dalmatian coast, Kyoto and around…",
+    "next": "Next",
+    "daysLabel": "Number of days",
+    "daysUnit": "days",
+    "paceLabel": "Pace",
+    "askDestination": "Where should this journey go? A country, a region, or a string of cities all work.",
+    "askDays": "How many days do you have, from 2 to 30?",
+    "answerDays": "{days} days",
+    "askPace": "And the pace?",
+    "drafting": "Drafting your route…",
+    "rateLimited": "The atlas needs a breather. Too many drafts in a short while; give it a minute and try again.",
+    "failed": "That route didn't come together. Try once more, or start from a blank page.",
+    "retry": "Try again",
+    "byHand": "Build it by hand"
+  },
+  "Modes": {
+    "train": "Train",
+    "bus": "Bus",
+    "flight": "Flight",
+    "car": "Car",
+    "ferry": "Ferry"
+  },
+  "Editor": {
+    "titleLabel": "Trip title",
+    "startsLabel": "Starts",
+    "startsHint": "Optional: dates each stop",
+    "undo": "Undo",
+    "undoHint": "Undo (Ctrl+Z)",
+    "redo": "Redo",
+    "redoHint": "Redo (Ctrl+Shift+Z)",
+    "myMaps": "My Maps",
+    "share": "Share",
+    "shareStale": "Edited since you shared it. Share again to update the link.",
+    "fixBeforeShare": "A few fields need fixing before this map can be shared.",
+    "redrafted": "Route redrafted. Undo brings the previous one back.",
+    "issues": {
+      "titleRequired": "Give your map a title.",
+      "nameRequired": "Give this stop a name.",
+      "nightsRange": "Nights run from 0 to 30.",
+      "startDateInvalid": "Pick a real calendar date.",
+      "invalid": "Check this field."
+    },
+    "stops": {
+      "heading": "Stops",
+      "counter": "{count}/{max} stops",
+      "searchNext": "Search for the next stop.",
+      "addBlank": "Or add a blank stop",
+      "newStopName": "New stop",
+      "limit": "Guest maps top out at {max} stops.",
+      "seeUnlocks": "See what unlocks"
+    },
+    "search": {
+      "placeholder": "Search for a city…",
+      "unreachable": "Couldn't reach the map atlas — try again in a moment.",
+      "noResults": "No cities found."
+    },
+    "stop": {
+      "flag": "Flag",
+      "city": "City",
+      "country": "Country",
+      "nights": "Nights",
+      "fallbackName": "stop",
+      "moveUp": "Move {name} up",
+      "moveDown": "Move {name} down",
+      "collapse": "Collapse details",
+      "expand": "Edit all details",
+      "remove": "Remove {name}"
+    },
+    "details": {
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "budgetLow": "Budget low (USD/day)",
+      "budgetHigh": "Budget high (USD/day)",
+      "why": "Why go",
+      "transport": "Getting around",
+      "stay": "Where to stay",
+      "must": "Must-sees",
+      "gems": "Hidden gems",
+      "food": "Food & drink",
+      "addDish": "Add dish",
+      "dish": "Dish",
+      "dishWhere": "Where to get it",
+      "days": "Day-by-day",
+      "addDay": "Add day",
+      "newDay": "Day",
+      "dayPlaceholder": "Day 1",
+      "dayTitlePlaceholder": "Old town",
+      "dayBodyPlaceholder": "What the day looks like",
+      "tips": "Tips"
+    },
+    "list": {
+      "add": "Add",
+      "remove": "Remove {label} {number}"
+    },
+    "leg": {
+      "mode": "Mode",
+      "label": "Label",
+      "labelPlaceholder": "Railjet via Linz",
+      "duration": "Duration",
+      "durationPlaceholder": "~2h 30m",
+      "crowFlies": "≈ {distance} as the crow flies",
+      "useEstimate": "Use estimate ({estimate} by {mode})"
+    },
+    "redraft": {
+      "eyebrow": "Redraft with AI",
+      "hint": "Replaces your stops in one step; undo brings them back.",
+      "where": "Where",
+      "days": "Days",
+      "pace": "Pace",
+      "submit": "Redraft route",
+      "drafting": "Drafting your route…",
+      "rateLimited": "The atlas needs a breather. Give it a minute and try again.",
+      "failed": "That redraft didn't come together. Your route is untouched; try again."
+    }
+  },
+  "Theme": {
+    "toLight": "Switch to light theme",
+    "toDark": "Switch to dark theme"
+  },
+  "Units": {
+    "trigger": "Units and currency",
+    "eyebrow": "Your view",
+    "title": "Units & currency",
+    "description": "Changes how routes read to you only. Budgets are estimated in US dollars and converted at today's rates.",
+    "distance": "Distance",
+    "km": "Kilometres",
+    "mi": "Miles",
+    "currency": "Currency",
+    "ratesUnavailable": "Live rates are out of reach right now, so amounts show in US dollars."
+  },
+  "Upsell": {
+    "eyebrow": "The atlas grows",
+    "title": "{max} stops, for now",
+    "description": "Guest maps travel light — {max} cities and a {days}-day link. Sign up (coming soon) for a longer itinerary and a few more keepsakes.",
+    "features": {
+      "stops": "15 stops",
+      "permanent": "Permanent links",
+      "pdf": "PDF export",
+      "themes": "Custom themes"
+    },
+    "dismiss": "Got it"
+  },
+  "Share": {
+    "eyebrow": "Ready to travel",
+    "title": "Your map is live",
+    "description": "Anyone with this link can view the route. It stays live for {days} days after its last visit; share again after editing.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "copiedToast": "Map shared — link copied",
+    "copyFailed": "Couldn't copy — select and copy the link manually.",
+    "nativeShare": "Share via…",
+    "errors": {
+      "tooLarge": "That map is too big to share — trim a few details and retry.",
+      "rateLimited": "The atlas needs a breather — try sharing again shortly.",
+      "failed": "Couldn't share that map — try again.",
+      "offline": "Couldn't reach the atlas — check your connection and retry."
+    }
+  },
+  "Maps": {
+    "title": "My <em>Maps</em>",
+    "newMap": "New map",
+    "empty": "No maps yet. Draft one with the atlas, or draw it stop by stop.",
+    "planWithAi": "Plan with AI",
+    "buildManually": "Build manually",
+    "imported": "Imported {title}",
+    "card": {
+      "view": "View",
+      "viewTrip": "View {title}",
+      "edit": "Edit {title}",
+      "share": "Share {title}",
+      "duplicate": "Duplicate {title}",
+      "duplicateHint": "Duplicate",
+      "export": "Download a backup of {title}",
+      "exportHint": "Download backup",
+      "delete": "Delete {title}",
+      "summary": "{stops, plural, one {# stop} other {# stops}} · {nights, plural, one {# night} other {# nights}} · Updated {updated}",
+      "sharedOn": "Shared {when} · <link>open link</link>",
+      "shareStale": "Edited since you shared it. Share again for an up-to-date link.",
+      "deleteTitle": "Delete {title}?",
+      "deleteBody": "This removes it from My Maps on this device. Any link you've already shared keeps working.",
+      "cancel": "Cancel",
+      "confirmDelete": "Delete"
+    },
+    "import": {
+      "button": "Import",
+      "fileLabel": "Map backup file",
+      "too_large": "That file is far too big to be a Grand Tour map.",
+      "not_json": "That file isn't a Grand Tour backup. Pick a .json map file.",
+      "not_a_trip": "That file doesn't hold a map this atlas can read (up to 5 stops)."
+    }
+  }
+}

@@ -12,6 +12,7 @@ import {
   Undo2,
 } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,11 +45,12 @@ function StartDateField({
   readonly onChange: (value: string) => void;
   readonly error?: string;
 }) {
+  const t = useTranslations("Editor");
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-center gap-2 text-sm text-ink-soft">
         <CalendarDays className="size-4 shrink-0" aria-hidden />
-        <label htmlFor={TRIP_START_INPUT_ID}>Starts</label>
+        <label htmlFor={TRIP_START_INPUT_ID}>{t("startsLabel")}</label>
         <Input
           id={TRIP_START_INPUT_ID}
           type="date"
@@ -60,7 +62,7 @@ function StartDateField({
         />
         {!error && (
           <span id="trip-start-hint" className="text-xs">
-            Optional: dates each stop
+            {t("startsHint")}
           </span>
         )}
       </div>
@@ -100,6 +102,8 @@ export function EditorHeader({
     readonly onRedo: () => void;
   };
 }) {
+  const t = useTranslations("Editor");
+  const common = useTranslations("Common");
   return (
     <header className="flex flex-wrap items-start justify-between gap-4 border-b border-line pb-5">
       <div className="flex min-w-64 flex-1 flex-col gap-2">
@@ -107,11 +111,11 @@ export function EditorHeader({
           href="/"
           className="eyebrow inline-flex w-fit items-center gap-1 text-muted-foreground transition-colors hover:text-brass-text"
         >
-          <ArrowLeft className="size-3" /> Field Atlas
+          <ArrowLeft className="size-3" /> {common("backToAtlas")}
         </Link>
         <Input
           id={TRIP_TITLE_INPUT_ID}
-          aria-label="Trip title"
+          aria-label={t("titleLabel")}
           aria-invalid={titleError ? true : undefined}
           aria-describedby={titleError ? "trip-title-error" : undefined}
           value={title}
@@ -131,7 +135,7 @@ export function EditorHeader({
         {shareStale && (
           <p className="flex w-full items-center justify-end gap-1.5 text-xs text-brass-text">
             <RefreshCw className="size-3.5 shrink-0" aria-hidden />
-            Edited since you shared it. Share again to update the link.
+            {t("shareStale")}
           </p>
         )}
         <div className="flex">
@@ -139,8 +143,8 @@ export function EditorHeader({
             type="button"
             variant="ghost"
             size="icon"
-            aria-label="Undo"
-            title="Undo (Ctrl+Z)"
+            aria-label={t("undo")}
+            title={t("undoHint")}
             aria-keyshortcuts="Control+Z Meta+Z"
             disabled={!history.canUndo}
             onClick={history.onUndo}
@@ -151,8 +155,8 @@ export function EditorHeader({
             type="button"
             variant="ghost"
             size="icon"
-            aria-label="Redo"
-            title="Redo (Ctrl+Shift+Z)"
+            aria-label={t("redo")}
+            title={t("redoHint")}
             aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z Control+Y"
             disabled={!history.canRedo}
             onClick={history.onRedo}
@@ -162,7 +166,7 @@ export function EditorHeader({
         </div>
         <Button asChild variant="outline">
           <Link href="/maps">
-            <Map /> My Maps
+            <Map /> {t("myMaps")}
           </Link>
         </Button>
         <Button
@@ -173,7 +177,7 @@ export function EditorHeader({
           onClick={onShare}
         >
           {sharing ? <Loader2 className="animate-spin" /> : <Share2 />}
-          Share
+          {t("share")}
         </Button>
       </div>
     </header>

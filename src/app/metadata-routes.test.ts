@@ -24,8 +24,10 @@ describe("metadata routes", () => {
     ]);
   });
 
-  it("ships installable PNG icons in the manifest", () => {
-    const sizes = manifest().icons?.map((icon) => icon.sizes);
+  it("ships installable PNG icons in the manifest", async () => {
+    const result = await manifest();
+    expect(result.name).toBe("Grand Tour");
+    const sizes = result.icons?.map((icon) => icon.sizes);
     expect(sizes).toEqual(expect.arrayContaining(["192x192", "512x512"]));
   });
 });

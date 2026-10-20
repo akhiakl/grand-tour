@@ -11,6 +11,7 @@ import {
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 
 import {
   AlertDialog,
@@ -34,9 +35,8 @@ const RELATIVE_UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
   ["hour", 3_600_000],
   ["minute", 60_000],
 ];
-const formatter = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
-
-function formatUpdated(updatedAt: number): string {
+function formatUpdated(updatedAt: number, locale: string): string {
+  const formatter = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
   const deltaMs = updatedAt - Date.now();
   for (const [unit, ms] of RELATIVE_UNITS) {
     if (Math.abs(deltaMs) >= ms)
@@ -47,25 +47,31 @@ function formatUpdated(updatedAt: number): string {
 
 /** Whether the last shared link still shows this trip as it is now. */
 function ShareStatus({ record }: { readonly record: LocalTripRecord }) {
+  const t = useTranslations("Maps.card");
+  const locale = useLocale();
   if (!record.shared) return null;
   if (isShareStale(record)) {
     return (
       <p className="flex items-center gap-1.5 text-xs text-brass-text">
         <RefreshCw className="size-3.5 shrink-0" aria-hidden />
-        Edited since you shared it. Share again for an up-to-date link.
+        {t("shareStale")}
       </p>
     );
   }
   return (
     <p className="flex items-center gap-1.5 text-xs text-ink-soft">
       <Link2 className="size-3.5 shrink-0" aria-hidden />
-      Shared {formatUpdated(record.shared.at)} ·{" "}
-      <Link
-        href={`/t/${record.shared.id}`}
-        className="underline underline-offset-2 hover:text-ink"
-      >
-        open link
-      </Link>
+      {t.rich("sharedOn", {
+        when: formatUpdated(record.shared.at, locale),
+        link: (chunks) => (
+          <Link
+            href={`/t/${record.shared?.id}`}
+            className="underline underline-offset-2 hover:text-ink"
+          >
+            {chunks}
+          </Link>
+        ),
+      })}
     </p>
   );
 }
@@ -86,34 +92,37 @@ export function TripCard({
   readonly onExport: () => void;
   readonly onDelete: () => void;
 }) {
+  const t = useTranslations("Maps.card");
+  const locale = useLocale();
   const stats = tripStats(record.trip);
+  const title = record.trip.title;
 
   return (
     <Card>
-      <Link href={`/maps/${record.id}`} aria-label={`View ${record.trip.title}`}>
+      <Link href={`/maps/${record.id}`} aria-label={t("viewTrip", { title })}>
         <RoutePreview cities={record.trip.cities} />
       </Link>
 
       <CardHeader>
         <CardTitle>{record.trip.title}</CardTitle>
         <p className="text-sm text-muted-foreground">
-          {stats.cities} stops · {stats.nights} nights · Updated{" "}
-          {formatUpdated(record.updatedAt)}
+          {t("summary", {
+            stops: stats.cities,
+            nights: stats.nights,
+            updated: formatUpdated(record.updatedAt, locale),
+          })}
         </p>
         <ShareStatus record={record} />
       </CardHeader>
 
       <CardFooter>
         <Button asChild variant="brass" size="sm">
-          <Link href={`/maps/${record.id}`}>View</Link>
+          <Link href={`/maps/${record.id}`}>{t("view")}</Link>
         </Button>
 
         <div className="flex gap-1">
           <Button asChild variant="ghost" size="icon">
-            <Link
-              href={`/new?remix=${record.id}`}
-              aria-label={`Edit ${record.trip.title}`}
-            >
+            <Link href={`/new?remix=${record.id}`} aria-label={t("edit", { title })}>
               <Pencil />
             </Link>
           </Button>
@@ -121,7 +130,7 @@ export function TripCard({
             type="button"
             variant="ghost"
             size="icon"
-            aria-label={`Share ${record.trip.title}`}
+            aria-label={t("share", { title })}
             disabled={sharing}
             onClick={onShare}
           >
@@ -131,8 +140,8 @@ export function TripCard({
             type="button"
             variant="ghost"
             size="icon"
-            aria-label={`Duplicate ${record.trip.title}`}
-            title="Duplicate"
+            aria-label={t("duplicate", { title })}
+            title={t("duplicateHint")}
             onClick={onDuplicate}
           >
             <CopyPlus />
@@ -141,8 +150,8 @@ export function TripCard({
             type="button"
             variant="ghost"
             size="icon"
-            aria-label={`Download a backup of ${record.trip.title}`}
-            title="Download backup"
+            aria-label={t("export", { title })}
+            title={t("exportHint")}
             onClick={onExport}
           >
             <FileDown />
@@ -154,22 +163,21 @@ export function TripCard({
                 type="button"
                 variant="ghost"
                 size="icon"
-                aria-label={`Delete ${record.trip.title}`}
+                aria-label={t("delete", { title })}
               >
                 <Trash2 />
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Delete {record.trip.title}?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This removes it from My Maps on this device. Any link you&apos;ve
-                  already shared keeps working.
-                </AlertDialogDescription>
+                <AlertDialogTitle>{t("deleteTitle", { title })}</AlertDialogTitle>
+                <AlertDialogDescription>{t("deleteBody")}</AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={onDelete}>Delete</AlertDialogAction>
+                <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
+                <AlertDialogAction onClick={onDelete}>
+                  {t("confirmDelete")}
+                </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>

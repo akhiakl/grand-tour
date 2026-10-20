@@ -178,20 +178,20 @@ describe("draftIssues", () => {
     expect(draftIssues(draftFromTrip(makeTrip(2)))).toEqual({});
   });
 
-  it("points at a blank title and blank stop names in plain words", () => {
+  it("points at a blank title and blank stop names", () => {
     const draft = updateCityAt(updateTitle(draftFromTrip(makeTrip(3)), "  "), 1, {
       name: " ",
     });
     expect(draftIssues(draft)).toEqual({
-      title: "Give your map a title.",
-      "cities.1.name": "Give this stop a name.",
+      title: "titleRequired",
+      "cities.1.name": "nameRequired",
     });
   });
 
   it("flags out-of-range nights on the right stop", () => {
     const draft = updateCityAt(draftFromTrip(makeTrip(2)), 0, { nights: 31 });
     expect(draftIssues(draft)).toEqual({
-      "cities.0.nights": "Nights run from 0 to 30.",
+      "cities.0.nights": "nightsRange",
     });
   });
 
@@ -200,11 +200,11 @@ describe("draftIssues", () => {
     expect(draftIssues(draftFromTrip(makeTrip(1)))).toEqual({});
   });
 
-  it("falls back to the schema message for other fields", () => {
+  it("falls back to a generic key for other fields", () => {
     const draft = updateLegAt(draftFromTrip(makeTrip(2)), 0, {
       duration: "x".repeat(21),
     });
-    expect(Object.keys(draftIssues(draft))).toEqual(["legs.0.duration"]);
+    expect(draftIssues(draft)).toEqual({ "legs.0.duration": "invalid" });
   });
 });
 
@@ -240,6 +240,6 @@ describe("updateStartDate", () => {
 
   it("reports an impossible date as a field issue", () => {
     const draft = updateStartDate(draftFromTrip(makeTrip(2)), "2027-02-30");
-    expect(draftIssues(draft)).toEqual({ startDate: "Pick a real calendar date." });
+    expect(draftIssues(draft)).toEqual({ startDate: "startDateInvalid" });
   });
 });

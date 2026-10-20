@@ -1,21 +1,19 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
 import { OffTheMap } from "@/components/off-the-map";
 
-export const metadata: Metadata = {
-  title: "Offline",
-  robots: { index: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Metadata.offline");
+  return { title: t("title"), robots: { index: false } };
+}
 
 /** Served by the service worker for pages that weren't saved before going offline. */
-export default function OfflinePage() {
+export default async function OfflinePage() {
+  const t = await getTranslations("Errors.offline");
   return (
-    <OffTheMap
-      title="Out of signal"
-      action={{ href: "/", label: "Try the atlas again" }}
-    >
-      This page wasn&apos;t saved before the connection dropped. Maps you have
-      already opened on this device still work offline.
+    <OffTheMap title={t("title")} action={{ href: "/", label: t("action") }}>
+      {t("body")}
     </OffTheMap>
   );
 }

@@ -1,17 +1,12 @@
 "use client";
 
 import { FileUp } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useRef } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { parseTripFile, type Trip, type TripFileError } from "@/lib/trip";
-
-const IMPORT_ERRORS: Record<TripFileError, string> = {
-  too_large: "That file is far too big to be a Grand Tour map.",
-  not_json: "That file isn't a Grand Tour backup. Pick a .json map file.",
-  not_a_trip: "That file doesn't hold a map this atlas can read (up to 5 stops).",
-};
+import { parseTripFile, type Trip } from "@/lib/trip";
 
 /** Picks a backup file and hands its validated trip to `onImport`. */
 export function ImportTripButton({
@@ -19,12 +14,13 @@ export function ImportTripButton({
 }: {
   readonly onImport: (trip: Trip) => void;
 }) {
+  const t = useTranslations("Maps.import");
   const input = useRef<HTMLInputElement>(null);
 
   const read = async (file: File) => {
     const result = parseTripFile(await file.text());
     if (result.ok) onImport(result.trip);
-    else toast.error(IMPORT_ERRORS[result.error]);
+    else toast.error(t(result.error));
   };
 
   return (
@@ -33,7 +29,7 @@ export function ImportTripButton({
         ref={input}
         type="file"
         accept="application/json,.json"
-        aria-label="Map backup file"
+        aria-label={t("fileLabel")}
         className="sr-only"
         tabIndex={-1}
         onChange={(event) => {
@@ -43,7 +39,7 @@ export function ImportTripButton({
         }}
       />
       <Button type="button" variant="outline" onClick={() => input.current?.click()}>
-        <FileUp /> Import
+        <FileUp /> {t("button")}
       </Button>
     </>
   );
