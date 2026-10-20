@@ -199,6 +199,9 @@ Branch: `feature/e2e`
    3. guest 5-city limit → upsell modal (editor + ghost stop)
    4. expired trip page (`getTrip` → null path).
    5. (added) units: switch to miles + another currency, persists.
+   6. (added) atlas card: stop detail from itinerary and marker, ESC
+      back, packing state, legend, landing CTAs, Customize → My maps;
+      mobile sheet rest/open/map-tap and marker tap.
 4. Wire `test:e2e` into CI as a separate job (build → start → test
    against `localhost:3000`; cache browsers).
 
