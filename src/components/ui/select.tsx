@@ -80,7 +80,7 @@ function SelectItem({
     >
       <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
       <SelectPrimitive.ItemIndicator className="absolute right-2 flex size-4 items-center justify-center">
-        <CheckIcon className="size-4 text-brass" />
+        <CheckIcon className="size-4 text-brass-text" />
       </SelectPrimitive.ItemIndicator>
     </SelectPrimitive.Item>
   );

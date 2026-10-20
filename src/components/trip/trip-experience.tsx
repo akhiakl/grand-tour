@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 
 import { ShareDialog } from "@/components/share/share-dialog";
 import { useShareTrip } from "@/hooks/use-share-trip";
@@ -29,12 +29,16 @@ export function TripExperience({
   trip,
   actions = "demo",
   localId,
+  cta,
 }: {
   readonly trip: Trip;
   readonly actions?: ExperienceVariant;
   /** The trip's local-store id, when `actions="own"` — lets "Edit" update
    * this same record in place instead of forking a new copy. */
   readonly localId?: string;
+  /** Page-specific floating chrome (the landing CTA on `/`); hidden while
+   * a city drawer is open so it never covers it on small screens. */
+  readonly cta?: ReactNode;
 }) {
   const router = useRouter();
   const [selected, setSelected] = useState<number | null>(null);
@@ -65,7 +69,12 @@ export function TripExperience({
   return (
     <div className="relative isolate h-dvh w-full overflow-hidden">
       <div className="absolute inset-0 z-0">
-        <TripMap trip={trip} selectedIndex={selected} onCitySelect={setSelected} />
+        <TripMap
+          trip={trip}
+          selectedIndex={selected}
+          onCitySelect={setSelected}
+          withChrome
+        />
       </div>
 
       <TopBar
@@ -90,6 +99,7 @@ export function TripExperience({
       )}
       <Panels active={panel} />
       <TimelineRail trip={trip} selectedIndex={selected} onSelect={setSelected} />
+      {selected === null && cta}
 
       <CityDrawer
         city={selected === null ? null : trip.cities[selected]}

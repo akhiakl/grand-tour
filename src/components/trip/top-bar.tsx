@@ -153,7 +153,7 @@ export function TopBar({
         />
         <button
           type="button"
-          className={cn(chipClass, activePanel === "packing" && "text-brass")}
+          className={cn(chipClass, activePanel === "packing" && "text-brass-text")}
           aria-pressed={activePanel === "packing"}
           onClick={() => onTogglePanel("packing")}
         >
@@ -162,7 +162,7 @@ export function TopBar({
         </button>
         <button
           type="button"
-          className={cn(chipClass, activePanel === "notes" && "text-brass")}
+          className={cn(chipClass, activePanel === "notes" && "text-brass-text")}
           aria-pressed={activePanel === "notes"}
           onClick={() => onTogglePanel("notes")}
         >

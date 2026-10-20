@@ -71,7 +71,9 @@ Follow exactly; tokens live in `src/app/globals.css`:
 - Palette (light / dark): paper `#F5F1E8`/`#0E1420`, ink `#16233A`/`#EDEAE2`,
   ink-soft `#4A5568`/`#9AA5B5`, brass `#B98A2F`/`#D4A94E`,
   azure `#3E7CB1`/`#6FA8D6`, line `rgba(22,35,58,.12)`/`rgba(237,234,226,.12)`.
-  Use the Tailwind utilities (`bg-paper`, `text-ink`, `text-brass`,
+  Small brass text/icons use `--brass-text` (light `#8A6420`, dark = brass)
+  for WCAG AA contrast; brass buttons take ink text. Use the Tailwind
+  utilities (`bg-paper`, `text-ink`, `text-brass-text`,
   `border-line`, …) — never hardcode hex values in components.
 - Surfaces: `.frost` (backdrop-blur 18px, 1px `--line` border, radius
   14–20px, soft long shadow). Labels: `.eyebrow` (10px, tracking .28em,

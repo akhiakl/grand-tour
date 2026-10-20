@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Compass, Plus } from "lucide-react";
+import { ArrowLeft, Compass, Plus, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -44,7 +44,7 @@ export function MapsPage() {
         <div>
           <Link
             href="/"
-            className="eyebrow inline-flex w-fit items-center gap-1 text-muted-foreground transition-colors hover:text-brass"
+            className="eyebrow inline-flex w-fit items-center gap-1 text-muted-foreground transition-colors hover:text-brass-text"
           >
             <ArrowLeft className="size-3" /> Field Atlas
           </Link>
@@ -63,11 +63,18 @@ export function MapsPage() {
         <div className="mt-16 flex flex-col items-center gap-3 text-center">
           <Compass className="size-10 text-muted-foreground" />
           <p className="text-muted-foreground">
-            No maps yet — build your first route.
+            No maps yet. Draft one with the atlas, or draw it stop by stop.
           </p>
-          <Button asChild variant="outline">
-            <Link href="/new">Start building</Link>
-          </Button>
+          <div className="flex flex-wrap justify-center gap-2">
+            <Button asChild variant="brass">
+              <Link href="/plan">
+                <Sparkles /> Plan with AI
+              </Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/new">Build manually</Link>
+            </Button>
+          </div>
         </div>
       )}
 

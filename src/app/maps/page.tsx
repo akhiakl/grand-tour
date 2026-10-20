@@ -4,6 +4,8 @@ import { MapsPage } from "@/components/maps/maps-page";
 
 export const metadata: Metadata = {
   title: "My Maps",
+  description:
+    "Every route you have drawn on this device, ready to open, edit or share.",
 };
 
 export default function Page() {

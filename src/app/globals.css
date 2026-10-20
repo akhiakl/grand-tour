@@ -14,6 +14,8 @@
   --ink: #16233a;
   --ink-soft: #4a5568;
   --brass: #b98a2f;
+  /* Brass for small text and icons on paper: the fill brass is 2.8:1. */
+  --brass-text: #8a6420;
   --azure: #3e7cb1;
   --line: rgba(22, 35, 58, 0.12);
   --card-solid: #ffffff;
@@ -49,6 +51,7 @@
   --ink: #edeae2;
   --ink-soft: #9aa5b5;
   --brass: #d4a94e;
+  --brass-text: var(--brass);
   --azure: #6fa8d6;
   --line: rgba(237, 234, 226, 0.12);
   --card-solid: #161f30;
@@ -72,6 +75,7 @@
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
   --color-brass: var(--brass);
+  --color-brass-text: var(--brass-text);
   --color-azure: var(--azure);
   --color-line: var(--line);
   --color-card-solid: var(--card-solid);
@@ -149,7 +153,7 @@ input[type="range"] {
     font-weight: 600;
     letter-spacing: 0.28em;
     text-transform: uppercase;
-    color: var(--brass);
+    color: var(--brass-text);
   }
 }
 
@@ -285,7 +289,7 @@ input[type="range"] {
 }
 
 .marker-active .marker-lbl {
-  color: var(--brass);
+  color: var(--brass-text);
 }
 
 /* Ghost stops: locked AI suggestions past the guest limit. */

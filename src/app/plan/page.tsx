@@ -6,6 +6,8 @@ import { AiChat } from "@/components/ai/ai-chat";
 
 export const metadata: Metadata = {
   title: "Plan with AI",
+  description:
+    "Three questions, one drafted route. Tell the atlas where, how long and what pace; then make it yours.",
 };
 
 export default function PlanPage() {
@@ -14,7 +16,7 @@ export default function PlanPage() {
       <header className="flex flex-col gap-2">
         <Link
           href="/"
-          className="eyebrow inline-flex w-fit items-center gap-1 text-muted-foreground transition-colors hover:text-brass"
+          className="eyebrow inline-flex w-fit items-center gap-1 text-muted-foreground transition-colors hover:text-brass-text"
         >
           <ArrowLeft className="size-3" /> Field Atlas
         </Link>

@@ -1,32 +1,21 @@
 "use client";
 
-import { Compass } from "lucide-react";
-import Link from "next/link";
 import { useParams } from "next/navigation";
 
+import { OffTheMap } from "@/components/off-the-map";
 import { TripExperience } from "@/components/trip/trip-experience";
-import { Button } from "@/components/ui/button";
 import { useMounted } from "@/hooks/use-mounted";
 import { getLocalTrip } from "@/lib/trip";
 
 function NotFoundOnThisDevice() {
   return (
-    <div className="grid min-h-dvh place-items-center px-6 text-center">
-      <div className="flex flex-col items-center gap-3">
-        <Compass className="size-10 text-muted-foreground" />
-        <p className="eyebrow">Off the map</p>
-        <h1 className="font-display text-3xl font-medium tracking-tight sm:text-4xl">
-          Not on this device
-        </h1>
-        <p className="max-w-sm text-muted-foreground">
-          Local maps live in this browser only. If you saved it somewhere else, open
-          it from there — or start a new one here.
-        </p>
-        <Button asChild variant="brass" className="mt-2">
-          <Link href="/maps">Back to My Maps</Link>
-        </Button>
-      </div>
-    </div>
+    <OffTheMap
+      title="Not on this device"
+      action={{ href: "/maps", label: "Back to My Maps" }}
+    >
+      Local maps live in this browser only. If you saved it somewhere else, open it
+      from there, or start a new one here.
+    </OffTheMap>
   );
 }
 

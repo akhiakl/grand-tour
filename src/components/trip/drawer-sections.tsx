@@ -21,7 +21,7 @@ function Pill({
     <span
       className={cn(
         "rounded-full border border-line bg-card px-3 py-1.5 text-[12.5px] font-medium",
-        gem && "border-brass/45 text-brass",
+        gem && "border-brass/45 text-brass-text",
       )}
     >
       {children}
@@ -40,7 +40,7 @@ function DayRow({
 }) {
   return (
     <div className="flex gap-3.5 border-b border-dashed border-line py-3">
-      <div className="w-14 shrink-0 pt-0.5 font-display text-[13px] font-semibold text-brass">
+      <div className="w-14 shrink-0 pt-0.5 font-display text-[13px] font-semibold text-brass-text">
         {lead}
       </div>
       <div>
@@ -147,7 +147,7 @@ export function PracticalSection({ city }: { readonly city: City }) {
               key={tip}
               className="flex gap-2.5 py-1.5 text-[13.5px] leading-relaxed text-muted-foreground"
             >
-              <span aria-hidden className="shrink-0 text-brass">
+              <span aria-hidden className="shrink-0 text-brass-text">
                 —
               </span>
               {tip}
