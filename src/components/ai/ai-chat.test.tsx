@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { readAndClearAiHandoff } from "@/lib/ai";
+import { readAiHandoff } from "@/lib/ai";
 import { makeGeneratedDraft } from "@/test/fixtures/ai";
 
 import { AiChat } from "./ai-chat";
@@ -57,7 +57,7 @@ describe("AiChat", () => {
       vibe: "balanced",
     });
     expect(router.push).toHaveBeenCalledWith("/new?from=ai");
-    expect(readAndClearAiHandoff()).toMatchObject({
+    expect(readAiHandoff()).toMatchObject({
       title: draft.trip.title,
       cities: draft.trip.cities,
       suggestedExtra: ["Ljubljana"],

@@ -2,8 +2,10 @@ import { AiTripSchema, type AiTrip } from "./schema";
 
 /**
  * One-shot localStorage handoff from the AI chat flow (step 6) to the
- * manual editor (`/new?from=ai`): the chat writes a drafted trip here,
- * the editor reads and clears it on mount. Isomorphic-safe like the trip
+ * manual editor (`/new?from=ai`): the chat writes a drafted trip here;
+ * the editor reads it while rendering and clears it once mounted. Reading
+ * never clears, because React may run a render (and its state
+ * initializers) more than once before committing it. Isomorphic-safe like the trip
  * domain's local store — guarded on `typeof window`.
  */
 const HANDOFF_KEY = "trips:ai-handoff";
@@ -16,11 +18,10 @@ export function writeAiHandoff(trip: AiTrip): void {
   window.localStorage.setItem(HANDOFF_KEY, JSON.stringify(trip));
 }
 
-/** Read and consume the handoff; corrupt or missing payloads read as null. */
-export function readAndClearAiHandoff(): AiTrip | null {
+/** Read the handoff without consuming it; corrupt or missing reads as null. */
+export function readAiHandoff(): AiTrip | null {
   if (!hasStorage()) return null;
   const raw = window.localStorage.getItem(HANDOFF_KEY);
-  window.localStorage.removeItem(HANDOFF_KEY);
   if (!raw) return null;
   try {
     const parsed = AiTripSchema.safeParse(JSON.parse(raw));
@@ -28,4 +29,10 @@ export function readAndClearAiHandoff(): AiTrip | null {
   } catch {
     return null;
   }
+}
+
+/** Drop the handoff once the editor has taken it. */
+export function clearAiHandoff(): void {
+  if (!hasStorage()) return;
+  window.localStorage.removeItem(HANDOFF_KEY);
 }
