@@ -68,9 +68,9 @@ Branch: `feature/editor`
      ("Grand Tour").
    - Live map preview: reuse `TripMap` (it already handles any valid
      Trip); preview updates as fields change (debounced).
-   - **City search via Nominatim**: `https://nominatim.openstreetmap.org/search`
-     with `format=jsonv2`, debounced ≥500ms, max 1 req/sec, and a
-     descriptive `User-Agent`/`Referer` per their usage policy. Wrap in
+   - **City search via Photon** (`https://photon.komoot.io/api/`, built
+     for search-as-you-type; public Nominatim forbids autocomplete),
+     debounced ≥500ms with stale requests aborted. Wrap in
      `src/lib/geo-search/` domain (index.ts public API) so the provider
      can be swapped; unit-test the response mapping with fixtures.
    - Guest limit layer 2: always-visible `n/5 stops` counter; "Add city"

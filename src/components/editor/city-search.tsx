@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 const DEBOUNCE_MS = 500;
 
 /**
- * Nominatim-backed city lookup: debounced input + a keyboard-operable
+ * Photon-backed city lookup: debounced input + a keyboard-operable
  * results listbox. Selecting a result hands the caller a prefilled city
  * shape; it does not touch the draft itself.
  */
