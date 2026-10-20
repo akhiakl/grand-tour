@@ -21,7 +21,7 @@
     "@upstash/redis": "^1.38.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "framer-motion": "^12.43.0",
+    "framer-motion": "^13.0.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^1.28.0",
     "nanoid": "^6.0.0",
