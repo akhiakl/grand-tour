@@ -9,7 +9,7 @@ import {
   type Trip,
 } from "@/lib/trip";
 
-import { MAP_ATTRIBUTION_TEXT } from "./map-style";
+import { MAP_STYLE } from "./map-style";
 import { MODE_META } from "./mode";
 import { drawBasemap, fadeTileEdges, type TileWindow } from "./poster-tiles";
 
@@ -174,7 +174,7 @@ function drawAttribution(
   ctx.textBaseline = "alphabetic";
   ctx.globalAlpha = 0.85;
   ctx.fillText(
-    MAP_ATTRIBUTION_TEXT,
+    MAP_STYLE.attributionText,
     WIN.x + WIN.width - 14,
     WIN.y + WIN.height - 14,
   );

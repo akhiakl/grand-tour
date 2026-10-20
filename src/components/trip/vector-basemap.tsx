@@ -8,7 +8,7 @@ import { useMap } from "react-leaflet";
 
 import "./maplibre";
 
-import { MAP_ATTRIBUTION, MAP_STYLE_URL } from "./map-style";
+import { MAP_STYLE } from "./map-style";
 
 /**
  * OpenFreeMap vector basemap rendered by MapLibre inside Leaflet's tile
@@ -19,13 +19,13 @@ export function VectorBasemap() {
 
   useEffect(() => {
     const layer = maplibreGL({
-      style: MAP_STYLE_URL,
+      style: MAP_STYLE.url,
       attributionControl: false,
     });
     layer.addTo(map);
-    map.attributionControl?.addAttribution(MAP_ATTRIBUTION);
+    map.attributionControl?.addAttribution(MAP_STYLE.attribution);
     return () => {
-      map.attributionControl?.removeAttribution(MAP_ATTRIBUTION);
+      map.attributionControl?.removeAttribution(MAP_STYLE.attribution);
       layer.remove();
     };
   }, [map]);

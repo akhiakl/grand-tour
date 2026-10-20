@@ -82,7 +82,7 @@ status table before starting work. Visual truth: `reference/grand-tour.html`.
   `useReducedMotion` for anything that moves a distance.
 - Buttons: `variant="brass"` for the signature CTA, `default` (ink)
   standard, `outline`/`ghost` secondary.
-- Map: OpenFreeMap positron vector style (`map-style.ts`) rendered by
+- Map: OpenFreeMap positron vector style (`map-style.ts`; `NEXT_PUBLIC_MAP_STYLE_URL` swaps in a self-hosted style) rendered by
   MapLibre inside Leaflet's tile pane (`vector-basemap`), themed by `--map-filter`;
   dashed brass route with marching-ants drift; pulse+dot+label-pill
   markers; zoom 5–12, `maxBoundsViscosity: 1.0`; Leaflet only via

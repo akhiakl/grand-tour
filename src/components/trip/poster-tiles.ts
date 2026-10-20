@@ -1,6 +1,6 @@
 import { mercatorCamera, type MercatorView } from "@/lib/trip";
 
-import { MAP_STYLE_URL } from "./map-style";
+import { MAP_STYLE } from "./map-style";
 
 export interface TileWindow {
   x: number;
@@ -28,7 +28,7 @@ async function renderBasemap(
   const { center, zoom } = mercatorCamera(view, window);
   const map = new maplibregl.Map({
     container,
-    style: MAP_STYLE_URL,
+    style: MAP_STYLE.url,
     center,
     zoom,
     interactive: false,
