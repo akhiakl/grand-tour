@@ -5,9 +5,13 @@ import { useMediaQuery } from "./use-media-query";
 
 function stubMatchMedia(initial: boolean) {
   const listeners = new Set<() => void>();
+  const subscribed = vi.fn();
   const list = {
     matches: initial,
-    addEventListener: (_: string, fn: () => void) => listeners.add(fn),
+    addEventListener: (_: string, fn: () => void) => {
+      subscribed();
+      listeners.add(fn);
+    },
     removeEventListener: (_: string, fn: () => void) => listeners.delete(fn),
   };
   vi.stubGlobal(
@@ -20,6 +24,7 @@ function stubMatchMedia(initial: boolean) {
       listeners.forEach((fn) => fn());
     },
     listeners,
+    subscribed,
   };
 }
 
@@ -38,5 +43,13 @@ describe("useMediaQuery", () => {
 
     unmount();
     expect(media.listeners.size).toBe(0);
+  });
+
+  it("keeps one subscription across re-renders", () => {
+    const media = stubMatchMedia(false);
+    const { rerender } = renderHook(() => useMediaQuery("(min-width: 1024px)"));
+    rerender();
+    rerender();
+    expect(media.subscribed).toHaveBeenCalledOnce();
   });
 });
