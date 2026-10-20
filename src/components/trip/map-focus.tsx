@@ -7,7 +7,12 @@ import { useMap } from "react-leaflet";
 
 import type { City, LatLng } from "@/lib/trip";
 
-import { clearPanOffset, fitPadding, type MapInsets } from "./fit-padding";
+import {
+  clearPanOffset,
+  fitPadding,
+  isPointObscured,
+  type MapInsets,
+} from "./fit-padding";
 
 const CITY_ZOOM = 9;
 
@@ -97,10 +102,10 @@ export function MarkerFocusPan({ insets }: { readonly insets: MapInsets }) {
       if (!icon) return;
       // Icons are 0×0 at their stop, so the icon's position is the stop's.
       const point = map.layerPointToContainerPoint(L.DomUtil.getPosition(icon));
-      const [dx, dy] = clearPanOffset(point, latest.current.insets, map.getSize());
-      if (dx !== 0 || dy !== 0) {
-        map.panBy([dx, dy], { animate: !latest.current.reducedMotion });
-      }
+      const { insets, reducedMotion } = latest.current;
+      const size = map.getSize();
+      if (!isPointObscured(point, insets, size)) return;
+      map.panBy(clearPanOffset(point, insets, size), { animate: !reducedMotion });
     };
     pane.addEventListener("focusin", onFocusIn);
     return () => pane.removeEventListener("focusin", onFocusIn);

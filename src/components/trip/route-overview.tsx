@@ -101,7 +101,7 @@ export function Itinerary({
               aria-current={selectedIndex === index ? "step" : undefined}
               data-hovered={hoveredIndex === index || undefined}
               className={cn(
-                "group flex w-full items-center gap-3 rounded-xl p-1.5 text-left transition-colors outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring data-hovered:bg-accent",
+                "group flex w-full items-center gap-3 rounded-xl p-1.5 text-left transition-colors outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring data-[hovered]:bg-accent",
                 selectedIndex === index && "bg-accent",
               )}
             >
