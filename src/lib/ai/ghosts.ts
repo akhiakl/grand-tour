@@ -20,10 +20,9 @@ export function placeGhostStops(
   cities: readonly City[],
   names: readonly string[],
 ): GhostStop[] {
-  if (cities.length === 0 || names.length === 0) return [];
-
-  const last = cities.at(-1)!.ll;
-  const prev = cities.length > 1 ? cities.at(-2)!.ll : null;
+  const last = cities.at(-1)?.ll;
+  if (!last || names.length === 0) return [];
+  const prev = cities.at(-2)?.ll ?? null;
   const dLat = prev ? last[0] - prev[0] : 0;
   const dLng = prev ? last[1] - prev[1] : 1;
   const heading = Math.atan2(dLat, dLng);
