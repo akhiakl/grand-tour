@@ -148,7 +148,7 @@ Branch: `feature/ai-chat`
    retry-later state; 502/503 → clear error, editor opens blank.
 
 **Definition of done**: mocked `/api/generate` returns a fixture trip in
-tests; with a real `GROQ_API_KEY` the flow lands a 5-city draft in the
+tests; with a real `AI_BASE_URL` + `AI_MODEL` the flow lands a 5-city draft in the
 editor with ghost stops; upsell opens from a ghost stop.
 
 ---
@@ -188,7 +188,7 @@ Branch: `feature/e2e`
    Chromium (`executablePath: /opt/pw-browsers/chromium`); never run
    `playwright install`.
 2. Mock network at the edge: route-intercept `/api/generate` (fixture
-   trip) and `/api/trips` (fake id) — no real Groq/Redis in e2e.
+   trip) and `/api/trips` (fake id) — no real LLM/Redis in e2e.
 3. Four core journeys:
    1. manual create → share → open `/t/{id}` → remix
    2. AI create flow (mocked generate) → editor prefilled
@@ -205,7 +205,7 @@ Branch: `feature/e2e`
 
 - [ ] Upstash Redis created; `UPSTASH_REDIS_REST_URL` / `_TOKEN` in
       `.env.local` + deploy host env.
-- [ ] `GROQ_API_KEY` in `.env.local` + deploy host env.
+- [ ] `AI_BASE_URL` / `AI_MODEL` (+ `AI_API_KEY` if needed) in `.env.local` + deploy host env.
 - [ ] Sentry project created; `NEXT_PUBLIC_SENTRY_DSN` set (optional
       `SENTRY_ORG/PROJECT/AUTH_TOKEN` in CI for source maps).
 - [x] `SONAR_TOKEN` repo secret.

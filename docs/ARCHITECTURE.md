@@ -36,7 +36,7 @@ src/
       service.ts        SERVER entry point (`import "server-only"`) — Redis persistence.
     ai/
       index.ts          PUBLIC API — isomorphic request/output schemas.
-      generate.ts       SERVER entry point — Groq call + validation retry.
+      generate.ts       SERVER entry point — OpenAI-compatible model call + validation retry.
       prompt.ts         Internal module (not exported; tests reach it relatively).
     http/
       index.ts          PUBLIC API — rate limiting, client IP (server concerns).
@@ -56,7 +56,7 @@ src/
 - Public APIs stay isomorphic; anything touching secrets/IO carries
   `import "server-only"` so the bundler fails the build if it ever leaks
   toward the client.
-- `src/app` and `src/components` never import Redis/Groq modules directly
+- `src/app` and `src/components` never import Redis/AI-model modules directly
   from client components — server components and route handlers are the
   only callers of server entry points.
 - Colocated tests may import their subject relatively (`./prompt`) — the

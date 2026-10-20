@@ -72,7 +72,7 @@ checked before merging the `1.0.0` release PR.
 
 - [ ] Upstash prod database; `UPSTASH_REDIS_REST_URL/_TOKEN` set on host
 - [ ] Rate limits verified live (11th trip POST in an hour → 429)
-- [ ] `GROQ_API_KEY` set; generation verified live including the
+- [ ] `AI_BASE_URL` / `AI_MODEL` set; generation verified live including the
       validation-retry path
 - [ ] Share TTL verified: `GETEX` refresh on read (open a link, check TTL)
 - [ ] 50KB payload cap returns 413 against prod

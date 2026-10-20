@@ -1,6 +1,6 @@
 ---
 name: grand-tour-testing
-description: Testing conventions and ready-made mocking recipes for this repo — vitest setup, fixtures, Redis/Groq/rate-limit/route/component test patterns, coverage rules, and real-browser verification. Use this whenever you write or modify tests, mock a dependency, add a lib function or API route (they always ship with tests), fix a failing test, or need to verify UI changes actually render.
+description: Testing conventions and ready-made mocking recipes for this repo — vitest setup, fixtures, Redis/AI-model/rate-limit/route/component test patterns, coverage rules, and real-browser verification. Use this whenever you write or modify tests, mock a dependency, add a lib function or API route (they always ship with tests), fix a failing test, or need to verify UI changes actually render.
 ---
 
 # Grand Tour testing
@@ -49,12 +49,13 @@ vi.mock("@/lib/trip/service", () => ({ saveTrip: mocks.saveTrip }));
 Cover every branch the route can return (success, 4xx contract shapes,
 429, 5xx) — the error contract IS the API.
 
-**External HTTP (Groq)** — stub `fetch` + env, assert the outgoing
+**External HTTP (AI model)** — stub `fetch` + env, assert the outgoing
 payload as well as the result:
 
 ```ts
 vi.stubGlobal("fetch", fetchMock);
-vi.stubEnv("GROQ_API_KEY", "test-key");
+vi.stubEnv("AI_BASE_URL", "http://ai.test/v1");
+vi.stubEnv("AI_MODEL", "test-model");
 // afterEach: vi.unstubAllGlobals(); vi.unstubAllEnvs();
 ```
 
