@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowLeft, Plus, X } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 
 import { Checkbox } from "@/components/ui/checkbox";
@@ -9,6 +10,7 @@ import { useMounted } from "@/hooks/use-mounted";
 import {
   packingList,
   readTripTools,
+  type PackingItem as SuggestedItem,
   TRIP_TOOLS_LIMITS,
   writeTripTools,
   type Trip,
@@ -21,6 +23,7 @@ import type { ToolId } from "./panel-actions";
 
 /** Return link shared by every panel view that replaces the itinerary. */
 export function BackToRoute({ onBack }: { readonly onBack: () => void }) {
+  const t = useTranslations("Trip.panel");
   return (
     <button
       type="button"
@@ -28,7 +31,7 @@ export function BackToRoute({ onBack }: { readonly onBack: () => void }) {
       onClick={onBack}
       className="-ml-1 flex w-fit items-center gap-1.5 rounded-full px-1 text-sm text-ink-soft transition-colors outline-none hover:text-ink focus-visible:ring-2 focus-visible:ring-ring [&_svg]:size-4"
     >
-      <ArrowLeft /> Route
+      <ArrowLeft /> {t("back")}
     </button>
   );
 }
@@ -66,6 +69,7 @@ function PackingItem({
   readonly onToggle: () => void;
   readonly onRemove?: () => void;
 }) {
+  const t = useTranslations("Trip.tools");
   return (
     <li className="flex items-center gap-3 text-sm">
       <Checkbox id={id} checked={checked} onCheckedChange={onToggle} />
@@ -82,7 +86,7 @@ function PackingItem({
         <button
           type="button"
           onClick={onRemove}
-          aria-label={`Remove ${item}`}
+          aria-label={t("removeItem", { item })}
           className="rounded-full p-1 text-ink-soft outline-none hover:text-ink focus-visible:ring-2 focus-visible:ring-ring [&_svg]:size-3.5"
         >
           <X />
@@ -93,6 +97,7 @@ function PackingItem({
 }
 
 function AddItemForm({ onAdd }: { readonly onAdd: (item: string) => void }) {
+  const t = useTranslations("Trip.tools");
   const [value, setValue] = useState("");
   return (
     <form
@@ -104,15 +109,15 @@ function AddItemForm({ onAdd }: { readonly onAdd: (item: string) => void }) {
       }}
     >
       <Input
-        aria-label="Add a packing item"
-        placeholder="Add your own…"
+        aria-label={t("addItem")}
+        placeholder={t("addItemPlaceholder")}
         maxLength={80}
         value={value}
         onChange={(event) => setValue(event.target.value)}
       />
       <button
         type="submit"
-        aria-label="Add item"
+        aria-label={t("addItemButton")}
         className="grid size-9 shrink-0 place-items-center rounded-md border border-line text-ink-soft outline-none hover:text-ink focus-visible:ring-2 focus-visible:ring-ring [&_svg]:size-4"
       >
         <Plus />
@@ -140,12 +145,35 @@ export function TripTools(props: ToolsProps) {
   ) : null;
 }
 
+/** A checklist row: a suggested item (translated) or one the viewer added. */
+type ChecklistItem = { id: string; label: string; custom: boolean };
+
+const customId = (text: string) => `custom:${text}`;
+
+function useSuggestedLabel() {
+  const t = useTranslations("Trip.packing");
+  const list = new Intl.ListFormat(useLocale(), {
+    style: "long",
+    type: "conjunction",
+  });
+  return (item: SuggestedItem) =>
+    item.key === "adapter"
+      ? t("adapter", { type: item.type, countries: list.format(item.countries) })
+      : t(item.key);
+}
+
 function ToolsBody({ trip, scope, active, onBack }: ToolsProps) {
+  const t = useTranslations("Trip.tools");
+  const label = useSuggestedLabel();
   const [state, setState] = useState<TripToolsState>(() => readTripTools(scope));
   const suggested = useMemo(() => packingList(trip), [trip]);
-  const items = [
-    ...suggested,
-    ...state.custom.filter((c) => !suggested.includes(c)),
+  const items: ChecklistItem[] = [
+    ...suggested.map((item) => ({ id: item.id, label: label(item), custom: false })),
+    ...state.custom.map((text) => ({
+      id: customId(text),
+      label: text,
+      custom: true,
+    })),
   ];
   const checked = new Set(state.checked);
 
@@ -155,38 +183,41 @@ function ToolsBody({ trip, scope, active, onBack }: ToolsProps) {
     writeTripTools(scope, next);
   };
 
-  const toggle = (item: string) =>
+  const toggle = (id: string) =>
     update({
-      checked: checked.has(item)
-        ? state.checked.filter((c) => c !== item)
-        : [...state.checked, item],
+      checked: checked.has(id)
+        ? state.checked.filter((c) => c !== id)
+        : [...state.checked, id],
     });
 
-  const addItem = (item: string) => {
-    if (items.includes(item) || state.custom.length >= TRIP_TOOLS_LIMITS.customItems)
+  const addItem = (text: string) => {
+    if (
+      state.custom.includes(text) ||
+      state.custom.length >= TRIP_TOOLS_LIMITS.customItems
+    )
       return;
-    update({ custom: [...state.custom, item] });
+    update({ custom: [...state.custom, text] });
   };
 
-  const removeItem = (item: string) =>
+  const removeItem = (text: string) =>
     update({
-      custom: state.custom.filter((c) => c !== item),
-      checked: state.checked.filter((c) => c !== item),
+      custom: state.custom.filter((c) => c !== text),
+      checked: state.checked.filter((c) => c !== customId(text)),
     });
 
-  const done = items.filter((item) => checked.has(item)).length;
+  const done = items.filter((item) => checked.has(item.id)).length;
   const progress = items.length ? Math.round((done / items.length) * 100) : 0;
 
   return (
     <>
       <ToolSection
         open={active === "packing"}
-        title="Packing checklist"
+        title={t("packingTitle")}
         onBack={onBack}
       >
         <div
           role="progressbar"
-          aria-label="Packed"
+          aria-label={t("packed")}
           aria-valuenow={progress}
           aria-valuemin={0}
           aria-valuemax={100}
@@ -200,32 +231,28 @@ function ToolsBody({ trip, scope, active, onBack }: ToolsProps) {
         <ul className="space-y-2.5">
           {items.map((item, index) => (
             <PackingItem
-              key={item}
+              key={item.id}
               id={`packing-${index}`}
-              item={item}
-              checked={checked.has(item)}
-              onToggle={() => toggle(item)}
-              onRemove={
-                suggested.includes(item) ? undefined : () => removeItem(item)
-              }
+              item={item.label}
+              checked={checked.has(item.id)}
+              onToggle={() => toggle(item.id)}
+              onRemove={item.custom ? () => removeItem(item.label) : undefined}
             />
           ))}
         </ul>
         <AddItemForm onAdd={addItem} />
       </ToolSection>
 
-      <ToolSection open={active === "notes"} title="Trip notes" onBack={onBack}>
+      <ToolSection open={active === "notes"} title={t("notesTitle")} onBack={onBack}>
         <textarea
-          aria-label="Trip notes"
+          aria-label={t("notesTitle")}
           value={state.notes}
           maxLength={TRIP_TOOLS_LIMITS.notesLength}
           onChange={(event) => update({ notes: event.target.value })}
-          placeholder="Booking codes, addresses, ideas…"
+          placeholder={t("notesPlaceholder")}
           className="min-h-48 w-full resize-y rounded-lg border border-line bg-transparent p-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
         />
-        <p className="text-xs text-ink-soft">
-          Saved in this browser only, never in the shared link.
-        </p>
+        <p className="text-xs text-ink-soft">{t("notesPrivacy")}</p>
       </ToolSection>
     </>
   );

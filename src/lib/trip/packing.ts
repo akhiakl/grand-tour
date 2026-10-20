@@ -1,71 +1,89 @@
 import { PLUG_TYPES } from "./plug-types";
 import type { Leg, Trip } from "./schema";
 
+/** Message keys for packing items; the UI owns the wording. */
+export type PackingKey =
+  | "passport"
+  | "insurance"
+  | "shoes"
+  | "powerBank"
+  | "bottle"
+  | "dayPack"
+  | "rainLayer"
+  | "adapter"
+  | "universalAdapter"
+  | Leg["mode"]
+  | "cash"
+  | "laundry";
+
+/**
+ * One suggested item. `id` is stable across visits (it keys the viewer's
+ * saved ticks); `countries`/`type` fill the adapter line's message.
+ */
+export type PackingItem =
+  | { id: string; key: Exclude<PackingKey, "adapter"> }
+  | { id: string; key: "adapter"; type: string; countries: string[] };
+
 /** Always worth packing, wherever the route goes. */
 const ESSENTIALS = [
-  "Passport & ID",
-  "Travel insurance details",
-  "Comfortable walking shoes",
-  "Power bank",
-  "Refillable water bottle",
-  "Day pack",
-  "Light rain layer",
-];
-
-const MODE_ITEMS: Record<Leg["mode"], string> = {
-  train: "Rail tickets saved offline",
-  bus: "Bus tickets saved offline",
-  flight: "Boarding passes & a clear liquids bag",
-  ferry: "Ferry booking & a motion-sickness remedy",
-  car: "Driving licence (and an international permit if needed)",
-};
+  "passport",
+  "insurance",
+  "shoes",
+  "powerBank",
+  "bottle",
+  "dayPack",
+  "rainLayer",
+] as const;
 
 /** A week or more on the road earns a laundry kit. */
 const LAUNDRY_NIGHTS = 7;
 
-const listFormat = new Intl.ListFormat("en", { style: "long", type: "conjunction" });
+const simple = (key: Exclude<PackingKey, "adapter">): PackingItem => ({
+  id: key,
+  key,
+});
 
 /**
  * One adapter line per distinct socket set on the route, naming the
  * countries it covers; countries without a known socket type share a
  * universal-adapter line.
  */
-function adapterItems(trip: Trip): string[] {
+function adapterItems(trip: Trip): PackingItem[] {
   const byType = new Map<string, string[]>();
-  const unknown: string[] = [];
+  let unknown = false;
 
   for (const country of new Set(trip.cities.map((city) => city.country.trim()))) {
     if (!country) continue;
     const type = PLUG_TYPES[country.toLowerCase()];
     if (type) byType.set(type, [...(byType.get(type) ?? []), country]);
-    else unknown.push(country);
+    else unknown = true;
   }
 
-  const items = [...byType].map(
-    ([type, countries]) =>
-      `Power adapter for type ${type} sockets (${listFormat.format(countries)})`,
-  );
-  if (unknown.length > 0 || items.length === 0) {
-    items.push("Universal travel adapter");
-  }
+  const items: PackingItem[] = [...byType].map(([type, countries]) => ({
+    id: `adapter:${type}`,
+    key: "adapter",
+    type,
+    countries,
+  }));
+  if (unknown || items.length === 0) items.push(simple("universalAdapter"));
   return items;
 }
 
 /**
  * A packing checklist shaped by the trip itself: essentials, the socket
  * adapters its countries need, tickets for the ways it travels, and a
- * laundry kit for longer routes. Labels double as stable checklist keys.
+ * laundry kit for longer routes.
  */
-export function packingList(trip: Trip): string[] {
+export function packingList(trip: Trip): PackingItem[] {
   const modes = [...new Set(trip.legs.map((leg) => leg.mode))];
   const nights = trip.cities.reduce((sum, city) => sum + city.nights, 0);
   const countries = new Set(trip.cities.map((city) => city.country)).size;
 
   return [
-    ...ESSENTIALS,
+    ...ESSENTIALS.map(simple),
     ...adapterItems(trip),
-    ...modes.map((mode) => MODE_ITEMS[mode]),
-    ...(countries > 1 ? ["A little local cash for each country"] : []),
-    ...(nights >= LAUNDRY_NIGHTS ? ["Travel laundry kit"] : []),
+    ...modes.map(simple),
+    ...(countries > 1 ? [simple("cash")] : []),
+    ...(nights >= LAUNDRY_NIGHTS ? [simple("laundry")] : []),
   ];
 }

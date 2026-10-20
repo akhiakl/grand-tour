@@ -30,14 +30,19 @@ export function tripDateRange(trip: Trip): StopDates | null {
   return { arrive: dates[0].arrive, depart: dates.at(-1)!.depart };
 }
 
-const dayFormat = new Intl.DateTimeFormat("en", {
-  month: "short",
-  day: "numeric",
-  timeZone: "UTC",
-});
+const dayFormat = (locale: string) =>
+  new Intl.DateTimeFormat(locale, {
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  });
 
-/** "May 1", or "May 1 – 4" / "May 30 – Jun 2" for a span. */
-export function formatDateSpan({ arrive, depart }: StopDates): string {
-  if (arrive === depart) return dayFormat.format(toUtc(arrive));
-  return dayFormat.formatRange(toUtc(arrive), toUtc(depart));
+/** "May 1", or "May 1 – 4" / "May 30 – Jun 2" for a span (in `locale`). */
+export function formatDateSpan(
+  { arrive, depart }: StopDates,
+  locale = "en",
+): string {
+  const format = dayFormat(locale);
+  if (arrive === depart) return format.format(toUtc(arrive));
+  return format.formatRange(toUtc(arrive), toUtc(depart));
 }

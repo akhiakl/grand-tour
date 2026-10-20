@@ -11,6 +11,7 @@ import {
   Share2,
 } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -39,17 +40,18 @@ export function PrimaryActions({
   readonly onShare?: () => void;
   readonly sharing?: boolean;
 }) {
+  const t = useTranslations("Trip.actions");
   if (variant === "demo" && cta) return cta;
 
   if (variant === "shared") {
     return (
       <div className="flex gap-2">
         <Button variant="brass" className="flex-1" onClick={onEditRoute}>
-          <Pencil /> Remix this trip
+          <Pencil /> {t("remix")}
         </Button>
         <Button asChild variant="outline" className="flex-1">
           <Link href="/new">
-            <Plus /> Create your own
+            <Plus /> {t("createOwn")}
           </Link>
         </Button>
       </div>
@@ -60,7 +62,7 @@ export function PrimaryActions({
     return (
       <div className="flex gap-2">
         <Button variant="brass" className="flex-1" onClick={onEditRoute}>
-          <Pencil /> Edit
+          <Pencil /> {t("edit")}
         </Button>
         <Button
           variant="outline"
@@ -68,7 +70,7 @@ export function PrimaryActions({
           onClick={onShare}
           disabled={sharing}
         >
-          <Share2 /> {sharing ? "Sharing…" : "Share"}
+          <Share2 /> {sharing ? t("sharing") : t("share")}
         </Button>
       </div>
     );
@@ -76,7 +78,7 @@ export function PrimaryActions({
 
   return (
     <Button variant="brass" onClick={onEditRoute}>
-      <Pencil /> Edit this route
+      <Pencil /> {t("editRoute")}
     </Button>
   );
 }
@@ -139,27 +141,30 @@ export function SecondaryActions({
   readonly onCalendar?: () => void;
   readonly onEditRoute: () => void;
 }) {
+  const t = useTranslations("Trip.actions");
   return (
-    <nav aria-label="Trip tools" className="flex justify-between gap-1 [&>*]:flex-1">
+    <nav aria-label={t("tools")} className="flex justify-between gap-1 [&>*]:flex-1">
       {variant === "demo" && (
-        <Tile icon={<Pencil />} label="Customize" onClick={onEditRoute} />
+        <Tile icon={<Pencil />} label={t("customize")} onClick={onEditRoute} />
       )}
-      {variant !== "shared" && <Tile icon={<Map />} label="My maps" href="/maps" />}
+      {variant !== "shared" && (
+        <Tile icon={<Map />} label={t("myMaps")} href="/maps" />
+      )}
       <Tile
         icon={<Backpack />}
-        label="Packing"
+        label={t("packing")}
         pressed={tool === "packing"}
         onClick={() => onTool("packing")}
       />
       <Tile
         icon={<NotebookPen />}
-        label="Notes"
+        label={t("notes")}
         pressed={tool === "notes"}
         onClick={() => onTool("notes")}
       />
-      <Tile icon={<ImageDown />} label="Poster" onClick={onPoster} />
+      <Tile icon={<ImageDown />} label={t("poster")} onClick={onPoster} />
       {onCalendar && (
-        <Tile icon={<CalendarPlus />} label="Calendar" onClick={onCalendar} />
+        <Tile icon={<CalendarPlus />} label={t("calendar")} onClick={onCalendar} />
       )}
     </nav>
   );

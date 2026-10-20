@@ -1,4 +1,5 @@
 import { ChevronRight } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { Fragment } from "react";
 
 import { useUnits } from "@/components/units/units-provider";
@@ -41,6 +42,8 @@ function Stat({
 }
 
 export function StatsGrid({ trip }: { readonly trip: Trip }) {
+  const t = useTranslations("Trip.stats");
+  const locale = useLocale();
   const stats = tripStats(trip);
   const range = tripDateRange(trip);
   const { money, distance } = useUnits();
@@ -49,25 +52,27 @@ export function StatsGrid({ trip }: { readonly trip: Trip }) {
     <div className="grid grid-cols-2 gap-2">
       <Stat
         value={stats.nights}
-        detail={range ? formatDateSpan(range) : undefined}
-        caption="Nights"
+        detail={range ? formatDateSpan(range, locale) : undefined}
+        caption={t("nights")}
       />
       <Stat
         value={stats.cities}
-        detail={`in ${stats.countries} countr${stats.countries === 1 ? "y" : "ies"}`}
-        caption="Cities"
+        detail={t("inCountries", { count: stats.countries })}
+        caption={t("cities")}
       />
-      <Stat value={distance(stats.totalKm)} caption="Total route" />
-      <Stat value={money(stats.budget)} caption="Budget / person" />
+      <Stat value={distance(stats.totalKm)} caption={t("totalRoute")} />
+      <Stat value={money(stats.budget)} caption={t("budget")} />
     </div>
   );
 }
 
 function LegLine({ leg }: { readonly leg: Leg }) {
-  const { emoji, label } = MODE_META[leg.mode];
+  const t = useTranslations("Trip.itinerary");
+  const label = useTranslations("Modes")(leg.mode);
+  const { emoji } = MODE_META[leg.mode];
   return (
     <li
-      aria-label={`${label}, ${leg.duration}`}
+      aria-label={t("legLabel", { mode: label, duration: leg.duration })}
       className="ml-[23px] flex items-center gap-2 border-l-2 border-dashed border-brass/50 py-2 pl-[21px] text-xs text-ink-soft"
     >
       <span aria-hidden>{emoji}</span>
@@ -97,9 +102,11 @@ export function Itinerary({
   readonly hoveredIndex?: number | null;
   readonly onHover?: (index: number | null) => void;
 }) {
+  const t = useTranslations("Trip.itinerary");
+  const locale = useLocale();
   const dates = stopDates(trip);
   return (
-    <ol aria-label="Itinerary">
+    <ol aria-label={t("label")}>
       {trip.cities.map((city, index) => (
         <Fragment key={`${city.name}-${index}`}>
           {index > 0 && <LegLine leg={trip.legs[index - 1]} />}
@@ -132,8 +139,11 @@ export function Itinerary({
                   {city.name}
                 </span>
                 <span className="block text-xs text-ink-soft">
-                  {dates && `${formatDateSpan(dates[index])} · `}
-                  {city.nights} night{city.nights === 1 ? "" : "s"} · {city.country}
+                  {t("stopLine", {
+                    dates: dates ? `${formatDateSpan(dates[index], locale)} · ` : "",
+                    nights: city.nights,
+                    country: city.country,
+                  })}
                 </span>
               </span>
               <ChevronRight

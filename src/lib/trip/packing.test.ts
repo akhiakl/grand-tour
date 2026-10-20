@@ -4,6 +4,9 @@ import { makeCity, makeLeg, makeTrip } from "@/test/fixtures/trip";
 
 import { packingList } from "./packing";
 
+const ids = (trip: Parameters<typeof packingList>[0]) =>
+  packingList(trip).map((item) => item.id);
+
 describe("packingList", () => {
   it("names the adapter its countries need, grouped by socket type", () => {
     const trip = makeTrip(3, {
@@ -14,35 +17,42 @@ describe("packingList", () => {
       ],
     });
     const list = packingList(trip);
-    expect(list).toContain(
-      "Power adapter for type C/F sockets (Austria and Germany)",
-    );
-    expect(list).toContain("Power adapter for type G sockets (United Kingdom)");
-    expect(list).not.toContain("Universal travel adapter");
+    expect(list).toContainEqual({
+      id: "adapter:C/F",
+      key: "adapter",
+      type: "C/F",
+      countries: ["Austria", "Germany"],
+    });
+    expect(list).toContainEqual({
+      id: "adapter:G",
+      key: "adapter",
+      type: "G",
+      countries: ["United Kingdom"],
+    });
+    expect(ids(trip)).not.toContain("universalAdapter");
   });
 
   it("falls back to a universal adapter for unknown or blank countries", () => {
     const trip = makeTrip(2, {
       cities: [makeCity({ country: "Atlantis" }), makeCity({ country: " " })],
     });
-    expect(packingList(trip)).toContain("Universal travel adapter");
+    expect(ids(trip)).toContain("universalAdapter");
   });
 
   it("adds one ticket line per way of travelling, once each", () => {
     const trip = makeTrip(3, {
       legs: [makeLeg({ mode: "ferry" }), makeLeg({ mode: "ferry" })],
     });
-    const list = packingList(trip);
-    expect(list.filter((item) => item.startsWith("Ferry booking"))).toHaveLength(1);
-    expect(list).not.toContain("Rail tickets saved offline");
+    expect(ids(trip).filter((id) => id === "ferry")).toHaveLength(1);
+    expect(ids(trip)).not.toContain("train");
   });
 
   it("adds cash for multi-country routes and laundry for a week or more", () => {
     const short = makeTrip(2, {
       cities: [makeCity({ nights: 2 }), makeCity({ nights: 2 })],
     });
-    expect(packingList(short)).not.toContain("Travel laundry kit");
-    expect(packingList(short)).not.toContain("A little local cash for each country");
+    expect(ids(short)).not.toContain("laundry");
+    expect(ids(short)).not.toContain("cash");
 
     const long = makeTrip(2, {
       cities: [
@@ -50,13 +60,12 @@ describe("packingList", () => {
         makeCity({ nights: 3, country: "France" }),
       ],
     });
-    expect(packingList(long)).toContain("Travel laundry kit");
-    expect(packingList(long)).toContain("A little local cash for each country");
+    expect(ids(long)).toEqual(expect.arrayContaining(["laundry", "cash"]));
   });
 
   it("always includes the essentials", () => {
-    expect(packingList(makeTrip(2))).toEqual(
-      expect.arrayContaining(["Passport & ID", "Power bank"]),
+    expect(ids(makeTrip(2))).toEqual(
+      expect.arrayContaining(["passport", "powerBank"]),
     );
   });
 });

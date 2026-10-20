@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState, type ReactNode } from "react";
 
 import { ShareDialog } from "@/components/share/share-dialog";
@@ -62,6 +63,7 @@ export function TripExperience({
   readonly cta?: ReactNode;
 }) {
   const router = useRouter();
+  const t = useTranslations("Trip");
   const [selected, setSelected] = useState<number | null>(null);
   // The stop under the pointer/focus, mirrored between list row and marker.
   const [hovered, setHovered] = useState<number | null>(null);
@@ -128,7 +130,7 @@ export function TripExperience({
           onExpandedChange={setSheetOpen}
         />
 
-        <main aria-label="Route map" className="absolute inset-0 z-0">
+        <main aria-label={t("map.label")} className="absolute inset-0 z-0">
           <TripMap
             trip={trip}
             selectedIndex={selected}
@@ -152,7 +154,11 @@ export function TripExperience({
 
         <IntroSplash
           title={trip.title}
-          eyebrow={`${stats.nights} nights · ${stats.cities} cities · ${stats.countries} countries`}
+          eyebrow={t("summary", {
+            nights: stats.nights,
+            cities: stats.cities,
+            countries: stats.countries,
+          })}
           route={route}
         />
       </div>

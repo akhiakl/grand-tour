@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useId, useState, type ReactNode } from "react";
 
 import { stopDates, type Trip, type TripToolsScope } from "@/lib/trip";
@@ -63,6 +64,7 @@ export function TripPanel({
   readonly expanded: boolean;
   readonly onExpandedChange: (expanded: boolean) => void;
 }) {
+  const t = useTranslations("Trip.panel");
   const [tool, setTool] = useState<ToolId | null>(null);
   const [collapsed, setCollapsed] = useState(false);
   const bodyId = useId();
@@ -103,7 +105,7 @@ export function TripPanel({
 
   return (
     <PanelShell
-      label="Trip details"
+      label={t("label")}
       expanded={expanded}
       onExpandedChange={onExpandedChange}
       collapsed={collapsed}
@@ -156,8 +158,8 @@ export function TripPanel({
               onEditRoute={onEditRoute}
             />
             <StatsGrid trip={trip} />
-            <section aria-label="Route" className="flex flex-col gap-2">
-              <p className="eyebrow">The route</p>
+            <section aria-label={t("routeLabel")} className="flex flex-col gap-2">
+              <p className="eyebrow">{t("theRoute")}</p>
               <Itinerary
                 trip={trip}
                 selectedIndex={selected}

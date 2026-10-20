@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import { useId } from "react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,13 +16,7 @@ import {
 } from "./drawer-sections";
 import { BackToRoute } from "./trip-tools";
 
-const TABS = [
-  { value: "overview", label: "Overview" },
-  { value: "itinerary", label: "Days" },
-  { value: "food", label: "Food" },
-  { value: "practical", label: "Practical" },
-  { value: "planner", label: "Planner" },
-] as const;
+const TABS = ["overview", "itinerary", "food", "practical", "planner"] as const;
 
 /** One stop in depth, shown in the panel in place of the itinerary. */
 export function CityDetail({
@@ -38,6 +33,8 @@ export function CityDetail({
   readonly dates?: StopDates;
   readonly onBack: () => void;
 }) {
+  const t = useTranslations("Trip");
+  const locale = useLocale();
   const titleId = useId();
   const { money } = useUnits();
 
@@ -54,7 +51,7 @@ export function CityDetail({
         </span>
         <div className="min-w-0">
           <p className="eyebrow">
-            Stop {index + 1} of {count} · {city.country}
+            {t("city.stopOf", { number: index + 1, count, country: city.country })}
           </p>
           <h2
             id={titleId}
@@ -67,17 +64,22 @@ export function CityDetail({
             <span>
               🛏{" "}
               <b className="font-semibold text-ink">
-                {city.nights} night{city.nights === 1 ? "" : "s"}
+                {t("nights", { count: city.nights })}
               </b>
             </span>
             {dates && (
               <span>
-                📅 <b className="font-semibold text-ink">{formatDateSpan(dates)}</b>
+                📅{" "}
+                <b className="font-semibold text-ink">
+                  {formatDateSpan(dates, locale)}
+                </b>
               </span>
             )}
             <span>
               💰{" "}
-              <b className="font-semibold text-ink">{money(city.budget)} per day</b>
+              <b className="font-semibold text-ink">
+                {t("perDay", { amount: money(city.budget) })}
+              </b>
             </span>
           </p>
         </div>
@@ -87,8 +89,8 @@ export function CityDetail({
       <Tabs key={`${city.name}-${index}`} defaultValue="overview">
         <TabsList className="w-full justify-between gap-2">
           {TABS.map((tab) => (
-            <TabsTrigger key={tab.value} value={tab.value}>
-              {tab.label}
+            <TabsTrigger key={tab} value={tab}>
+              {t(`city.tabs.${tab}`)}
             </TabsTrigger>
           ))}
         </TabsList>

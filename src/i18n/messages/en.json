@@ -196,7 +196,8 @@
       "drafting": "Drafting your route…",
       "rateLimited": "The atlas needs a breather. Give it a minute and try again.",
       "failed": "That redraft didn't come together. Your route is untouched; try again."
-    }
+    },
+    "previewEmpty": "Add a stop to see it appear on the map."
   },
   "Theme": {
     "toLight": "Switch to light theme",
@@ -272,6 +273,164 @@
       "too_large": "That file is far too big to be a Grand Tour map.",
       "not_json": "That file isn't a Grand Tour backup. Pick a .json map file.",
       "not_a_trip": "That file doesn't hold a map this atlas can read (up to 5 stops)."
+    }
+  },
+  "Trip": {
+    "nights": "{count, plural, one {# night} other {# nights}}",
+    "summary": "{nights, plural, one {# night} other {# nights}} · {cities, plural, one {# city} other {# cities}} · {countries, plural, one {# country} other {# countries}}",
+    "perPerson": "{amount} per person",
+    "perDay": "{amount} per day",
+    "panel": {
+      "label": "Trip details",
+      "expandSheet": "Expand trip details",
+      "collapseSheet": "Collapse trip details",
+      "expandCard": "Expand trip card",
+      "collapseCard": "Collapse trip card",
+      "expandHint": "Expand",
+      "collapseHint": "Collapse",
+      "theRoute": "The route",
+      "routeLabel": "Route",
+      "back": "Route",
+      "eyebrow": {
+        "demo": "Example route",
+        "shared": "Shared route",
+        "own": "Your map"
+      },
+      "headline": "{nights, plural, one {# night} other {# nights}} · {cities, plural, one {# city} other {# cities}} · {distance}"
+    },
+    "actions": {
+      "remix": "Remix this trip",
+      "createOwn": "Create your own",
+      "edit": "Edit",
+      "share": "Share",
+      "sharing": "Sharing…",
+      "editRoute": "Edit this route",
+      "tools": "Trip tools",
+      "customize": "Customize",
+      "myMaps": "My maps",
+      "packing": "Packing",
+      "notes": "Notes",
+      "poster": "Poster",
+      "calendar": "Calendar"
+    },
+    "stats": {
+      "nights": "Nights",
+      "cities": "Cities",
+      "inCountries": "in {count, plural, one {# country} other {# countries}}",
+      "totalRoute": "Total route",
+      "budget": "Budget / person"
+    },
+    "itinerary": {
+      "label": "Itinerary",
+      "legLabel": "{mode}, {duration}",
+      "stopLine": "{dates}{nights, plural, one {# night} other {# nights}} · {country}"
+    },
+    "city": {
+      "stopOf": "Stop {number} of {count} · {country}",
+      "tabs": {
+        "overview": "Overview",
+        "itinerary": "Days",
+        "food": "Food",
+        "practical": "Practical",
+        "planner": "Planner"
+      },
+      "whyVisit": "Why visit",
+      "mustSee": "Must see",
+      "hiddenGems": "Hidden gems",
+      "dayByDay": "Day by day",
+      "eatLocal": "Eat like a local",
+      "dailyBudget": "Daily budget",
+      "gettingAround": "Getting around",
+      "whereToStay": "Where to stay",
+      "localTips": "Local tips",
+      "budgetCalculator": "Budget calculator",
+      "spendingStyle": "Spending style — <b>{style}</b>",
+      "spendStyles": {
+        "backpacker": "Backpacker",
+        "comfortable": "Comfortable",
+        "indulgent": "Indulgent"
+      },
+      "budgetTotal": "total · {perDay}/day × {nights, plural, one {# night} other {# nights}}",
+      "checklist": "Attraction checklist",
+      "planned": "{done}/{total} planned"
+    },
+    "tools": {
+      "packingTitle": "Packing checklist",
+      "packed": "Packed",
+      "addItem": "Add a packing item",
+      "addItemPlaceholder": "Add your own…",
+      "addItemButton": "Add item",
+      "removeItem": "Remove {item}",
+      "notesTitle": "Trip notes",
+      "notesPlaceholder": "Booking codes, addresses, ideas…",
+      "notesPrivacy": "Saved in this browser only, never in the shared link."
+    },
+    "packing": {
+      "passport": "Passport & ID",
+      "insurance": "Travel insurance details",
+      "shoes": "Comfortable walking shoes",
+      "powerBank": "Power bank",
+      "bottle": "Refillable water bottle",
+      "dayPack": "Day pack",
+      "rainLayer": "Light rain layer",
+      "adapter": "Power adapter for type {type} sockets ({countries})",
+      "universalAdapter": "Universal travel adapter",
+      "train": "Rail tickets saved offline",
+      "bus": "Bus tickets saved offline",
+      "flight": "Boarding passes & a clear liquids bag",
+      "ferry": "Ferry booking & a motion-sickness remedy",
+      "car": "Driving licence (and an international permit if needed)",
+      "cash": "A little local cash for each country",
+      "laundry": "Travel laundry kit"
+    },
+    "sharedNote": {
+      "views": "Opened {count, plural, one {# time} other {# times}}.",
+      "expiry": "This link stays live for {days} days after its last visit."
+    },
+    "map": {
+      "label": "Route map",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "fitRoute": "Fit the whole route",
+      "marker": "{name}, stop {number}",
+      "ghostMarker": "{name}, locked suggestion",
+      "basemapDown": "The basemap is out of reach. Your route is still here.",
+      "retry": "Retry"
+    },
+    "legend": {
+      "title": "Legend",
+      "stop": "Stop",
+      "selected": "Selected stop",
+      "locked": "Locked suggestion"
+    },
+    "poster": {
+      "title": "Share your route",
+      "description": "A clean poster of the journey — sized for Instagram (4:5), no app chrome, follows your theme. Or print the full itinerary for the road.",
+      "alt": "Route poster for {title}",
+      "failed": "The press jammed on this one. Close and open the poster again to retry.",
+      "print": "Print itinerary",
+      "share": "Share…",
+      "download": "Download PNG",
+      "eyebrow": "FIELD ATLAS",
+      "summary": "{nights, plural, one {# night} other {# nights}} · {cities, plural, one {# city} other {# cities}} · {countries, plural, one {# country} other {# countries}} · {distance}",
+      "brand": "Grand Tour"
+    },
+    "print": {
+      "eyebrow": "Grand Tour itinerary",
+      "stop": "Stop {number} · {country}",
+      "dayByDay": "Day by day",
+      "mustSee": "Must see",
+      "hiddenGems": "Hidden gems",
+      "eat": "Eat",
+      "tips": "Tips",
+      "stay": "Stay: {stay}.",
+      "gettingAround": "Getting around: {transport}."
+    },
+    "og": {
+      "alt": "A Grand Tour route map",
+      "eyebrow": "FIELD ATLAS",
+      "expired": "This map has expired",
+      "summary": "{cities, plural, one {# city} other {# cities}} · {nights, plural, one {# night} other {# nights}} · {countries, plural, one {# country} other {# countries}}"
     }
   }
 }
