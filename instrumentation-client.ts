@@ -5,11 +5,10 @@ const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
 if (dsn) {
   Sentry.init({
     dsn,
+    // No IPs, user details or request bodies: the privacy notice promises it.
     dataCollection: {
-      // To disable sending user data and HTTP bodies, uncomment the lines below. For more info visit:
-      // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#dataCollection
-      // userInfo: false,
-      // httpBodies: [],
+      userInfo: false,
+      httpBodies: [],
     },
     // Capture 100% in dev, 10% in production
     // Adjust based on your traffic volume

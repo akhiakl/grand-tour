@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Outfit } from "next/font/google";
 
+import { SiteAnalytics } from "@/components/site-analytics";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { UnitsProvider } from "@/components/units/units-provider";
@@ -50,6 +51,7 @@ export default function RootLayout({
           <UnitsProvider>{children}</UnitsProvider>
           <Toaster position="bottom-center" />
         </ThemeProvider>
+        <SiteAnalytics />
       </body>
     </html>
   );

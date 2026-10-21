@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { AiNotice, TermsNotice } from "@/components/legal/notices";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGenerateTrip, type GeneratedDraft } from "@/hooks/use-generate-trip";
@@ -86,6 +87,7 @@ export function AiChat() {
 
   return (
     <div className="flex flex-col gap-4">
+      <AiNotice />
       <div aria-live="polite" className="flex flex-col gap-3">
         <ChatBubble from="atlas">
           Where should this journey go? A country, a region, or a string of cities
@@ -118,7 +120,12 @@ export function AiChat() {
       {destination && !days && (
         <DaysStep onAnswer={(value) => answer({ days: value })} />
       )}
-      {days && !vibe && <VibeStep onAnswer={(value) => answer({ vibe: value })} />}
+      {days && !vibe && (
+        <>
+          <VibeStep onAnswer={(value) => answer({ vibe: value })} />
+          <TermsNotice action="choosing a pace and drafting a route" />
+        </>
+      )}
     </div>
   );
 }

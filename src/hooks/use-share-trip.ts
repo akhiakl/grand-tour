@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { trackEvent } from "@/lib/analytics";
 import type { Trip } from "@/lib/trip";
 
 /**
@@ -26,6 +27,7 @@ export function useShareTrip({ onCityLimit }: { readonly onCityLimit: () => void
 
       if (response.status === 201) {
         const { id } = (await response.json()) as { id: string };
+        trackEvent("share_created");
         setShareId(id);
         setDialogOpen(true);
         return;

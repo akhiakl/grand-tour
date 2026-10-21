@@ -133,6 +133,23 @@ describe("TripExperience", () => {
     expect(mocks.saveLocalTrip.mock.calls[0][1]).toBeUndefined();
   });
 
+  it("shared mode: offers a report link beside the legal links", () => {
+    render(<TripExperience trip={routeTrip()} actions="shared" />);
+    const legal = screen.getByRole("navigation", { name: "Legal" });
+    expect(
+      within(legal).getByRole("link", { name: "Report this map" }),
+    ).toBeVisible();
+    expect(within(legal).getByRole("link", { name: "Terms" })).toBeVisible();
+  });
+
+  it("demo mode: legal links without a report link", () => {
+    render(<TripExperience trip={routeTrip()} actions="demo" />);
+    const legal = screen.getByRole("navigation", { name: "Legal" });
+    expect(
+      within(legal).queryByRole("link", { name: "Report this map" }),
+    ).toBeNull();
+  });
+
   it("opens a stop's detail from the itinerary and steps back with Escape", async () => {
     render(<TripExperience trip={routeTrip()} actions="shared" />);
 
