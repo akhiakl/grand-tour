@@ -63,7 +63,13 @@ route maps — populated by AI chat or manually — shared via short links
   `km` in UI copy.
 - **Monitoring**: Sentry (`@sentry/nextjs`) via the instrumentation hooks;
   fully gated on `NEXT_PUBLIC_SENTRY_DSN` — never add monitoring calls in
-  components; error boundaries and `onRequestError` cover capture.
+  components; error boundaries and `onRequestError` cover capture. In the
+  browser, Sentry loads only when an error is reported (`@/lib/monitoring`);
+  never import `@sentry/nextjs` in client code.
+- **Performance**: keep script out of the startup bundle (map, dialogs and
+  print view wait for `usePageIdle`; `m.*` not `motion.*`;
+  `import * as z from "zod"`). See `docs/ARCHITECTURE.md` → Performance
+  budget.
 - **Analytics**: cookieless Vercel Web Analytics behind `@/lib/analytics`
   (`trackEvent`, query strings stripped). No cookies or trackers: adding
   one means updating `/privacy` and likely a consent banner.

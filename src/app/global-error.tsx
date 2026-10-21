@@ -1,11 +1,11 @@
 "use client";
 
-import * as Sentry from "@sentry/nextjs";
 import { createTranslator } from "next-intl";
 import { useEffect } from "react";
 
 import { DEFAULT_LOCALE } from "@/i18n/config";
 import messages from "@/i18n/messages/en.json";
+import { captureError } from "@/lib/monitoring";
 
 /**
  * Last-resort error boundary — replaces the root layout, so globals.css and
@@ -30,7 +30,7 @@ export default function GlobalError({
   readonly reset: () => void;
 }) {
   useEffect(() => {
-    Sentry.captureException(error);
+    captureError(error);
   }, [error]);
 
   return (

@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-import { z } from "zod";
+import * as z from "zod";
 
 import { tripFingerprint } from "./fingerprint";
 import { TripSchema, type Trip } from "./schema";

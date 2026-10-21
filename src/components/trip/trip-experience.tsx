@@ -1,10 +1,11 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState, type ReactNode } from "react";
 
-import { ShareDialog } from "@/components/share/share-dialog";
+import { usePageIdle } from "@/hooks/use-page-idle";
 import { useShareTrip } from "@/hooks/use-share-trip";
 import {
   saveLocalTrip,
@@ -16,10 +17,17 @@ import {
 import type { MapInsets } from "./fit-padding";
 import { IntroSplash } from "./intro-splash";
 import type { ExperienceVariant } from "./panel-actions";
-import { PosterDialog } from "./poster-dialog";
 import { PrintItinerary } from "./print-itinerary";
 import { TripMap } from "./trip-map";
 import { TripPanel } from "./trip-panel";
+
+// Closed until asked for: load after first paint, outside hydration.
+const PosterDialog = dynamic(() =>
+  import("./poster-dialog").then((mod) => mod.PosterDialog),
+);
+const ShareDialog = dynamic(() =>
+  import("@/components/share/share-dialog").then((mod) => mod.ShareDialog),
+);
 
 const noop = () => {};
 
@@ -69,6 +77,8 @@ export function TripExperience({
   const [hovered, setHovered] = useState<number | null>(null);
   const [posterOpen, setPosterOpen] = useState(false);
   const [insets, setInsets] = useState<MapInsets>({});
+  // Dialogs and the print-only itinerary aren't needed for first paint.
+  const idle = usePageIdle();
   const [sheetOpen, setSheetOpen] = useState(false);
 
   // Picking a stop (map or itinerary) opens the sheet to show its detail.
@@ -142,8 +152,10 @@ export function TripExperience({
           />
         </main>
 
-        <PosterDialog trip={trip} open={posterOpen} onOpenChange={setPosterOpen} />
-        {actions === "own" && (
+        {idle && (
+          <PosterDialog trip={trip} open={posterOpen} onOpenChange={setPosterOpen} />
+        )}
+        {idle && actions === "own" && (
           <ShareDialog
             shareId={sharedId}
             title={sharedTitle}
@@ -162,7 +174,7 @@ export function TripExperience({
           route={route}
         />
       </div>
-      <PrintItinerary trip={trip} />
+      {idle && <PrintItinerary trip={trip} />}
     </>
   );
 }

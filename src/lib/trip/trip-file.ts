@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod";
 
 import { MAX_TRIP_PAYLOAD_BYTES, TripSchema, type Trip } from "./schema";
 

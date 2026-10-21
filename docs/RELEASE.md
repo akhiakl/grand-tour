@@ -68,7 +68,9 @@ checked before merging the `1.0.0` release PR.
       full tab-through of editor and chat
 - [ ] Lighthouse: a11y ≥ 95, performance ≥ 85 on `/`, `/new`, `/t/[id]`
       (a11y 96–100 and desktop performance 98 everywhere; mobile
-      performance 61–74 under Lighthouse's 4× CPU throttle, map JS boot time)
+      performance ~62 / 74 / 63 on `/`, `/new`, `/t` under Lighthouse's
+      4× CPU throttle: React hydration plus the map engine. Even with no
+      map at all `/` scores ~75, so 85 needs less client-rendered UI)
 - [x] Both themes checked on every page; no layout shift on toggle
       (e2e: axe in light and dark, `motion-theme.spec.ts`)
 - [x] `prefers-reduced-motion` honored everywhere (splash, route, drawers)

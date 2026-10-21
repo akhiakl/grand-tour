@@ -45,6 +45,23 @@ const eslintConfig = defineConfig([
         },
       ],
 
+      // Bundle size: named imports that defeat tree-shaking on the client.
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "ImportDeclaration[source.value='zod'] > ImportSpecifier[imported.name='z']",
+          message:
+            'Use `import * as z from "zod"`: the named `z` keeps every Zod locale (~200KB) in the client bundle.',
+        },
+        {
+          selector:
+            "ImportDeclaration[source.value='framer-motion'] > ImportSpecifier[imported.name='motion']",
+          message:
+            "Use `m` from framer-motion: MotionProvider loads animation features lazily.",
+        },
+      ],
+
       // Domain boundaries: consume lib domains through their public API.
       // The two negated patterns are the documented server-only entry points.
       "no-restricted-imports": [
