@@ -63,7 +63,9 @@ function fieldIdFor(key: string): string | null {
 
 /** Undo group for an edit to one stop's or leg's fields, e.g. "city-2-name". */
 const fieldGroup = (kind: string, index: number, patch: object) =>
-  `${kind}-${index}-${Object.keys(patch).sort().join(",")}`;
+  `${kind}-${index}-${Object.keys(patch)
+    .sort((a, b) => a.localeCompare(b))
+    .join(",")}`;
 
 function focusFirstIssue(issues: DraftIssues) {
   for (const key of Object.keys(issues)) {

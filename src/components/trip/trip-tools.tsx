@@ -215,19 +215,12 @@ function ToolsBody({ trip, scope, active, onBack }: ToolsProps) {
         title={t("packingTitle")}
         onBack={onBack}
       >
-        <div
-          role="progressbar"
+        <progress
           aria-label={t("packed")}
-          aria-valuenow={progress}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          className="h-1 overflow-hidden rounded-full bg-secondary"
-        >
-          <div
-            className="h-full rounded-full bg-brass transition-[width]"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
+          value={progress}
+          max={100}
+          className="h-1 w-full appearance-none overflow-hidden rounded-full bg-secondary [&::-moz-progress-bar]:rounded-full [&::-moz-progress-bar]:bg-brass [&::-webkit-progress-bar]:bg-secondary [&::-webkit-progress-value]:rounded-full [&::-webkit-progress-value]:bg-brass [&::-webkit-progress-value]:transition-[width]"
+        />
         <ul className="space-y-2.5">
           {items.map((item, index) => (
             <PackingItem

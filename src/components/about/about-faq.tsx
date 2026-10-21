@@ -1,7 +1,7 @@
 import { ChevronDown } from "lucide-react";
-import Link from "next/link";
 import { useTranslations } from "next-intl";
 
+import { privacyLink } from "@/components/rich-text";
 import { GUEST_MAX_CITIES, SHARE_TTL_DAYS } from "@/lib/trip";
 
 const QUESTIONS = ["free", "account", "links", "ai", "data"] as const;
@@ -34,14 +34,7 @@ export function AboutFaq() {
               {t.rich(`${key}.a`, {
                 max: GUEST_MAX_CITIES,
                 days: SHARE_TTL_DAYS,
-                link: (chunks) => (
-                  <Link
-                    href="/privacy"
-                    className="underline underline-offset-2 hover:text-ink"
-                  >
-                    {chunks}
-                  </Link>
-                ),
+                link: privacyLink,
               })}
             </p>
           </details>

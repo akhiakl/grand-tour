@@ -45,7 +45,7 @@ describe("TripTools", () => {
     expect(screen.getByRole("checkbox", { name: "Power bank" })).toBeChecked();
     expect(screen.getByRole("checkbox", { name: "Snorkel" })).toBeInTheDocument();
     expect(screen.getByRole("progressbar", { name: "Packed" })).not.toHaveAttribute(
-      "aria-valuenow",
+      "value",
       "0",
     );
 

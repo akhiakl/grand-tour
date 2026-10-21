@@ -36,6 +36,6 @@ describe("redraftDefaults", () => {
       ),
     });
     expect(long.days).toBe(30);
-    expect(long.destination.length).toBe(120);
+    expect(long.destination).toHaveLength(120);
   });
 });

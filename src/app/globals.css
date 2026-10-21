@@ -465,12 +465,15 @@ input[type="range"] {
     transition: none;
   }
 
-  /* Overlays never belong on paper, even if one is open while printing. */
+  /*
+   * Overlays never belong on paper, even if one is open while printing.
+   * Unlayered, so this beats the utility layer's display classes.
+   */
   [data-slot$="-overlay"],
   [data-slot$="dialog-content"],
   [data-slot="sheet-content"],
   [data-sonner-toaster] {
-    display: none !important;
+    display: none;
   }
 
   @page {

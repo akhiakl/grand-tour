@@ -38,7 +38,8 @@ export function LandingCta() {
           onClear={() => setDestination(null)}
         />
       ) : (
-        <div role="group" aria-label={t("group")} className="flex gap-2">
+        <fieldset className="flex gap-2">
+          <legend className="sr-only">{t("group")}</legend>
           <Button
             asChild
             variant={returning ? "outline" : "brass"}
@@ -53,7 +54,7 @@ export function LandingCta() {
               <PenLine /> {t("buildManually")}
             </Link>
           </Button>
-        </div>
+        </fieldset>
       )}
 
       {/* Under the buttons so they stay in view on the mobile sheet's peek. */}

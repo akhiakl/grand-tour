@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
 import { AiChat } from "@/components/ai/ai-chat";
+import { accent } from "@/components/rich-text";
 import { destinationFromParam } from "@/lib/ai";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -29,9 +30,7 @@ export default async function PlanPage({
           <ArrowLeft className="size-3" /> {common("backToAtlas")}
         </Link>
         <h1 className="font-display text-4xl font-medium tracking-tight text-ink">
-          {t.rich("title", {
-            em: (chunks) => <em className="text-azure">{chunks}</em>,
-          })}
+          {t.rich("title", { em: accent })}
         </h1>
         <p className="text-sm text-ink-soft">{t("lede")}</p>
       </header>

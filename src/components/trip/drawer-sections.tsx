@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
+import { highlight } from "@/components/rich-text";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useUnits } from "@/components/units/units-provider";
 import type { City } from "@/lib/trip";
@@ -210,9 +211,7 @@ export function PlannerSection({ city }: { readonly city: City }) {
           >
             {t.rich("spendingStyle", {
               style: t(`spendStyles.${spendStyle}`),
-              b: (chunks) => (
-                <b className="font-semibold text-foreground">{chunks}</b>
-              ),
+              b: highlight,
             })}
           </label>
           <input

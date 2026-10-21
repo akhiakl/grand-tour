@@ -49,7 +49,7 @@ describe("tripIcs", () => {
       expect(new TextEncoder().encode(line).length).toBeLessThanOrEqual(75);
     }
     const unfolded = ics.replace(/\r\n /g, "");
-    expect(unfolded).toContain("DESCRIPTION:Line one\;\\nline two — é");
+    expect(unfolded).toContain(String.raw`DESCRIPTION:Line one\;\nline two — é`);
     expect(unfolded.match(/DESCRIPTION:/g)).toHaveLength(1);
   });
 });

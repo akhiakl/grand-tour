@@ -7,6 +7,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { downloadFile } from "@/components/download-file";
+import { accent } from "@/components/rich-text";
 import { ShareDialog } from "@/components/share/share-dialog";
 import { Button } from "@/components/ui/button";
 import { UpsellModal } from "@/components/upsell/upsell-modal";
@@ -85,9 +86,7 @@ export function MapsPage() {
             <ArrowLeft className="size-3" /> {common("backToAtlas")}
           </Link>
           <h1 className="font-display text-3xl font-medium tracking-tight">
-            {t.rich("title", {
-              em: (chunks) => <em className="text-azure italic">{chunks}</em>,
-            })}
+            {t.rich("title", { em: accent })}
           </h1>
         </div>
         <div className="flex gap-2">

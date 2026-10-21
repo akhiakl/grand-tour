@@ -5,10 +5,10 @@ import type { Trip } from "./schema";
 /** RFC 5545 TEXT escaping: backslash, semicolon, comma and newlines. */
 const escapeText = (text: string) =>
   text
-    .replace(/\\/g, "\\\\")
-    .replace(/;/g, "\;")
-    .replace(/,/g, "\\,")
-    .replace(/\r?\n/g, "\\n");
+    .replaceAll("\\", String.raw`\\`)
+    .replaceAll(";", String.raw`\;`)
+    .replaceAll(",", String.raw`\,`)
+    .replaceAll(/\r?\n/g, String.raw`\n`);
 
 /** Fold content lines longer than 75 octets (RFC 5545 §3.1). */
 function fold(line: string): string {
@@ -61,7 +61,7 @@ export function tripIcs(trip: Trip, now: number = Date.now()): string | null {
       `DTSTART;VALUE=DATE:${compactDay(arrive)}`,
       // All-day DTEND is exclusive; a zero-night stop still gets its day.
       `DTEND;VALUE=DATE:${compactDay(arrive === depart ? nextDay(arrive) : depart)}`,
-      `SUMMARY:${escapeText(`${city.name} · ${trip.title}`)}`,
+      `SUMMARY:${escapeText(city.name + " · " + trip.title)}`,
       `LOCATION:${escapeText([city.name, city.country].filter(Boolean).join(", "))}`,
       ...(city.why ? [`DESCRIPTION:${escapeText(city.why)}`] : []),
       "TRANSP:TRANSPARENT",

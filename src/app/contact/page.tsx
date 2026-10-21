@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 
 import { CopyEmail } from "@/components/legal/copy-email";
 import { LegalPage, type LegalSection } from "@/components/legal/legal-page";
+import { privacyLink } from "@/components/rich-text";
 import {
   CONTACT_EMAIL,
   GRIEVANCE_ACK_HOURS,
@@ -36,7 +36,7 @@ export default function ContactPage() {
           <li>
             {t.rich("write.privacy", {
               strong,
-              link: (chunks) => <Link href="/privacy">{chunks}</Link>,
+              link: privacyLink,
             })}
           </li>
         </ul>

@@ -91,11 +91,8 @@ export function VibeStep({
   const t = useTranslations("Chat");
   const vibes = useTranslations("Vibes");
   return (
-    <div
-      role="group"
-      aria-label={t("paceLabel")}
-      className="grid gap-2 sm:grid-cols-3"
-    >
+    <fieldset className="grid gap-2 sm:grid-cols-3">
+      <legend className="sr-only">{t("paceLabel")}</legend>
       {VIBES.map((vibe, i) => (
         <button
           key={vibe}
@@ -110,6 +107,6 @@ export function VibeStep({
           <span className="text-xs text-ink-soft">{vibes(`${vibe}.hint`)}</span>
         </button>
       ))}
-    </div>
+    </fieldset>
   );
 }

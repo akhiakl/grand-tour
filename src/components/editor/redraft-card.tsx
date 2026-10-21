@@ -28,9 +28,9 @@ export function RedraftCard({
   const t = useTranslations("Editor.redraft");
   const vibes = useTranslations("Vibes");
   // Untouched fields follow the defaults (which track the draft's stops).
-  const [destinationInput, setDestination] = useState<string | null>(null);
-  const [daysInput, setDays] = useState<string | null>(null);
-  const [vibeInput, setVibe] = useState<GenerateRequest["vibe"] | null>(null);
+  const [destinationInput, setDestinationInput] = useState<string | null>(null);
+  const [daysInput, setDaysInput] = useState<string | null>(null);
+  const [vibeInput, setVibeInput] = useState<GenerateRequest["vibe"] | null>(null);
   const destination = destinationInput ?? defaults.destination;
   const days = daysInput ?? String(defaults.days);
   const vibe = vibeInput ?? defaults.vibe;
@@ -70,7 +70,7 @@ export function RedraftCard({
             id="redraft-destination"
             value={destination}
             maxLength={120}
-            onChange={(e) => setDestination(e.target.value)}
+            onChange={(e) => setDestinationInput(e.target.value)}
           />
         </div>
         <div className="flex flex-wrap items-end gap-3">
@@ -83,7 +83,7 @@ export function RedraftCard({
               min={2}
               max={30}
               value={days}
-              onChange={(e) => setDays(e.target.value)}
+              onChange={(e) => setDaysInput(e.target.value)}
             />
           </div>
           <div
@@ -98,7 +98,7 @@ export function RedraftCard({
                 role="radio"
                 aria-checked={vibe === option}
                 title={vibes(`${option}.hint`)}
-                onClick={() => setVibe(option)}
+                onClick={() => setVibeInput(option)}
                 className={cn(
                   "h-9 flex-1 rounded-md border border-line px-2 text-xs transition-colors outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring",
                   vibe === option && "border-brass bg-accent text-brass-text",

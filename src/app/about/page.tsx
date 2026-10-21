@@ -7,6 +7,7 @@ import { getTranslations } from "next-intl/server";
 import { AboutFaq } from "@/components/about/about-faq";
 import { HowItWorks } from "@/components/about/how-it-works";
 import { SiteFooter } from "@/components/legal/site-footer";
+import { accent } from "@/components/rich-text";
 import { RouteSketch } from "@/components/trip/route-sketch";
 import { Button } from "@/components/ui/button";
 import { GUEST_MAX_CITIES, SAMPLE_TRIP, tripStats } from "@/lib/trip";
@@ -93,9 +94,7 @@ export default function AboutPage() {
             </Link>
             <p className="eyebrow">{t("eyebrow")}</p>
             <h1 className="font-display text-4xl font-medium tracking-tight text-balance text-ink sm:text-5xl">
-              {t.rich("title", {
-                em: (chunks) => <em className="text-azure">{chunks}</em>,
-              })}
+              {t.rich("title", { em: accent })}
             </h1>
             <p className="max-w-prose text-lg text-ink-soft">{t("lede")}</p>
             <StartButtons />

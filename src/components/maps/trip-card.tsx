@@ -13,6 +13,7 @@ import {
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 
+import { linkTo } from "@/components/rich-text";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -63,14 +64,7 @@ function ShareStatus({ record }: { readonly record: LocalTripRecord }) {
       <Link2 className="size-3.5 shrink-0" aria-hidden />
       {t.rich("sharedOn", {
         when: formatUpdated(record.shared.at, locale),
-        link: (chunks) => (
-          <Link
-            href={`/t/${record.shared?.id}`}
-            className="underline underline-offset-2 hover:text-ink"
-          >
-            {chunks}
-          </Link>
-        ),
+        link: linkTo(`/t/${record.shared.id}`),
       })}
     </p>
   );
