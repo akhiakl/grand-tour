@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod";
 
 import type { DistanceUnit } from "./format";
 import { CurrencySchema, SUPPORTED_CURRENCIES, type Currency } from "./rates";

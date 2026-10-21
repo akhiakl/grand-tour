@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod";
 
 import { CitySchema, GUEST_MAX_CITIES, LegSchema } from "@/lib/trip";
 

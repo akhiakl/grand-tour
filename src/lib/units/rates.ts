@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod";
 
 /** Budgets are stored in this currency; every other one is converted. */
 export const BASE_CURRENCY = "USD";

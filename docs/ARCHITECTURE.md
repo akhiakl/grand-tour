@@ -159,12 +159,28 @@ host there. No nonces, so pages stay static (inline scripts allowed).
 
 ## Observability
 
-- Sentry via `@sentry/nextjs`, wired in `src/instrumentation.ts`
-  (server/edge + `onRequestError`), `src/instrumentation-client.ts`
-  (browser + router transitions) and `src/app/global-error.tsx`
+- Sentry via `@sentry/nextjs`, wired in `instrumentation.ts`
+  (server/edge + `onRequestError`), `instrumentation-client.ts`
+  (uncaught browser errors and rejections) and `src/app/global-error.tsx`
   (last-resort boundary, in-voice copy, inline styles only — it replaces
   the root layout so globals.css is unavailable).
+- In the browser, Sentry goes through `@/lib/monitoring`
+  (`captureError`, `watchGlobalErrors`), which downloads the SDK only when
+  an error is reported. It is never in the startup bundle, so there is no
+  client performance tracing; page speed comes from Vercel Analytics.
 - Everything is gated on `NEXT_PUBLIC_SENTRY_DSN`: unset → total no-op.
   Source-map upload happens only when `SENTRY_AUTH_TOKEN` exists (CI).
-- Keep sample rates conservative (`tracesSampleRate: 0.1`) to stay inside
-  the free tier; raise deliberately, never by default.
+- Keep server sample rates conservative (`tracesSampleRate: 0.1`) to stay
+  inside the free tier; raise deliberately, never by default.
+
+## Performance budget
+
+Lighthouse mobile simulates a slow phone, so script that runs before first
+paint counts against every metric. Keep it out of the startup bundle:
+
+- The map engine (MapLibre + Leaflet), dialogs and the print itinerary
+  mount once the page is idle (`usePageIdle`).
+- Framer Motion features load lazily (`MotionProvider` + `m.*`;
+  `motion.*` is lint-rejected).
+- Import Zod as `import * as z from "zod"`; the named `z` drags every
+  locale into the client (lint-rejected).

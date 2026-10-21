@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod";
 
 /** Maximum stops a guest trip may contain (Phase 2 lifts this for accounts). */
 export const GUEST_MAX_CITIES = 5;

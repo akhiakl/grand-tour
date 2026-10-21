@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod";
 
 /** One GeoJSON feature from Photon's `/api` search endpoint (subset we use). */
 export const PhotonFeatureSchema = z.object({
