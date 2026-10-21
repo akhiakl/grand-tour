@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { destinationFromParam, planHref } from ".";
+import { destinationFromParam, planHref } from "./destination";
 
 describe("planHref", () => {
   it("encodes the destination as a query parameter", () => {

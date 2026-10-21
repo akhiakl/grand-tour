@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { blankCity, startCityFromParams, startCityQuery } from ".";
+import { blankCity } from "./draft";
+import { startCityFromParams, startCityQuery } from "./start-city";
 
 const KYOTO = {
   name: "Kyoto",
