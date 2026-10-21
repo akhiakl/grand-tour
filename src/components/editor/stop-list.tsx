@@ -62,6 +62,20 @@ export function StopList({
     );
   };
 
+  // Rows are keyed by position, so after a move the focused button would
+  // belong to the neighbour; hand focus to the moved stop's button instead
+  // (its other move button when it reached an end of the list).
+  const moveWithButton = (from: number, to: number, direction: "up" | "down") => {
+    moveCity(from, to);
+    requestAnimationFrame(() => {
+      const same = document.getElementById(`stop-${to}-move-${direction}`);
+      const other = document.getElementById(
+        `stop-${to}-move-${direction === "up" ? "down" : "up"}`,
+      );
+      (same && !same.hasAttribute("disabled") ? same : other)?.focus();
+    });
+  };
+
   const removeCity = (index: number) => {
     onRemoveCity(index);
     setExpandedIndex((current) =>
@@ -95,8 +109,8 @@ export function StopList({
             }
             onChange={(patch) => onUpdateCity(index, patch)}
             onRemove={() => removeCity(index)}
-            onMoveUp={() => moveCity(index, index - 1)}
-            onMoveDown={() => moveCity(index, index + 1)}
+            onMoveUp={() => moveWithButton(index, index - 1, "up")}
+            onMoveDown={() => moveWithButton(index, index + 1, "down")}
             {...drag.rowProps(index)}
             dragging={drag.dragged === index}
             dropSide={drag.dropSide(index)}

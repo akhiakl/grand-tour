@@ -15,6 +15,8 @@ test("a removed stop comes back with Undo, and moves are announced", async ({
     "Vienna moved to stop 2 of 2.",
   );
   await expect(page.locator("#stop-0-name")).toHaveValue("Prague");
+  // Focus followed Vienna to the end of the list, onto its other move button.
+  await expect(page.getByRole("button", { name: "Move Vienna up" })).toBeFocused();
 
   await page.getByRole("button", { name: "Remove Prague" }).click();
   await expect(page.getByText("1/5 stops")).toBeVisible();

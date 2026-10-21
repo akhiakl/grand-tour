@@ -155,6 +155,7 @@ export function StopRow({
 
         <div className="flex items-center gap-1">
           <Button
+            id={`stop-${index}-move-up`}
             type="button"
             variant="ghost"
             size="icon"
@@ -165,6 +166,7 @@ export function StopRow({
             <MoveUp />
           </Button>
           <Button
+            id={`stop-${index}-move-down`}
             type="button"
             variant="ghost"
             size="icon"
