@@ -150,7 +150,8 @@ export function TripPanel({
             onBack={() => onSelect(null)}
           />
         )}
-        {/* Always mounted so ticks and notes survive a detour to a stop. */}
+        {/* Mounted once idle (or when a tool opens), then kept, so ticks and
+            notes survive a detour to a stop. */}
         {(idle || tool) && (
           <TripTools
             trip={trip}
