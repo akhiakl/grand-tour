@@ -2,6 +2,8 @@
 
 import { useEffect, useId, useState, type ReactNode } from "react";
 
+import { LegalLinks } from "@/components/legal/legal-links";
+import { ReportMapLink } from "@/components/legal/report-map-link";
 import type { Trip } from "@/lib/trip";
 
 import { CityDetail } from "./city-detail";
@@ -151,6 +153,9 @@ export function TripPanel({
                 onHover={onHover}
               />
             </section>
+            <LegalLinks className="border-t border-line pt-4">
+              {variant === "shared" && <ReportMapLink />}
+            </LegalLinks>
           </>
         )}
       </div>

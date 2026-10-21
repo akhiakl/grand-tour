@@ -1,6 +1,7 @@
 "use client";
 
 import { Lock } from "lucide-react";
+import { useEffect } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { trackEvent } from "@/lib/analytics";
 import { GUEST_MAX_CITIES } from "@/lib/trip";
 
 const LOCKED_FEATURES = [
@@ -33,6 +35,11 @@ export function UpsellModal({
   readonly open: boolean;
   readonly onOpenChange: (open: boolean) => void;
 }) {
+  // Each time a guest hits the ceiling: the demand signal for the paid tier.
+  useEffect(() => {
+    if (open) trackEvent("upsell_shown");
+  }, [open]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>

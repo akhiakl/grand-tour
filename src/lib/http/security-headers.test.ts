@@ -66,6 +66,7 @@ describe("contentSecurityPolicy", () => {
       "'self'",
       "'unsafe-inline'",
       "'unsafe-eval'",
+      "https://va.vercel-scripts.com",
       "https://vercel.live",
     ]);
     expect(directive(csp, "connect-src")).toContain("ws:");

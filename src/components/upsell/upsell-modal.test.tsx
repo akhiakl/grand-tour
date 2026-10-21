@@ -4,10 +4,14 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { UpsellModal } from "./upsell-modal";
 
+const trackEvent = vi.hoisted(() => vi.fn());
+vi.mock("@/lib/analytics", () => ({ trackEvent }));
+
 const onOpenChange = vi.fn();
 
 beforeEach(() => {
   onOpenChange.mockClear();
+  trackEvent.mockClear();
 });
 
 describe("UpsellModal", () => {
@@ -39,5 +43,14 @@ describe("UpsellModal", () => {
   it("renders nothing when closed", () => {
     render(<UpsellModal open={false} onOpenChange={onOpenChange} />);
     expect(screen.queryByText("15 stops")).not.toBeInTheDocument();
+  });
+
+  it("records each time the ceiling is shown, not while closed", () => {
+    const { rerender } = render(
+      <UpsellModal open={false} onOpenChange={onOpenChange} />,
+    );
+    expect(trackEvent).not.toHaveBeenCalled();
+    rerender(<UpsellModal open onOpenChange={onOpenChange} />);
+    expect(trackEvent).toHaveBeenCalledWith("upsell_shown");
   });
 });

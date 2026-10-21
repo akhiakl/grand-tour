@@ -4,6 +4,7 @@ import { Check, Copy } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { TermsNotice } from "@/components/legal/notices";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -61,6 +62,7 @@ export function ShareDialog({
             {copied ? "Copied" : "Copy"}
           </Button>
         </div>
+        <TermsNotice action="sharing this link" />
       </DialogContent>
     </Dialog>
   );

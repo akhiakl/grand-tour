@@ -7,6 +7,8 @@ import { useShareTrip } from "./use-share-trip";
 
 const toastMocks = vi.hoisted(() => ({ error: vi.fn(), success: vi.fn() }));
 vi.mock("sonner", () => ({ toast: toastMocks }));
+const trackEvent = vi.hoisted(() => vi.fn());
+vi.mock("@/lib/analytics", () => ({ trackEvent }));
 
 const jsonResponse = (body: unknown, status: number) =>
   ({ status, json: () => Promise.resolve(body) }) as Response;
@@ -15,6 +17,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
   toastMocks.error.mockClear();
   toastMocks.success.mockClear();
+  trackEvent.mockClear();
 });
 
 describe("useShareTrip", () => {
@@ -31,6 +34,7 @@ describe("useShareTrip", () => {
     expect(result.current.shareId).toBe("abc12345");
     expect(result.current.dialogOpen).toBe(true);
     expect(result.current.sharing).toBe(false);
+    expect(trackEvent).toHaveBeenCalledWith("share_created");
   });
 
   it("delegates the city_limit contract to the caller instead of a toast", async () => {

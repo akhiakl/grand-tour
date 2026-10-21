@@ -42,6 +42,11 @@ describe("ShareDialog", () => {
     ).toBeInTheDocument();
   });
 
+  it("puts the terms next to the link being shared", () => {
+    render(<ShareDialog shareId="abc12345" open onOpenChange={onOpenChange} />);
+    expect(screen.getByText(/By sharing this link you agree/)).toBeVisible();
+  });
+
   it("renders nothing when closed", () => {
     render(
       <ShareDialog shareId="abc12345" open={false} onOpenChange={onOpenChange} />,
