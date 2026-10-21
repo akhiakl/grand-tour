@@ -39,11 +39,8 @@ export function DestinationStart({
           <X className="size-4" />
         </button>
       </div>
-      <div
-        role="group"
-        aria-label={`Start a route to ${place}`}
-        className="flex gap-2"
-      >
+      <fieldset className="flex gap-2">
+        <legend className="sr-only">Start a route to {place}</legend>
         <Button asChild variant={primary ? "brass" : "outline"} className="flex-1">
           <Link href={planHref(place)}>
             <Sparkles /> Plan with AI
@@ -54,7 +51,7 @@ export function DestinationStart({
             <PenLine /> Build manually
           </Link>
         </Button>
-      </div>
+      </fieldset>
     </div>
   );
 }
