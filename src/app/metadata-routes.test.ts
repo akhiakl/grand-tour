@@ -16,11 +16,15 @@ describe("metadata routes", () => {
     expect(result.rules).toMatchObject({ disallow: ["/api/", "/new", "/maps"] });
   });
 
-  it("lists only the public entry points in the sitemap", () => {
+  it("lists the public pages in the sitemap", () => {
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://grandtour.example");
     expect(sitemap().map((entry) => entry.url)).toEqual([
       "https://grandtour.example/",
       "https://grandtour.example/plan",
+      "https://grandtour.example/about",
+      "https://grandtour.example/contact",
+      "https://grandtour.example/privacy",
+      "https://grandtour.example/terms",
     ]);
   });
 
