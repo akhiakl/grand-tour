@@ -50,7 +50,7 @@ src/
     units/              Display units: km/mi, currency formatting, live rates.
     geo-search/         City search (Photon) behind `searchCities`.
     legal/              Operator and contact facts, report-a-map link.
-    analytics/          Cookieless Vercel Web Analytics behind `trackEvent`.
+    analytics/          Cookieless Vercel Web Analytics + Speed Insights helpers.
     utils.ts            cn() — kept at this path for shadcn compatibility.
   test/
     fixtures/           ALL reused mock data/builders. Never define shared
@@ -167,7 +167,7 @@ host there. No nonces, so pages stay static (inline scripts allowed).
 - In the browser, Sentry goes through `@/lib/monitoring`
   (`captureError`, `watchGlobalErrors`), which downloads the SDK only when
   an error is reported. It is never in the startup bundle, so there is no
-  client performance tracing; page speed comes from Vercel Analytics.
+  client performance tracing; page speed comes from Vercel Speed Insights.
 - Everything is gated on `NEXT_PUBLIC_SENTRY_DSN`: unset → total no-op.
   Source-map upload happens only when `SENTRY_AUTH_TOKEN` exists (CI).
 - Keep server sample rates conservative (`tracesSampleRate: 0.1`) to stay
@@ -175,8 +175,10 @@ host there. No nonces, so pages stay static (inline scripts allowed).
 
 ## Performance budget
 
-Lighthouse mobile simulates a slow phone, so script that runs before first
-paint counts against every metric. Keep it out of the startup bundle:
+The release gate is real-user Core Web Vitals from Vercel Speed Insights
+(good at p75 on mobile, see `docs/RELEASE.md`); Lighthouse is a diagnostic.
+Script that runs before first paint hurts both, so keep it out of the
+startup bundle:
 
 - The map engine (MapLibre + Leaflet), dialogs, the print itinerary,
   packing/notes tools and the units dialog mount once the page is idle

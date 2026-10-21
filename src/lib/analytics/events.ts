@@ -1,4 +1,4 @@
-import { track, type BeforeSendEvent } from "@vercel/analytics";
+import { track } from "@vercel/analytics";
 
 /**
  * The few moments that tell whether the product works. Page views
@@ -16,7 +16,7 @@ export function trackEvent(event: AnalyticsEvent): void {
  * Drops query strings and fragments before an event leaves the browser:
  * they can carry local draft ids (`/new?remix=…`), which aren't ours to log.
  */
-export function withoutQuery<T extends BeforeSendEvent>(event: T): T {
+export function withoutQuery<T extends { url: string }>(event: T): T {
   const url = new URL(event.url);
   return { ...event, url: `${url.origin}${url.pathname}` };
 }

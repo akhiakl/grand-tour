@@ -24,8 +24,8 @@ const mail = <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>;
 const PROCESSORS = [
   [
     "Vercel",
-    "Hosts the app; keeps short-lived request logs (IP address, browser) and counts page views without cookies.",
-    "Logs: short-lived. Analytics: aggregate counts only",
+    "Hosts the app; keeps short-lived request logs (IP address, browser), counts page views and measures page speed (load and response times, device type) without cookies.",
+    "Logs: short-lived. Analytics and speed: aggregate figures only",
   ],
   [
     "Upstash",
