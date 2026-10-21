@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -63,6 +63,57 @@ describe("StopList", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "Move Vienna down" }));
     expect(props.onMoveCity).toHaveBeenCalledWith(0, 1);
+  });
+
+  it("announces where a moved stop went", async () => {
+    const cities = [makeCity({ name: "Vienna" }), makeCity({ name: "Prague" })];
+    render(<StopList {...props} cities={cities} legs={[makeLeg()]} canAddCity />);
+
+    await userEvent.click(screen.getByRole("button", { name: "Move Prague up" }));
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Prague moved to stop 1 of 2.",
+    );
+  });
+
+  it("keeps focus on the moved stop's move buttons", async () => {
+    const cities = [makeCity({ name: "Vienna" }), makeCity({ name: "Prague" })];
+    const { rerender } = render(
+      <StopList {...props} cities={cities} legs={[makeLeg()]} canAddCity />,
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: "Move Prague up" }));
+    // The parent applies the move; Prague is now first, so its up button is
+    // disabled and focus lands on its down button.
+    rerender(
+      <StopList
+        {...props}
+        cities={[cities[1], cities[0]]}
+        legs={[makeLeg()]}
+        canAddCity
+      />,
+    );
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Move Prague down" })).toHaveFocus(),
+    );
+  });
+
+  it("marks the stop being edited as active", async () => {
+    const onActivate = vi.fn();
+    const cities = [makeCity({ name: "Vienna" }), makeCity({ name: "Prague" })];
+    render(
+      <StopList
+        {...props}
+        cities={cities}
+        legs={[makeLeg()]}
+        canAddCity
+        onActivate={onActivate}
+      />,
+    );
+
+    await userEvent.click(
+      screen.getByLabelText("City", { selector: "#stop-1-name" }),
+    );
+    expect(onActivate).toHaveBeenCalledWith(1);
   });
 
   it("disables move buttons at the ends of the list", () => {

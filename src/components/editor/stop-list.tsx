@@ -20,6 +20,7 @@ import {
 import { CitySearch } from "./city-search";
 import { LegRow } from "./leg-row";
 import { StopRow } from "./stop-row";
+import { useStopDrag } from "./use-stop-drag";
 
 export function StopList({
   cities,
@@ -32,6 +33,8 @@ export function StopList({
   canAddCity,
   onLimitReached,
   issues = {},
+  activeIndex = null,
+  onActivate,
 }: {
   readonly cities: City[];
   readonly legs: Leg[];
@@ -43,18 +46,43 @@ export function StopList({
   readonly canAddCity: boolean;
   readonly onLimitReached: () => void;
   readonly issues?: DraftIssues;
+  /** The stop being edited; the map preview follows it. */
+  readonly activeIndex?: number | null;
+  readonly onActivate?: (index: number) => void;
 }) {
   const t = useTranslations("Editor.stops");
   const issueText = useTranslations("Editor.issues");
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
-  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [announcement, setAnnouncement] = useState("");
 
-  // The open detail panel follows its stop through reorders and deletes.
+  // The open detail panel follows its stop through reorders and deletes,
+  // and screen readers hear where the stop went.
   const moveCity = (from: number, to: number) => {
     onMoveCity(from, to);
+    setAnnouncement(
+      t("moved", {
+        name: cities[from]?.name || t("newStopName"),
+        position: to + 1,
+        count: cities.length,
+      }),
+    );
     setExpandedIndex((current) =>
       current === null ? null : indexAfterMove(current, from, to),
     );
+  };
+
+  // Rows are keyed by position, so after a move the focused button would
+  // belong to the neighbour; hand focus to the moved stop's button instead
+  // (its other move button when it reached an end of the list).
+  const moveWithButton = (from: number, to: number, direction: "up" | "down") => {
+    moveCity(from, to);
+    requestAnimationFrame(() => {
+      const same = document.getElementById(`stop-${to}-move-${direction}`);
+      const other = document.getElementById(
+        `stop-${to}-move-${direction === "up" ? "down" : "up"}`,
+      );
+      (same && !same.hasAttribute("disabled") ? same : other)?.focus();
+    });
   };
 
   const issueAt = (path: string) => {
@@ -69,8 +97,13 @@ export function StopList({
     );
   };
 
+  const drag = useStopDrag(moveCity);
+
   return (
     <div className="flex flex-col gap-2">
+      <p role="status" aria-live="polite" className="sr-only">
+        {announcement}
+      </p>
       <div className="flex items-center justify-between">
         <h2 className="font-display text-lg font-medium">{t("heading")}</h2>
         <span className="eyebrow">
@@ -79,7 +112,7 @@ export function StopList({
       </div>
 
       {cities.map((city, index) => (
-        <div key={index}>
+        <div key={index} onFocusCapture={() => onActivate?.(index)}>
           <StopRow
             city={city}
             index={index}
@@ -90,20 +123,13 @@ export function StopList({
             }
             onChange={(patch) => onUpdateCity(index, patch)}
             onRemove={() => removeCity(index)}
-            onMoveUp={() => moveCity(index, index - 1)}
-            onMoveDown={() => moveCity(index, index + 1)}
-            draggable
-            dragging={draggedIndex === index}
-            onDragStart={() => setDraggedIndex(index)}
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={(e) => {
-              e.preventDefault();
-              if (draggedIndex !== null && draggedIndex !== index) {
-                moveCity(draggedIndex, index);
-              }
-              setDraggedIndex(null);
-            }}
-            onDragEnd={() => setDraggedIndex(null)}
+            onMoveUp={() => moveWithButton(index, index - 1, "up")}
+            onMoveDown={() => moveWithButton(index, index + 1, "down")}
+            {...drag.rowProps(index)}
+            dragging={drag.dragged === index}
+            dropSide={drag.dropSide(index)}
+            gripProps={drag.gripProps(index)}
+            active={activeIndex === index}
             errors={{
               name: issueAt(`cities.${index}.name`),
               nights: issueAt(`cities.${index}.nights`),

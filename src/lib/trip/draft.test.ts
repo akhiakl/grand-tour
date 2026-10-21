@@ -11,6 +11,7 @@ import {
   draftIssues,
   indexAfterMove,
   indexAfterRemove,
+  insertCityAt,
   draftToTrip,
   isShareable,
   moveCity,
@@ -97,6 +98,39 @@ describe("removeCityAt", () => {
     };
     const result = removeCityAt(draft, 2);
     expect(result.legs).toEqual([makeLeg({ label: "A to B" })]);
+  });
+});
+
+describe("insertCityAt", () => {
+  const abc = (): DraftTrip => ({
+    title: "T",
+    cities: [makeCity({ name: "A" }), makeCity({ name: "C" })],
+    legs: [makeLeg({ label: "A to C" })],
+  });
+
+  it("puts the stop back between its neighbours, keeping legs by position", () => {
+    const result = insertCityAt(abc(), 1, makeCity({ name: "B" }));
+    expect(result.cities.map((c) => c.name)).toEqual(["A", "B", "C"]);
+    // Same positional reuse as removeCityAt, so undoing a removal keeps
+    // the first leg and adds a blank one after it.
+    expect(result.legs).toEqual([
+      makeLeg({ label: "A to C" }),
+      expect.objectContaining({ label: "" }),
+    ]);
+  });
+
+  it("clamps the position into the list", () => {
+    expect(insertCityAt(abc(), 9, makeCity({ name: "Z" })).cities.at(-1)?.name).toBe(
+      "Z",
+    );
+    expect(insertCityAt(abc(), -2, makeCity({ name: "Z" })).cities[0].name).toBe(
+      "Z",
+    );
+  });
+
+  it("refuses to pass the guest stop limit", () => {
+    const full = draftFromTrip(makeTrip(GUEST_MAX_CITIES));
+    expect(insertCityAt(full, 0, makeCity())).toBe(full);
   });
 });
 

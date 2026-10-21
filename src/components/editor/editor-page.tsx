@@ -24,6 +24,9 @@ import {
   draftIssues,
   draftToTrip,
   getLocalTrip,
+  indexAfterMove,
+  indexAfterRemove,
+  insertCityAt,
   isShareable,
   moveCity,
   removeCityAt,
@@ -135,6 +138,8 @@ function EditorWorkspace() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const t = useTranslations("Editor");
+  const stops = useTranslations("Editor.stops");
+  const stopCopy = useTranslations("Editor.stop");
   // Resolved once: later URL changes (the autosave's ?remix= replace) must
   // not re-read storage or the already-consumed AI handoff.
   const [initial] = useState(() => resolveInitialState(searchParams));
@@ -147,6 +152,8 @@ function EditorWorkspace() {
   const [createdAt] = useState(initial.createdAt);
   const [ghostNames, setGhostNames] = useState(initial.ghostNames);
   const [request, setRequest] = useState(initial.request);
+  // The stop being edited (focused in the list or picked on the map).
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   // The AI draft is now in state; consume the handoff so a later visit to
   // /new?from=ai starts blank. Cleared here, not while rendering (see
@@ -200,6 +207,36 @@ function EditorWorkspace() {
     toast.success(t("redrafted"));
   };
 
+  const handleMove = (from: number, to: number) => {
+    update((d) => moveCity(d, from, to));
+    setActiveIndex((i) => (i === null ? null : indexAfterMove(i, from, to)));
+  };
+
+  // The toast's Undo puts the stop back where it was, as a new history
+  // step, so it still works after later edits (Ctrl+Z steps back in order).
+  const handleRemove = (index: number) => {
+    const city = draft.cities[index];
+    update((d) => removeCityAt(d, index));
+    setActiveIndex((i) => (i === null ? null : indexAfterRemove(i, index)));
+    toast(stops("removed", { name: city.name || stopCopy("fallbackName") }), {
+      action: {
+        label: t("undo"),
+        onClick: () => update((d) => insertCityAt(d, index, city)),
+      },
+    });
+  };
+
+  // A stop picked on the map scrolls its row into view.
+  const selectFromMap = (index: number) => {
+    setActiveIndex(index);
+    document.getElementById(`stop-${index}-name`)?.scrollIntoView({
+      block: "nearest",
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
+    });
+  };
+
   const handleShare = () => {
     if (Object.keys(issues).length > 0) {
       focusFirstIssue(issues);
@@ -237,8 +274,10 @@ function EditorWorkspace() {
           onLimitReached={() => setUpsellOpen(true)}
           issues={issues}
           onAddCity={(city: City) => update((d) => addCity(d, city))}
-          onRemoveCity={(index) => update((d) => removeCityAt(d, index))}
-          onMoveCity={(from, to) => update((d) => moveCity(d, from, to))}
+          onRemoveCity={handleRemove}
+          onMoveCity={handleMove}
+          activeIndex={activeIndex}
+          onActivate={setActiveIndex}
           onUpdateCity={(index, patch) =>
             update(
               (d) => updateCityAt(d, index, patch),
@@ -261,6 +300,8 @@ function EditorWorkspace() {
               draft={draft}
               ghostNames={ghostNames}
               onGhostSelect={() => setUpsellOpen(true)}
+              selectedIndex={activeIndex}
+              onCitySelect={selectFromMap}
             />
           </div>
           {draft.cities.length > 0 && (

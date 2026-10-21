@@ -156,7 +156,9 @@
       "addBlank": "Or add a blank stop",
       "newStopName": "New stop",
       "limit": "Guest maps top out at {max} stops.",
-      "seeUnlocks": "See what unlocks"
+      "seeUnlocks": "See what unlocks",
+      "moved": "{name} moved to stop {position} of {count}.",
+      "removed": "Removed {name}"
     },
     "search": {
       "placeholder": "Search for a city…",

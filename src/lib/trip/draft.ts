@@ -29,7 +29,7 @@ const MAX_NIGHTS = 30;
  * Rebuilds legs to `cities.length - 1`, reusing existing legs positionally;
  * a newly needed leg is drafted from the distance between its stops.
  */
-function rebuildLegs(cities: City[], legs: Leg[]): Leg[] {
+function rebuildLegs(cities: City[], legs: readonly (Leg | undefined)[]): Leg[] {
   const targetLength = Math.max(cities.length - 1, 0);
   return Array.from(
     { length: targetLength },
@@ -74,6 +74,20 @@ export function addCity(draft: DraftTrip, city: City): DraftTrip {
   if (!canAddCity(draft)) return draft;
   const cities = [...draft.cities, city];
   return { ...draft, cities, legs: rebuildLegs(cities, draft.legs) };
+}
+
+/** Puts a stop back at `index` (clamped to the list), e.g. to undo a removal. */
+export function insertCityAt(
+  draft: DraftTrip,
+  index: number,
+  city: City,
+): DraftTrip {
+  if (!canAddCity(draft)) return draft;
+  const at = Math.min(Math.max(index, 0), draft.cities.length);
+  const cities = [...draft.cities.slice(0, at), city, ...draft.cities.slice(at)];
+  // A gap where the new leg goes; rebuildLegs drafts it from the distance.
+  const legs = [...draft.legs.slice(0, at), undefined, ...draft.legs.slice(at)];
+  return { ...draft, cities, legs: rebuildLegs(cities, legs) };
 }
 
 export function removeCityAt(draft: DraftTrip, index: number): DraftTrip {
