@@ -58,6 +58,30 @@ describe("captureError", () => {
   });
 });
 
+describe("captureError when the SDK can't download", () => {
+  afterEach(() => {
+    vi.doMock("@sentry/nextjs", () => sentry);
+    vi.unstubAllEnvs();
+  });
+
+  it("swallows the failure so it can't feed the rejection handler", async () => {
+    vi.stubEnv("NEXT_PUBLIC_SENTRY_DSN", DSN);
+    vi.resetModules();
+    vi.doMock("@sentry/nextjs", () => {
+      throw new Error("chunk load failed");
+    });
+    const { captureError } = await import("./sentry");
+    const rejections: unknown[] = [];
+    const onRejection = (reason: unknown) => rejections.push(reason);
+    process.on("unhandledRejection", onRejection);
+    captureError(new Error("boom"));
+    await flush();
+    await flush();
+    process.off("unhandledRejection", onRejection);
+    expect(rejections).toEqual([]);
+  });
+});
+
 describe("watchGlobalErrors", () => {
   beforeEach(() => vi.clearAllMocks());
   afterEach(() => vi.unstubAllEnvs());

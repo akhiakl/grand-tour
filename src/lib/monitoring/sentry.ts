@@ -6,19 +6,27 @@ let loading: Promise<SentryModule | undefined> | undefined;
 function loadSentry(): Promise<SentryModule | undefined> {
   const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
   if (!dsn) return Promise.resolve(undefined);
-  loading ??= import("@sentry/nextjs").then((sentry) => {
-    sentry.init({
-      dsn,
-      // No IPs, user details or request bodies: the privacy notice promises it.
-      dataCollection: { userInfo: false, httpBodies: [] },
-      // watchGlobalErrors reports uncaught errors; Sentry's own handlers
-      // would report them twice.
-      integrations: (defaults) =>
-        defaults.filter((integration) => integration.name !== "GlobalHandlers"),
-      enableLogs: process.env.NODE_ENV === "development",
+  loading ??= import("@sentry/nextjs")
+    .then((sentry) => {
+      sentry.init({
+        dsn,
+        // No IPs, user details or request bodies: the privacy notice promises it.
+        dataCollection: { userInfo: false, httpBodies: [] },
+        // watchGlobalErrors reports uncaught errors; Sentry's own handlers
+        // would report them twice.
+        integrations: (defaults) =>
+          defaults.filter((integration) => integration.name !== "GlobalHandlers"),
+        enableLogs: process.env.NODE_ENV === "development",
+      });
+      return sentry;
+    })
+    // A failed download (offline, or a stale chunk after a deploy) must not
+    // reject: the unhandledrejection listener would report it, fail again
+    // and loop. Forget it so a later error can try again.
+    .catch(() => {
+      loading = undefined;
+      return undefined;
     });
-    return sentry;
-  });
   return loading;
 }
 
