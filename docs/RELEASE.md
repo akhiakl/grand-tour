@@ -48,28 +48,32 @@ checked before merging the `1.0.0` release PR.
 - [x] Step 6 — AI chat, ghost-stops upsell
 - [x] Step 7 — landing page with both CTAs, polish pass
 - [x] Step 8 — Playwright e2e: all four journeys green in CI
-- [ ] Step 9 — UX & a11y hardening (design-review follow-ups)
+- [x] Step 9 — UX & a11y hardening (design-review follow-ups)
 - [x] Step 10 — legal pages, report link, AI notice, analytics
 - [x] Step 11 — `/about` story page, map motion under 5s
 - [x] Step 12 — landing destination search, returning visitors
 
 ### Guest limit verified at all three layers
 
-- [ ] Server: 6-city POST returns `403 {error:"city_limit",limit:5}`
-- [ ] Editor: counter + upsell modal at 5/5
+- [x] Server: 6-city POST returns `403 {error:"city_limit",limit:5}`
+- [x] Editor: counter + upsell modal at 5/5 (e2e `limit.spec.ts`)
 - [ ] AI: >5-city request yields 5 cities + `suggestedExtra` ghost stops
 
 ### Quality
 
-- [ ] All CI checks green on `main` (Lint, Typecheck, Tests & coverage,
+- [x] All CI checks green on `main` (Lint, Typecheck, Tests & coverage,
       Build, e2e) and SonarQube quality gate passing
-- [ ] Coverage ≥ 85% overall
+- [x] Coverage ≥ 85% overall
 - [ ] Keyboard audit: ESC closes drawer/modals, focus trapped & restored,
       full tab-through of editor and chat
 - [ ] Lighthouse: a11y ≥ 95, performance ≥ 85 on `/`, `/new`, `/t/[id]`
-- [ ] Both themes checked on every page; no layout shift on toggle
-- [ ] `prefers-reduced-motion` honored everywhere (splash, route, drawers)
-- [ ] Responsive at 360 / 768 / 1280; no horizontal scroll
+      (a11y 96–100 and desktop performance 98 everywhere; mobile
+      performance 61–74 under Lighthouse's 4× CPU throttle, map JS boot time)
+- [x] Both themes checked on every page; no layout shift on toggle
+      (e2e: axe in light and dark, `motion-theme.spec.ts`)
+- [x] `prefers-reduced-motion` honored everywhere (splash, route, drawers)
+- [x] Responsive at 360 / 768 / 1280; no horizontal scroll
+      (e2e `responsive.spec.ts`)
 - [ ] Loading, error, empty and expired states designed in-voice
 
 ### Infrastructure (production values)

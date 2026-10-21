@@ -96,17 +96,27 @@ Do NOT create the workspace until a second consumer actually exists.
   hoists them — but the data they return comes from fixtures.
 - Schema, service layer and utils always have coverage; route handlers are
   tested through their exported `POST`/`GET` with lib modules mocked.
-- Playwright e2e lands last, in `e2e/` (exempt from max-lines).
+- Playwright e2e lands last, in `e2e/` (exempt from max-lines). It also
+  guards accessibility and layout: `a11y.spec.ts` runs axe (WCAG 2.1 AA)
+  on every page in both themes, `responsive.spec.ts` fails any page that
+  scrolls sideways at 360 / 768 / 1280, and `motion-theme.spec.ts` checks
+  reduced motion and that a theme switch moves nothing.
 
 ## Tooling standard
 
-- ESLint: `max-lines` 300 (tests/e2e exempt), `import/order`,
+- ESLint: `jsx-a11y` recommended rules as errors, `max-lines` 300
+  (tests/e2e exempt), `import/order`,
   `consistent-type-imports`, `eqeqeq`, `no-console` (warn/error allowed),
   domain-boundary `no-restricted-imports`, Prettier last.
 - Husky pre-commit: lint-staged (eslint --fix, related vitest, prettier) +
   full typecheck. commit-msg: commitlint (Conventional Commits).
-- CI (`.github/workflows/ci.yml`): lint → typecheck → test → build on every
-  PR and push to main.
+- CI (`.github/workflows/ci.yml`): lint, typecheck, test, build and e2e on
+  every PR and push to main. Shared steps come from `akhiakl/ci-workflows`
+  (private; it must allow access from akhiakl repos), pinned to a commit
+  SHA marked `# v1`: `setup-pnpm`, `playwright-browsers`, the run-check
+  action around each check, and a sticky **Quality Gate** PR comment that
+  lists what failed. PR title, release-please and deploy call its reusable
+  workflows. Bump all pins together when `ci-workflows` changes.
 - Node pinned via `.nvmrc` + `engines`; pnpm via `packageManager`.
 - Coverage: `pnpm test:coverage` (v8) over `src/lib/**` + `src/app/api/**`
   with enforced thresholds; UI components are covered by e2e instead.

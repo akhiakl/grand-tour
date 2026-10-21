@@ -43,7 +43,7 @@ in `docs/RELEASE.md`. Do not wire any host to auto-deploy `main`.
 | 6    | AI chat UI + ghost-stops upsell                    | ✅ done |
 | 7    | Landing page + polish pass                         | ✅ done |
 | 8    | Playwright e2e                                     | ✅ done |
-| 9    | UX & a11y hardening (design-review follow-ups)     | 🟨 wip  |
+| 9    | UX & a11y hardening (design-review follow-ups)     | ✅ done |
 | 10   | Legal pages, report link, AI notice, analytics     | ✅ done |
 | 11   | `/about` story page, motion limits on the map      | ✅ done |
 | 12   | Landing: destination search, returning visitors    | ✅ done |

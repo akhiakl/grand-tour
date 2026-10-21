@@ -2,10 +2,17 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 import prettier from "eslint-config-prettier/flat";
+import jsxA11y from "eslint-plugin-jsx-a11y";
 
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
+  {
+    // Next registers jsx-a11y but enables only a handful of its rules (as
+    // warnings); turn on the full recommended set as errors.
+    files: ["**/*.{jsx,tsx}"],
+    rules: jsxA11y.flatConfigs.recommended.rules,
+  },
   {
     rules: {
       // Hard ceiling: files must be split by responsibility, not grown.
@@ -65,6 +72,8 @@ const eslintConfig = defineConfig([
     files: ["src/components/ui/**"],
     rules: {
       "react/prefer-read-only-props": "off",
+      // Headings get their text through spread `children`.
+      "jsx-a11y/heading-has-content": "off",
     },
   },
   prettier,
