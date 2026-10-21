@@ -6,13 +6,13 @@ export function PageLoading() {
   const t = useTranslations("Common");
   return (
     <main className="grid min-h-dvh place-items-center px-6">
-      <div role="status" className="flex flex-col items-center gap-3">
+      <output className="flex flex-col items-center gap-3">
         <Compass
           aria-hidden
           className="size-10 text-muted-foreground motion-safe:animate-pulse"
         />
-        <p className="eyebrow">{t("loading")}</p>
-      </div>
+        <span className="eyebrow">{t("loading")}</span>
+      </output>
     </main>
   );
 }
