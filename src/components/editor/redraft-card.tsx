@@ -73,7 +73,7 @@ export function RedraftCard({
             onChange={(e) => setDestination(e.target.value)}
           />
         </div>
-        <div className="flex items-end gap-3">
+        <div className="flex flex-wrap items-end gap-3">
           <div className="flex w-24 flex-col gap-1.5">
             <Label htmlFor="redraft-days">{t("days")}</Label>
             <Input

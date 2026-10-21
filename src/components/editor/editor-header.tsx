@@ -48,7 +48,7 @@ function StartDateField({
   const t = useTranslations("Editor");
   return (
     <div className="flex flex-col gap-1">
-      <div className="flex items-center gap-2 text-sm text-ink-soft">
+      <div className="flex flex-wrap items-center gap-2 text-sm text-ink-soft">
         <CalendarDays className="size-4 shrink-0" aria-hidden />
         <label htmlFor={TRIP_START_INPUT_ID}>{t("startsLabel")}</label>
         <Input
@@ -167,15 +167,17 @@ export function EditorHeader({
               <Redo2 />
             </Button>
           </div>
-          <Button asChild variant="outline">
-            <Link href="/maps">
-              <Map /> {t("myMaps")}
+          {/* Icon-only on phones so the row fits 360px; the name stays for AT. */}
+          <Button asChild variant="outline" className="max-sm:size-10 max-sm:px-0">
+            <Link href="/maps" title={t("myMaps")}>
+              <Map /> <span className="max-sm:sr-only">{t("myMaps")}</span>
             </Link>
           </Button>
           <Button
             type="button"
             variant="brass"
-            size="lg"
+            // Default size on phones so the row fits 360px; large from `sm`.
+            className="sm:h-12 sm:px-7 sm:text-base"
             disabled={!canShare || sharing}
             onClick={onShare}
           >
