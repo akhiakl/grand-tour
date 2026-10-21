@@ -69,11 +69,12 @@ checked before merging the `1.0.0` release PR.
       stop after a removal, on a new blank stop, and on Retry when a
       draft fails; Sonner returns focus to the last control when tabbing
       out of a toast, by design)
-- [ ] Lighthouse: a11y ≥ 95, performance ≥ 85 on `/`, `/new`, `/t/[id]`
-      (a11y 96–100 and desktop performance 98 everywhere; mobile
-      performance ~70 / 74 / 71 on `/`, `/new`, `/t` under Lighthouse's
-      4× CPU throttle. Without the trip panel at all `/` reaches ~80, so
-      the rest is React hydration of the panel and the map engine)
+- [x] Lighthouse a11y ≥ 95 on `/`, `/new`, `/t/[id]` (96–100 everywhere)
+- [ ] Core Web Vitals "good" at the 75th percentile on mobile in Vercel
+      Speed Insights for `/`, `/new` and `/t/[id]`: LCP ≤ 2.5 s, INP ≤
+      200 ms, CLS ≤ 0.1, over at least 7 days of real traffic. Lighthouse
+      performance is a diagnostic only (desktop 98; simulated mobile
+      ~70 / 74 / 71, held back by React hydration and the map engine)
 - [x] Both themes checked on every page; no layout shift on toggle
       (e2e: axe in light and dark, `motion-theme.spec.ts`)
 - [x] `prefers-reduced-motion` honored everywhere (splash, route, drawers)
@@ -111,6 +112,8 @@ checked before merging the `1.0.0` release PR.
 - [ ] Vercel and Sentry log retention checked against CERT-In's 180 days
 - [ ] Vercel Web Analytics enabled on the project; custom events need
       Pro, otherwise only page views are recorded
+- [ ] Vercel Speed Insights enabled on the project (feeds the Core Web
+      Vitals gate above)
 - [ ] Search the code for `TODO(legal)` / `TODO(analytics)`; each is
       resolved or consciously deferred
 
