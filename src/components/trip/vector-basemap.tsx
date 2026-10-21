@@ -3,6 +3,7 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { maplibreGL } from "@maplibre/maplibre-gl-leaflet";
+import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 import { useMap } from "react-leaflet";
 import { toast } from "sonner";
@@ -22,6 +23,9 @@ const OFFLINE_TOAST_ID = "basemap-offline";
  */
 export function VectorBasemap() {
   const map = useMap();
+  const t = useTranslations("Trip.map");
+  const downMessage = t("basemapDown");
+  const retryLabel = t("retry");
 
   useEffect(() => {
     const layer = maplibreGL({
@@ -36,12 +40,12 @@ export function VectorBasemap() {
       // Once the style is up, errors are per-tile hiccups the map rides
       // out on its own; only a style that never arrived means an outage.
       if (basemap.isStyleLoaded()) return;
-      toast.error("The basemap is out of reach. Your route is still here.", {
+      toast.error(downMessage, {
         id: OFFLINE_TOAST_ID,
         // Stays until the style loads (after Retry) or the map unmounts.
         duration: Infinity,
         action: {
-          label: "Retry",
+          label: retryLabel,
           onClick: () => basemap.setStyle(MAP_STYLE.url),
         },
       });
@@ -60,7 +64,7 @@ export function VectorBasemap() {
       map.attributionControl?.removeAttribution(MAP_STYLE.attribution);
       layer.remove();
     };
-  }, [map]);
+  }, [map, downMessage, retryLabel]);
 
   return null;
 }

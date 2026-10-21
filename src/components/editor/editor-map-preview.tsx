@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 
 import { placeGhostStops } from "@/lib/ai";
@@ -40,6 +41,7 @@ export function EditorMapPreview({
   readonly ghostNames?: readonly string[];
   readonly onGhostSelect?: () => void;
 }) {
+  const t = useTranslations("Editor");
   const debounced = useDebouncedDraft(draft);
   // Placed from the same debounced draft as the route, so the ghost fan
   // moves together with the route's end while the guest edits.
@@ -51,9 +53,7 @@ export function EditorMapPreview({
   if (debounced.cities.length === 0) {
     return (
       <div className="grid h-full place-items-center p-8 text-center">
-        <p className="text-sm text-muted-foreground">
-          Add a stop to see it appear on the map.
-        </p>
+        <p className="text-sm text-muted-foreground">{t("previewEmpty")}</p>
       </div>
     );
   }

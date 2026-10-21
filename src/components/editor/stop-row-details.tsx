@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,11 +19,12 @@ export function StopRowDetails({
   readonly index: number;
   readonly onChange: (patch: Partial<City>) => void;
 }) {
+  const t = useTranslations("Editor.details");
   return (
     <div className="flex flex-col gap-5 border-t border-line pt-4">
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor={`stop-${index}-lat`}>Latitude</Label>
+          <Label htmlFor={`stop-${index}-lat`}>{t("latitude")}</Label>
           <Input
             id={`stop-${index}-lat`}
             type="number"
@@ -30,7 +33,7 @@ export function StopRowDetails({
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor={`stop-${index}-lng`}>Longitude</Label>
+          <Label htmlFor={`stop-${index}-lng`}>{t("longitude")}</Label>
           <Input
             id={`stop-${index}-lng`}
             type="number"
@@ -39,7 +42,7 @@ export function StopRowDetails({
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor={`stop-${index}-budget-low`}>Budget low (USD/day)</Label>
+          <Label htmlFor={`stop-${index}-budget-low`}>{t("budgetLow")}</Label>
           <Input
             id={`stop-${index}-budget-low`}
             type="number"
@@ -51,7 +54,7 @@ export function StopRowDetails({
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor={`stop-${index}-budget-high`}>Budget high (USD/day)</Label>
+          <Label htmlFor={`stop-${index}-budget-high`}>{t("budgetHigh")}</Label>
           <Input
             id={`stop-${index}-budget-high`}
             type="number"
@@ -65,7 +68,7 @@ export function StopRowDetails({
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor={`stop-${index}-why`}>Why go</Label>
+        <Label htmlFor={`stop-${index}-why`}>{t("why")}</Label>
         <Textarea
           id={`stop-${index}-why`}
           maxLength={500}
@@ -76,7 +79,7 @@ export function StopRowDetails({
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor={`stop-${index}-transport`}>Getting around</Label>
+          <Label htmlFor={`stop-${index}-transport`}>{t("transport")}</Label>
           <Input
             id={`stop-${index}-transport`}
             maxLength={120}
@@ -85,7 +88,7 @@ export function StopRowDetails({
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor={`stop-${index}-stay`}>Where to stay</Label>
+          <Label htmlFor={`stop-${index}-stay`}>{t("stay")}</Label>
           <Textarea
             id={`stop-${index}-stay`}
             maxLength={300}
@@ -96,7 +99,7 @@ export function StopRowDetails({
       </div>
 
       <ListEditor
-        label="Must-sees"
+        label={t("must")}
         items={city.must}
         max={10}
         newItem={() => ""}
@@ -111,7 +114,7 @@ export function StopRowDetails({
       />
 
       <ListEditor
-        label="Hidden gems"
+        label={t("gems")}
         items={city.gems}
         max={6}
         newItem={() => ""}
@@ -126,10 +129,10 @@ export function StopRowDetails({
       />
 
       <ListEditor
-        label="Food & drink"
+        label={t("food")}
         items={city.food}
         max={6}
-        addLabel="Add dish"
+        addLabel={t("addDish")}
         newItem={() => ["", ""] as [string, string]}
         onChange={(food) => onChange({ food })}
         renderRow={([dish, note], change) => (
@@ -137,13 +140,13 @@ export function StopRowDetails({
             <Input
               value={dish}
               maxLength={60}
-              placeholder="Dish"
+              placeholder={t("dish")}
               onChange={(e) => change([e.target.value, note])}
             />
             <Input
               value={note}
               maxLength={120}
-              placeholder="Where to get it"
+              placeholder={t("dishWhere")}
               onChange={(e) => change([dish, e.target.value])}
             />
           </div>
@@ -151,11 +154,11 @@ export function StopRowDetails({
       />
 
       <ListEditor
-        label="Day-by-day"
+        label={t("days")}
         items={city.days}
         max={10}
-        addLabel="Add day"
-        newItem={() => ["Day", "", ""] as [string, string, string]}
+        addLabel={t("addDay")}
+        newItem={() => [t("newDay"), "", ""] as [string, string, string]}
         onChange={(days) => onChange({ days })}
         renderRow={([day, title, description], change) => (
           <div className="flex flex-col gap-2">
@@ -163,21 +166,21 @@ export function StopRowDetails({
               <Input
                 value={day}
                 maxLength={20}
-                placeholder="Day 1"
+                placeholder={t("dayPlaceholder")}
                 className="w-24"
                 onChange={(e) => change([e.target.value, title, description])}
               />
               <Input
                 value={title}
                 maxLength={60}
-                placeholder="Old town"
+                placeholder={t("dayTitlePlaceholder")}
                 onChange={(e) => change([day, e.target.value, description])}
               />
             </div>
             <Textarea
               value={description}
               maxLength={300}
-              placeholder="What the day looks like"
+              placeholder={t("dayBodyPlaceholder")}
               onChange={(e) => change([day, title, e.target.value])}
             />
           </div>
@@ -185,7 +188,7 @@ export function StopRowDetails({
       />
 
       <ListEditor
-        label="Tips"
+        label={t("tips")}
         items={city.tips}
         max={6}
         newItem={() => ""}

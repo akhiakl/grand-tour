@@ -1,3 +1,4 @@
+import { suggestLeg } from "./leg-estimate";
 import {
   DEFAULT_TRIP_TITLE,
   GUEST_MAX_CITIES,
@@ -18,22 +19,28 @@ export type DraftTrip = {
   title: string;
   cities: City[];
   legs: Leg[];
+  /** YYYY-MM-DD, or absent for an undated trip. */
+  startDate?: string;
 };
 
 const MAX_NIGHTS = 30;
 
-const defaultLeg = (): Leg => ({ mode: "train", label: "", duration: "" });
-
-/** Rebuilds legs to `cities.length - 1`, reusing existing legs positionally. */
-function rebuildLegs(cities: City[], legs: Leg[]): Leg[] {
+/**
+ * Rebuilds legs to `cities.length - 1`, reusing existing legs positionally;
+ * a newly needed leg is drafted from the distance between its stops.
+ */
+function rebuildLegs(cities: City[], legs: readonly (Leg | undefined)[]): Leg[] {
   const targetLength = Math.max(cities.length - 1, 0);
-  return Array.from({ length: targetLength }, (_, i) => legs[i] ?? defaultLeg());
+  return Array.from(
+    { length: targetLength },
+    (_, i) => legs[i] ?? suggestLeg(cities[i], cities[i + 1]),
+  );
 }
 
 /** A stop with only placeholders filled in; callers set what they know. */
-export function blankCity(): City {
+export function blankCity(name = ""): City {
   return {
-    name: "New stop",
+    name,
     country: "",
     flag: "",
     ll: [0, 0],
@@ -55,7 +62,8 @@ export function createBlankDraft(): DraftTrip {
 }
 
 export function draftFromTrip(trip: Trip): DraftTrip {
-  return { title: trip.title, cities: trip.cities, legs: trip.legs };
+  const { title, cities, legs, startDate } = trip;
+  return startDate ? { title, cities, legs, startDate } : { title, cities, legs };
 }
 
 export function canAddCity(draft: DraftTrip): boolean {
@@ -77,7 +85,8 @@ export function insertCityAt(
   if (!canAddCity(draft)) return draft;
   const at = Math.min(Math.max(index, 0), draft.cities.length);
   const cities = [...draft.cities.slice(0, at), city, ...draft.cities.slice(at)];
-  const legs = [...draft.legs.slice(0, at), defaultLeg(), ...draft.legs.slice(at)];
+  // A gap where the new leg goes; rebuildLegs drafts it from the distance.
+  const legs = [...draft.legs.slice(0, at), undefined, ...draft.legs.slice(at)];
   return { ...draft, cities, legs: rebuildLegs(cities, legs) };
 }
 
@@ -148,6 +157,12 @@ export function updateTitle(draft: DraftTrip, title: string): DraftTrip {
   return { ...draft, title };
 }
 
+/** Sets the first day (YYYY-MM-DD); an empty value makes the trip undated. */
+export function updateStartDate(draft: DraftTrip, startDate: string): DraftTrip {
+  const { title, cities, legs } = draft;
+  return startDate ? { title, cities, legs, startDate } : { title, cities, legs };
+}
+
 /**
  * Cities ≥ 2 is the only gate that disables Share — field-level problems
  * are reported by {@link draftIssues} so the editor can point at them.
@@ -156,18 +171,23 @@ export function isShareable(draft: DraftTrip): boolean {
   return draft.cities.length >= 2;
 }
 
-/** Field paths the editor renders inline, keyed like `cities.0.name`. */
-export type DraftIssues = Record<string, string>;
+/** Why a field is invalid, as a message key the editor translates. */
+export type DraftIssueKey =
+  "titleRequired" | "nameRequired" | "nightsRange" | "startDateInvalid" | "invalid";
 
-const FRIENDLY_MESSAGES: Record<string, string> = {
-  title: "Give your map a title.",
-  name: "Give this stop a name.",
-  nights: "Nights run from 0 to 30.",
+/** Field paths the editor renders inline, keyed like `cities.0.name`. */
+export type DraftIssues = Record<string, DraftIssueKey>;
+
+const FIELD_ISSUES: Record<string, DraftIssueKey> = {
+  title: "titleRequired",
+  name: "nameRequired",
+  nights: "nightsRange",
+  startDate: "startDateInvalid",
 };
 
 /**
- * Field-level schema problems in a draft, first message per field. Skips
- * the trip-wide count/legs rules: the stop counter and Share gate already
+ * Field-level schema problems in a draft, one per field. Skips the
+ * trip-wide count/legs rules: the stop counter and Share gate already
  * cover those, and they have no single field to point at.
  */
 export function draftIssues(draft: DraftTrip): DraftIssues {
@@ -176,10 +196,11 @@ export function draftIssues(draft: DraftTrip): DraftIssues {
 
   const issues: DraftIssues = {};
   for (const issue of parsed.error.issues) {
-    if (issue.path.length === 1 && issue.path[0] !== "title") continue;
+    const topLevelField = issue.path[0] === "title" || issue.path[0] === "startDate";
+    if (issue.path.length === 1 && !topLevelField) continue;
     const key = issue.path.join(".");
     const field = String(issue.path.at(-1));
-    issues[key] ??= FRIENDLY_MESSAGES[field] ?? issue.message;
+    issues[key] ??= FIELD_ISSUES[field] ?? "invalid";
   }
   return issues;
 }
@@ -190,6 +211,7 @@ function toCandidate(draft: DraftTrip, createdAt: number) {
     title: draft.title,
     cities: draft.cities,
     legs: draft.legs,
+    ...(draft.startDate ? { startDate: draft.startDate } : {}),
     createdBy: "guest" as const,
     createdAt,
   };

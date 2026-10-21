@@ -2,6 +2,7 @@
 
 import { ArrowRight, PenLine, Sparkles } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { CitySearch } from "@/components/editor/city-search";
@@ -19,6 +20,7 @@ import { WelcomeBack } from "./welcome-back";
  * a destination first. The sample route stays below as inspiration.
  */
 export function LandingCta() {
+  const t = useTranslations("Landing");
   // Saved maps live in this browser only; read them after mount so the
   // server and first client render agree.
   const trips = useMounted() ? listLocalTrips() : [];
@@ -36,30 +38,31 @@ export function LandingCta() {
           onClear={() => setDestination(null)}
         />
       ) : (
-        <div role="group" aria-label="Start your own route" className="flex gap-2">
+        <fieldset className="flex gap-2">
+          <legend className="sr-only">{t("group")}</legend>
           <Button
             asChild
             variant={returning ? "outline" : "brass"}
             className="flex-1"
           >
             <Link href="/plan">
-              <Sparkles /> Plan with AI
+              <Sparkles /> {t("planWithAi")}
             </Link>
           </Button>
           <Button asChild variant="outline" className="flex-1">
             <Link href="/new">
-              <PenLine /> Build manually
+              <PenLine /> {t("buildManually")}
             </Link>
           </Button>
-        </div>
+        </fieldset>
       )}
 
       {/* Under the buttons so they stay in view on the mobile sheet's peek. */}
       <CitySearch
         onSelect={setDestination}
-        label="Where to?"
+        label={t("searchLabel")}
         placeholder={
-          returning ? "Or plan somewhere new…" : "Know where? Search a city…"
+          returning ? t("searchPlaceholderReturning") : t("searchPlaceholder")
         }
       />
 
@@ -67,8 +70,7 @@ export function LandingCta() {
         href="/about"
         className="inline-flex w-fit items-center gap-1 rounded-sm text-xs text-ink-soft underline-offset-4 outline-none hover:text-ink hover:underline focus-visible:ring-2 focus-visible:ring-ring"
       >
-        Free, no account needed · How it works{" "}
-        <ArrowRight aria-hidden className="size-3" />
+        {t("howItWorks")} <ArrowRight aria-hidden className="size-3" />
       </Link>
     </div>
   );

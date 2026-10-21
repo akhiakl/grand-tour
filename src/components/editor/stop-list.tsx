@@ -1,6 +1,7 @@
 "use client";
 
 import { Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import {
   GUEST_MAX_CITIES,
   indexAfterMove,
   indexAfterRemove,
+  legDistanceKm,
   type City,
   type DraftIssues,
   type Leg,
@@ -48,6 +50,8 @@ export function StopList({
   readonly activeIndex?: number | null;
   readonly onActivate?: (index: number) => void;
 }) {
+  const t = useTranslations("Editor.stops");
+  const issueText = useTranslations("Editor.issues");
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const [announcement, setAnnouncement] = useState("");
 
@@ -55,8 +59,13 @@ export function StopList({
   // and screen readers hear where the stop went.
   const moveCity = (from: number, to: number) => {
     onMoveCity(from, to);
-    const name = cities[from]?.name || "Stop";
-    setAnnouncement(`${name} moved to stop ${to + 1} of ${cities.length}.`);
+    setAnnouncement(
+      t("moved", {
+        name: cities[from]?.name || t("newStopName"),
+        position: to + 1,
+        count: cities.length,
+      }),
+    );
     setExpandedIndex((current) =>
       current === null ? null : indexAfterMove(current, from, to),
     );
@@ -76,6 +85,11 @@ export function StopList({
     });
   };
 
+  const issueAt = (path: string) => {
+    const key = issues[path];
+    return key ? issueText(key) : undefined;
+  };
+
   const removeCity = (index: number) => {
     onRemoveCity(index);
     setExpandedIndex((current) =>
@@ -91,9 +105,9 @@ export function StopList({
         {announcement}
       </p>
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-lg font-medium">Stops</h2>
+        <h2 className="font-display text-lg font-medium">{t("heading")}</h2>
         <span className="eyebrow">
-          {cities.length}/{GUEST_MAX_CITIES} stops
+          {t("counter", { count: cities.length, max: GUEST_MAX_CITIES })}
         </span>
       </div>
 
@@ -117,14 +131,15 @@ export function StopList({
             gripProps={drag.gripProps(index)}
             active={activeIndex === index}
             errors={{
-              name: issues[`cities.${index}.name`],
-              nights: issues[`cities.${index}.nights`],
+              name: issueAt(`cities.${index}.name`),
+              nights: issueAt(`cities.${index}.nights`),
             }}
           />
           {index < legs.length && (
             <LegRow
               leg={legs[index]}
               index={index}
+              km={legDistanceKm(city, cities[index + 1])}
               onChange={(patch) => onUpdateLeg(index, patch)}
             />
           )}
@@ -134,13 +149,11 @@ export function StopList({
       <Card className="gap-3">
         {canAddCity ? (
           <>
-            <p className="text-sm text-muted-foreground">
-              Search for the next stop.
-            </p>
+            <p className="text-sm text-muted-foreground">{t("searchNext")}</p>
             <CitySearch
               onSelect={(result) =>
                 onAddCity({
-                  ...blankCity(),
+                  ...blankCity(t("newStopName")),
                   name: result.name,
                   country: result.country,
                   flag: result.flag,
@@ -153,15 +166,15 @@ export function StopList({
               variant="ghost"
               size="sm"
               className="self-start"
-              onClick={() => onAddCity(blankCity())}
+              onClick={() => onAddCity(blankCity(t("newStopName")))}
             >
-              <Plus /> Or add a blank stop
+              <Plus /> {t("addBlank")}
             </Button>
           </>
         ) : (
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm text-muted-foreground">
-              Guest maps top out at {GUEST_MAX_CITIES} stops.
+              {t("limit", { max: GUEST_MAX_CITIES })}
             </p>
             <Button
               type="button"
@@ -169,7 +182,7 @@ export function StopList({
               size="sm"
               onClick={onLimitReached}
             >
-              See what unlocks
+              {t("seeUnlocks")}
             </Button>
           </div>
         )}

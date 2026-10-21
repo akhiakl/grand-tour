@@ -1,12 +1,14 @@
 "use client";
 
 import { Check, Copy } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 
 /** The address as selectable text, a mail link and a copy button. */
 export function CopyEmail({ email }: { readonly email: string }) {
+  const t = useTranslations("Legal");
   const [copied, setCopied] = useState(false);
 
   const copy = async () => {
@@ -29,7 +31,7 @@ export function CopyEmail({ email }: { readonly email: string }) {
       </a>
       <Button type="button" variant="outline" size="sm" onClick={copy}>
         {copied ? <Check /> : <Copy />}
-        {copied ? "Copied" : "Copy"}
+        {copied ? t("copied") : t("copy")}
       </Button>
     </div>
   );

@@ -20,6 +20,9 @@ export default defineConfig({
     baseURL: `http://localhost:${PORT}`,
     trace: "retain-on-failure",
     ...devices["Desktop Chrome"],
+    // The offline service worker would answer requests before page.route
+    // mocks see them; journeys test the app, not its offline cache.
+    serviceWorkers: "block",
     launchOptions: { executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH },
   },
   webServer: [

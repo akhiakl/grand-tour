@@ -2,6 +2,7 @@
 
 import type { LatLngBounds } from "leaflet";
 import { Maximize, Minus, Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import { useMap } from "react-leaflet";
 
@@ -39,17 +40,18 @@ export function MapControls({
   readonly insets: MapInsets;
 }) {
   const map = useMap();
+  const t = useTranslations("Trip.map");
 
   return (
     <MapOverlay className="top-3 right-3 flex flex-col divide-y divide-line overflow-hidden rounded-xl border border-line bg-card-solid shadow-soft">
-      <ControlButton label="Zoom in" onClick={() => map.zoomIn()}>
+      <ControlButton label={t("zoomIn")} onClick={() => map.zoomIn()}>
         <Plus />
       </ControlButton>
-      <ControlButton label="Zoom out" onClick={() => map.zoomOut()}>
+      <ControlButton label={t("zoomOut")} onClick={() => map.zoomOut()}>
         <Minus />
       </ControlButton>
       <ControlButton
-        label="Fit the whole route"
+        label={t("fitRoute")}
         onClick={() =>
           map.flyToBounds(bounds, {
             ...fitPadding(insets, map.getSize().y),

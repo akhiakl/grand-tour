@@ -200,8 +200,8 @@ describe("StopList", () => {
         legs={[makeLeg()]}
         canAddCity
         issues={{
-          "cities.0.name": "Give this stop a name.",
-          "cities.1.nights": "Nights run from 0 to 30.",
+          "cities.0.name": "nameRequired",
+          "cities.1.nights": "nightsRange",
         }}
       />,
     );

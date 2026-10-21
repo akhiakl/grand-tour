@@ -1,13 +1,12 @@
+import { getTranslations } from "next-intl/server";
+
 import { OffTheMap } from "@/components/off-the-map";
 
-export default function NotFound() {
+export default async function NotFound() {
+  const t = await getTranslations("Errors.notFound");
   return (
-    <OffTheMap
-      title="No road leads here"
-      action={{ href: "/", label: "Back to the atlas" }}
-    >
-      This page isn&apos;t on any map we&apos;ve drawn. Head back and start a new
-      route from the atlas.
+    <OffTheMap title={t("title")} action={{ href: "/", label: t("action") }}>
+      {t("body")}
     </OffTheMap>
   );
 }

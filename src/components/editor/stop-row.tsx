@@ -8,6 +8,7 @@ import {
   MoveUp,
   Trash2,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { DragEventHandler, PointerEventHandler } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -71,6 +72,8 @@ export function StopRow({
   readonly active?: boolean;
   readonly errors?: StopRowErrors;
 }) {
+  const t = useTranslations("Editor.stop");
+  const name = city.name || t("fallbackName");
   const nameErrorId = `stop-${index}-name-error`;
   const nightsErrorId = `stop-${index}-nights-error`;
 
@@ -106,7 +109,7 @@ export function StopRow({
         </div>
 
         <div className="flex w-16 flex-col gap-1.5">
-          <Label htmlFor={`stop-${index}-flag`}>Flag</Label>
+          <Label htmlFor={`stop-${index}-flag`}>{t("flag")}</Label>
           <Input
             id={`stop-${index}-flag`}
             value={city.flag}
@@ -116,7 +119,7 @@ export function StopRow({
         </div>
 
         <div className="flex min-w-32 flex-1 flex-col gap-1.5">
-          <Label htmlFor={`stop-${index}-name`}>City</Label>
+          <Label htmlFor={`stop-${index}-name`}>{t("city")}</Label>
           <Input
             id={`stop-${index}-name`}
             value={city.name}
@@ -128,7 +131,7 @@ export function StopRow({
         </div>
 
         <div className="flex min-w-32 flex-1 flex-col gap-1.5">
-          <Label htmlFor={`stop-${index}-country`}>Country</Label>
+          <Label htmlFor={`stop-${index}-country`}>{t("country")}</Label>
           <Input
             id={`stop-${index}-country`}
             value={city.country}
@@ -138,7 +141,7 @@ export function StopRow({
         </div>
 
         <div className="flex w-24 flex-col gap-1.5">
-          <Label htmlFor={`stop-${index}-nights`}>Nights</Label>
+          <Label htmlFor={`stop-${index}-nights`}>{t("nights")}</Label>
           <Input
             id={`stop-${index}-nights`}
             type="number"
@@ -159,7 +162,7 @@ export function StopRow({
             type="button"
             variant="ghost"
             size="icon"
-            aria-label={`Move ${city.name || "stop"} up`}
+            aria-label={t("moveUp", { name })}
             disabled={index === 0}
             onClick={onMoveUp}
           >
@@ -170,7 +173,7 @@ export function StopRow({
             type="button"
             variant="ghost"
             size="icon"
-            aria-label={`Move ${city.name || "stop"} down`}
+            aria-label={t("moveDown", { name })}
             disabled={index === count - 1}
             onClick={onMoveDown}
           >
@@ -180,7 +183,7 @@ export function StopRow({
             type="button"
             variant="ghost"
             size="icon"
-            aria-label={expanded ? "Collapse details" : "Edit all details"}
+            aria-label={expanded ? t("collapse") : t("expand")}
             aria-expanded={expanded}
             onClick={onToggleExpand}
           >
@@ -192,7 +195,7 @@ export function StopRow({
             type="button"
             variant="ghost"
             size="icon"
-            aria-label={`Remove ${city.name || "stop"}`}
+            aria-label={t("remove", { name })}
             onClick={onRemove}
           >
             <Trash2 />

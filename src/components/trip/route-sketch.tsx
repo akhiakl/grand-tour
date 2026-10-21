@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 import { sketchRoute, type Trip } from "@/lib/trip";
 
 const WIDTH = 480;
@@ -18,6 +20,7 @@ export function RouteSketch({
   readonly trip: Trip;
   readonly className?: string;
 }) {
+  const t = useTranslations("Trip");
   const { path, stops } = sketchRoute(trip.cities, BOX);
   const names = trip.cities.map((city) => city.name).join(", ");
 
@@ -25,7 +28,7 @@ export function RouteSketch({
     <svg
       viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
       role="img"
-      aria-label={`Route sketch: ${names}`}
+      aria-label={t("sketchLabel", { stops: names })}
       className={className}
     >
       <path

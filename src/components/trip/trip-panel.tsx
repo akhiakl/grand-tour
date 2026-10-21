@@ -1,10 +1,11 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useId, useState, type ReactNode } from "react";
 
 import { LegalLinks } from "@/components/legal/legal-links";
 import { ReportMapLink } from "@/components/legal/report-map-link";
-import type { Trip } from "@/lib/trip";
+import { stopDates, type Trip, type TripToolsScope } from "@/lib/trip";
 
 import { CityDetail } from "./city-detail";
 import type { MapInsets } from "./fit-padding";
@@ -17,6 +18,8 @@ import {
 import { PanelHead } from "./panel-head";
 import { PanelShell } from "./panel-shell";
 import { Itinerary, StatsGrid } from "./route-overview";
+import { SharedLinkNote } from "./shared-link-note";
+import { downloadTripCalendar } from "./trip-calendar";
 import { TripTools } from "./trip-tools";
 
 /**
@@ -27,6 +30,8 @@ import { TripTools } from "./trip-tools";
  */
 export function TripPanel({
   trip,
+  toolsScope,
+  views,
   variant,
   cta,
   selected,
@@ -42,6 +47,9 @@ export function TripPanel({
   onExpandedChange,
 }: {
   readonly trip: Trip;
+  /** Where this viewer's packing ticks and notes are saved. */
+  readonly toolsScope: TripToolsScope;
+  readonly views?: number;
   readonly variant: ExperienceVariant;
   readonly cta?: ReactNode;
   readonly selected: number | null;
@@ -58,10 +66,12 @@ export function TripPanel({
   readonly expanded: boolean;
   readonly onExpandedChange: (expanded: boolean) => void;
 }) {
+  const t = useTranslations("Trip.panel");
   const [tool, setTool] = useState<ToolId | null>(null);
   const [collapsed, setCollapsed] = useState(false);
   const bodyId = useId();
   const city = selected === null ? null : trip.cities[selected];
+  const dates = stopDates(trip);
 
   // A newly picked stop (from the map or the itinerary) takes over the
   // panel from any open tool, unfolding a collapsed card to show it.
@@ -97,7 +107,7 @@ export function TripPanel({
 
   return (
     <PanelShell
-      label="Trip details"
+      label={t("label")}
       expanded={expanded}
       onExpandedChange={onExpandedChange}
       collapsed={collapsed}
@@ -128,11 +138,17 @@ export function TripPanel({
             city={city}
             index={selected}
             count={trip.cities.length}
+            dates={dates?.[selected]}
             onBack={() => onSelect(null)}
           />
         )}
         {/* Always mounted so ticks and notes survive a detour to a stop. */}
-        <TripTools active={city ? null : tool} onBack={() => setTool(null)} />
+        <TripTools
+          trip={trip}
+          scope={toolsScope}
+          active={city ? null : tool}
+          onBack={() => setTool(null)}
+        />
         {!city && !tool && (
           <>
             <SecondaryActions
@@ -140,11 +156,12 @@ export function TripPanel({
               tool={tool}
               onTool={openTool}
               onPoster={onPoster}
+              onCalendar={dates ? () => downloadTripCalendar(trip) : undefined}
               onEditRoute={onEditRoute}
             />
             <StatsGrid trip={trip} />
-            <section aria-label="Route" className="flex flex-col gap-2">
-              <p className="eyebrow">The route</p>
+            <section aria-label={t("routeLabel")} className="flex flex-col gap-2">
+              <p className="eyebrow">{t("theRoute")}</p>
               <Itinerary
                 trip={trip}
                 selectedIndex={selected}
@@ -153,6 +170,7 @@ export function TripPanel({
                 onHover={onHover}
               />
             </section>
+            {variant === "shared" && <SharedLinkNote views={views} />}
             <LegalLinks className="border-t border-line pt-4">
               {variant === "shared" && <ReportMapLink />}
             </LegalLinks>

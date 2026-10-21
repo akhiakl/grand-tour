@@ -1,7 +1,9 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
+import { highlight } from "@/components/rich-text";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useUnits } from "@/components/units/units-provider";
 import type { City } from "@/lib/trip";
@@ -55,14 +57,15 @@ function DayRow({
 }
 
 export function OverviewSection({ city }: { readonly city: City }) {
+  const t = useTranslations("Trip.city");
   return (
     <div className="space-y-7">
       <div>
-        <SectionHeading>Why visit</SectionHeading>
+        <SectionHeading>{t("whyVisit")}</SectionHeading>
         <p className="text-sm leading-relaxed text-muted-foreground">{city.why}</p>
       </div>
       <div>
-        <SectionHeading>Must see</SectionHeading>
+        <SectionHeading>{t("mustSee")}</SectionHeading>
         <div className="flex flex-wrap gap-2">
           {city.must.map((item) => (
             <Pill key={item}>{item}</Pill>
@@ -71,7 +74,7 @@ export function OverviewSection({ city }: { readonly city: City }) {
       </div>
       {city.gems.length > 0 && (
         <div>
-          <SectionHeading>Hidden gems</SectionHeading>
+          <SectionHeading>{t("hiddenGems")}</SectionHeading>
           <div className="flex flex-wrap gap-2">
             {city.gems.map((item) => (
               <Pill key={item} gem>
@@ -86,9 +89,10 @@ export function OverviewSection({ city }: { readonly city: City }) {
 }
 
 export function ItinerarySection({ city }: { readonly city: City }) {
+  const t = useTranslations("Trip.city");
   return (
     <div>
-      <SectionHeading>Day by day</SectionHeading>
+      <SectionHeading>{t("dayByDay")}</SectionHeading>
       {city.days.map(([day, theme, plan]) => (
         <DayRow key={day} lead={day} title={theme} body={plan} />
       ))}
@@ -97,9 +101,10 @@ export function ItinerarySection({ city }: { readonly city: City }) {
 }
 
 export function FoodSection({ city }: { readonly city: City }) {
+  const t = useTranslations("Trip.city");
   return (
     <div>
-      <SectionHeading>Eat like a local</SectionHeading>
+      <SectionHeading>{t("eatLocal")}</SectionHeading>
       {city.food.map(([dish, where]) => (
         <DayRow key={dish} lead="🍽" title={dish} body={where} />
       ))}
@@ -132,17 +137,21 @@ function InfoCard({
 }
 
 export function PracticalSection({ city }: { readonly city: City }) {
+  const t = useTranslations("Trip");
   const { money } = useUnits();
   return (
     <div className="space-y-7">
       <div className="grid grid-cols-2 gap-2.5">
-        <InfoCard label="Daily budget" value={`${money(city.budget)} per person`} />
-        <InfoCard label="Getting around" value={city.transport} />
-        <InfoCard label="Where to stay" value={city.stay} wide />
+        <InfoCard
+          label={t("city.dailyBudget")}
+          value={t("perPerson", { amount: money(city.budget) })}
+        />
+        <InfoCard label={t("city.gettingAround")} value={city.transport} />
+        <InfoCard label={t("city.whereToStay")} value={city.stay} wide />
       </div>
       {city.tips.length > 0 && (
         <div>
-          <SectionHeading>Local tips</SectionHeading>
+          <SectionHeading>{t("city.localTips")}</SectionHeading>
           {city.tips.map((tip) => (
             <p
               key={tip}
@@ -160,7 +169,7 @@ export function PracticalSection({ city }: { readonly city: City }) {
   );
 }
 
-const SPEND_STYLES = ["Backpacker", "Comfortable", "Indulgent"] as const;
+const SPEND_STYLES = ["backpacker", "comfortable", "indulgent"] as const;
 
 function spendStyleIndex(spend: number) {
   if (spend < 33) return 0;
@@ -173,6 +182,7 @@ export function PlannerSection({ city }: { readonly city: City }) {
   const [checked, setChecked] = useState<ReadonlySet<string>>(new Set());
   const [spend, setSpend] = useState(50);
   const { money } = useUnits();
+  const t = useTranslations("Trip.city");
 
   const [low, high] = city.budget;
   const perDay = Math.round(low + ((high - low) * spend) / 100);
@@ -193,14 +203,16 @@ export function PlannerSection({ city }: { readonly city: City }) {
   return (
     <div className="space-y-7">
       <div>
-        <SectionHeading>Budget calculator</SectionHeading>
+        <SectionHeading>{t("budgetCalculator")}</SectionHeading>
         <div className="rounded-2xl border border-line bg-card p-4">
           <label
             htmlFor="spend-style"
             className="mb-1.5 block text-xs text-muted-foreground"
           >
-            Spending style —{" "}
-            <b className="font-semibold text-foreground">{spendStyle}</b>
+            {t.rich("spendingStyle", {
+              style: t(`spendStyles.${spendStyle}`),
+              b: highlight,
+            })}
           </label>
           <input
             id="spend-style"
@@ -214,8 +226,7 @@ export function PlannerSection({ city }: { readonly city: City }) {
           <p className="mt-2 font-display text-2xl font-medium">
             {money(perDay * city.nights)}{" "}
             <span className="font-sans text-[13px] font-normal text-muted-foreground">
-              total · {money(perDay)}/day × {city.nights} night
-              {city.nights === 1 ? "" : "s"}
+              {t("budgetTotal", { perDay: money(perDay), nights: city.nights })}
             </span>
           </p>
         </div>
@@ -223,9 +234,9 @@ export function PlannerSection({ city }: { readonly city: City }) {
 
       <div>
         <div className="flex items-baseline justify-between">
-          <SectionHeading>Attraction checklist</SectionHeading>
+          <SectionHeading>{t("checklist")}</SectionHeading>
           <span className="text-xs text-muted-foreground">
-            {checked.size}/{items.length} planned
+            {t("planned", { done: checked.size, total: items.length })}
           </span>
         </div>
         <ul>

@@ -72,6 +72,12 @@ route maps — populated by AI chat or manually — shared via short links
   new data flows to third parties must be added to the Privacy processor list.
 - Default trip title is "Grand Tour" (`DEFAULT_TRIP_TITLE`); users can set a
   custom title per trip.
+- **Copy**: every UI string lives in `src/i18n/messages/en.json` (next-intl,
+  single locale, typed keys) — never hardcode copy in components; `lib`
+  returns message keys, not text. Only the Privacy/Terms policy text stays
+  inline. See `docs/ARCHITECTURE.md` → Copy and i18n.
+- **Viewer state** (packing ticks, own items, notes) is per trip in
+  localStorage (`trip-tools:*`), never in the shared snapshot.
 
 ## Design system — "field atlas", minimal luxury
 

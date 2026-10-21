@@ -88,4 +88,17 @@ describe("TripSchema", () => {
   it("rejects unknown schema versions", () => {
     expect(TripSchema.safeParse({ ...makeTrip(), v: 2 }).success).toBe(false);
   });
+
+  it("keeps a start date optional so older snapshots still parse", () => {
+    expect(TripSchema.parse(makeTrip()).startDate).toBeUndefined();
+    expect(
+      TripSchema.parse(makeTrip(2, { startDate: "2027-05-01" })).startDate,
+    ).toBe("2027-05-01");
+    expect(TripSchema.safeParse(makeTrip(2, { startDate: "May 1st" })).success).toBe(
+      false,
+    );
+    expect(
+      TripSchema.safeParse(makeTrip(2, { startDate: "2027-02-30" })).success,
+    ).toBe(false);
+  });
 });

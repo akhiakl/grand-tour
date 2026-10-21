@@ -1,5 +1,6 @@
 import { Compass } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -14,11 +15,12 @@ export function OffTheMap({
   readonly children: ReactNode;
   readonly action: { readonly href: string; readonly label: string };
 }) {
+  const t = useTranslations("Common");
   return (
     <main className="grid min-h-dvh place-items-center px-6 text-center">
       <div className="flex flex-col items-center gap-3">
         <Compass aria-hidden className="size-10 text-muted-foreground" />
-        <p className="eyebrow">Off the map</p>
+        <p className="eyebrow">{t("offTheMap")}</p>
         <h1 className="font-display text-3xl font-medium tracking-tight sm:text-4xl">
           {title}
         </h1>

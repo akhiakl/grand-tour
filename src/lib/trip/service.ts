@@ -3,7 +3,7 @@ import "server-only";
 import { Redis } from "@upstash/redis";
 import { nanoid } from "nanoid";
 
-import { TripSchema, type Trip } from "./schema";
+import { SHARE_TTL_DAYS, TripSchema, type Trip } from "./schema";
 
 /**
  * Service layer over Upstash Redis — plain transport-agnostic functions.
@@ -11,7 +11,7 @@ import { TripSchema, type Trip } from "./schema";
  */
 
 /** Shared snapshots live for 60 days; every read slides the window. */
-export const TRIP_TTL_SECONDS = 60 * 24 * 60 * 60;
+export const TRIP_TTL_SECONDS = SHARE_TTL_DAYS * 24 * 60 * 60;
 
 /** Length of the short share id used in `/t/{id}` links. */
 export const TRIP_ID_LENGTH = 8;
