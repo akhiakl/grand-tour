@@ -1,0 +1,573 @@
+{
+  "Common": {
+    "appName": "Grand Tour",
+    "backToAtlas": "Field Atlas",
+    "offTheMap": "Off the map"
+  },
+  "Metadata": {
+    "titleTemplate": "%s · Grand Tour",
+    "description": "Craft a beautiful, interactive travel route map — drawn by AI or by hand — and share it with a single link.",
+    "manifestDescription": "Beautiful, interactive travel route maps, drawn by AI or by hand and shared with one link.",
+    "plan": {
+      "title": "Plan with AI",
+      "description": "Three questions, one drafted route. Tell the atlas where, how long and what pace; then make it yours."
+    },
+    "new": {
+      "title": "Build a trip",
+      "description": "Draw your route stop by stop: cities, nights, legs and the notes that make each one yours."
+    },
+    "maps": {
+      "title": "My Maps",
+      "description": "Every route you have drawn on this device, ready to open, edit or share."
+    },
+    "mapView": {
+      "title": "Your map"
+    },
+    "offline": {
+      "title": "Offline"
+    },
+    "shared": {
+      "notFound": "Map not found",
+      "description": "{cities, plural, one {# city} other {# cities}} · {nights, plural, one {# night} other {# nights}} · {countries, plural, one {# country} other {# countries}} — a route drawn with Grand Tour."
+    },
+    "about": {
+      "title": "How it works",
+      "description": "Draw a travel route with AI or by hand, shape every leg, and share it as one link. Free, no account needed."
+    },
+    "contact": {
+      "title": "Contact",
+      "description": "Feedback, privacy requests and map reports for Grand Tour."
+    },
+    "terms": {
+      "title": "Terms",
+      "description": "The rules for using Grand Tour and sharing maps with it."
+    },
+    "privacy": {
+      "title": "Privacy",
+      "description": "What Grand Tour collects, who processes it, how long it is kept and how to reach us."
+    }
+  },
+  "Plan": {
+    "title": "Plan with the <em>atlas</em>",
+    "lede": "Three questions, one drafted route. You edit everything after."
+  },
+  "Landing": {
+    "group": "Start your own route",
+    "planWithAi": "Plan with AI",
+    "buildManually": "Build manually",
+    "howItWorks": "Free, no account needed · How it works",
+    "welcomeBack": "Welcome back",
+    "continue": "Continue {title}",
+    "searchLabel": "Where to?",
+    "searchPlaceholder": "Know where? Search a city…",
+    "searchPlaceholderReturning": "Or plan somewhere new…",
+    "clearDestination": "Clear destination",
+    "startTo": "Start a route to {place}"
+  },
+  "Errors": {
+    "notFound": {
+      "title": "No road leads here",
+      "body": "This page isn't on any map we've drawn. Head back and start a new route from the atlas.",
+      "action": "Back to the atlas"
+    },
+    "expired": {
+      "title": "This map has expired",
+      "body": "Shared routes stay live for {days} days after their last visit, and this one's trail has gone cold. You can always draw a new one.",
+      "action": "Create your own"
+    },
+    "notOnDevice": {
+      "title": "Not on this device",
+      "body": "Local maps live in this browser only. If you saved it somewhere else, open it from there, or start a new one here.",
+      "action": "Back to My Maps"
+    },
+    "offline": {
+      "title": "Out of signal",
+      "body": "This page wasn't saved before the connection dropped. Maps you have already opened on this device still work offline.",
+      "action": "Try the atlas again"
+    },
+    "global": {
+      "title": "We lost the trail for a moment.",
+      "body": "Something went wrong on our side. Your maps are safe — try picking up where you left off.",
+      "action": "Try again"
+    }
+  },
+  "Vibes": {
+    "relaxed": {
+      "label": "Relaxed",
+      "hint": "Fewer stops, long lunches"
+    },
+    "balanced": {
+      "label": "Balanced",
+      "hint": "A steady rhythm"
+    },
+    "packed": {
+      "label": "Packed",
+      "hint": "See as much as possible"
+    }
+  },
+  "Chat": {
+    "destinationLabel": "Destination",
+    "destinationPlaceholder": "Austria, the Dalmatian coast, Kyoto and around…",
+    "next": "Next",
+    "daysLabel": "Number of days",
+    "daysUnit": "days",
+    "paceLabel": "Pace",
+    "askDestination": "Where should this journey go? A country, a region, or a string of cities all work.",
+    "askDays": "How many days do you have, from 2 to 30?",
+    "answerDays": "{days} days",
+    "askPace": "And the pace?",
+    "drafting": "Drafting your route…",
+    "rateLimited": "The atlas needs a breather. Too many drafts in a short while; give it a minute and try again.",
+    "failed": "That route didn't come together. Try once more, or start from a blank page.",
+    "retry": "Try again",
+    "byHand": "Build it by hand"
+  },
+  "Modes": {
+    "train": "Train",
+    "bus": "Bus",
+    "flight": "Flight",
+    "car": "Car",
+    "ferry": "Ferry"
+  },
+  "Editor": {
+    "titleLabel": "Trip title",
+    "startsLabel": "Starts",
+    "startsHint": "Optional: dates each stop",
+    "undo": "Undo",
+    "undoHint": "Undo (Ctrl+Z)",
+    "redo": "Redo",
+    "redoHint": "Redo (Ctrl+Shift+Z)",
+    "myMaps": "My Maps",
+    "share": "Share",
+    "shareStale": "Edited since you shared it. Share again to update the link.",
+    "fixBeforeShare": "A few fields need fixing before this map can be shared.",
+    "redrafted": "Route redrafted. Undo brings the previous one back.",
+    "issues": {
+      "titleRequired": "Give your map a title.",
+      "nameRequired": "Give this stop a name.",
+      "nightsRange": "Nights run from 0 to 30.",
+      "startDateInvalid": "Pick a real calendar date.",
+      "invalid": "Check this field."
+    },
+    "stops": {
+      "heading": "Stops",
+      "counter": "{count}/{max} stops",
+      "searchNext": "Search for the next stop.",
+      "addBlank": "Or add a blank stop",
+      "newStopName": "New stop",
+      "limit": "Guest maps top out at {max} stops.",
+      "seeUnlocks": "See what unlocks"
+    },
+    "search": {
+      "placeholder": "Search for a city…",
+      "unreachable": "Couldn't reach the map atlas — try again in a moment.",
+      "noResults": "No cities found.",
+      "label": "Search for a city"
+    },
+    "stop": {
+      "flag": "Flag",
+      "city": "City",
+      "country": "Country",
+      "nights": "Nights",
+      "fallbackName": "stop",
+      "moveUp": "Move {name} up",
+      "moveDown": "Move {name} down",
+      "collapse": "Collapse details",
+      "expand": "Edit all details",
+      "remove": "Remove {name}"
+    },
+    "details": {
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "budgetLow": "Budget low (USD/day)",
+      "budgetHigh": "Budget high (USD/day)",
+      "why": "Why go",
+      "transport": "Getting around",
+      "stay": "Where to stay",
+      "must": "Must-sees",
+      "gems": "Hidden gems",
+      "food": "Food & drink",
+      "addDish": "Add dish",
+      "dish": "Dish",
+      "dishWhere": "Where to get it",
+      "days": "Day-by-day",
+      "addDay": "Add day",
+      "newDay": "Day",
+      "dayPlaceholder": "Day 1",
+      "dayTitlePlaceholder": "Old town",
+      "dayBodyPlaceholder": "What the day looks like",
+      "tips": "Tips"
+    },
+    "list": {
+      "add": "Add",
+      "remove": "Remove {label} {number}"
+    },
+    "leg": {
+      "mode": "Mode",
+      "label": "Label",
+      "labelPlaceholder": "Railjet via Linz",
+      "duration": "Duration",
+      "durationPlaceholder": "~2h 30m",
+      "crowFlies": "{distance} as the crow flies",
+      "useEstimate": "Use estimate ({estimate} by {mode})"
+    },
+    "redraft": {
+      "eyebrow": "Redraft with AI",
+      "hint": "Replaces your stops in one step; undo brings them back.",
+      "where": "Where",
+      "days": "Days",
+      "pace": "Pace",
+      "submit": "Redraft route",
+      "drafting": "Drafting your route…",
+      "rateLimited": "The atlas needs a breather. Give it a minute and try again.",
+      "failed": "That redraft didn't come together. Your route is untouched; try again."
+    },
+    "previewEmpty": "Add a stop to see it appear on the map."
+  },
+  "Theme": {
+    "toLight": "Switch to light theme",
+    "toDark": "Switch to dark theme"
+  },
+  "Units": {
+    "trigger": "Units and currency",
+    "eyebrow": "Your view",
+    "title": "Units & currency",
+    "description": "Changes how routes read to you only. Budgets are estimated in US dollars and converted at today's rates.",
+    "distance": "Distance",
+    "km": "Kilometres",
+    "mi": "Miles",
+    "currency": "Currency",
+    "ratesUnavailable": "Live rates are out of reach right now, so amounts show in US dollars."
+  },
+  "Upsell": {
+    "eyebrow": "The atlas grows",
+    "title": "{max} stops, for now",
+    "description": "Guest maps travel light — {max} cities and a {days}-day link. Sign up (coming soon) for a longer itinerary and a few more keepsakes.",
+    "features": {
+      "stops": "15 stops",
+      "permanent": "Permanent links",
+      "pdf": "PDF export",
+      "themes": "Custom themes"
+    },
+    "dismiss": "Got it"
+  },
+  "Share": {
+    "eyebrow": "Ready to travel",
+    "title": "Your map is live",
+    "description": "Anyone with this link can view the route. It stays live for {days} days after its last visit; share again after editing.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "copiedToast": "Map shared — link copied",
+    "copyFailed": "Couldn't copy — select and copy the link manually.",
+    "nativeShare": "Share via…",
+    "errors": {
+      "tooLarge": "That map is too big to share — trim a few details and retry.",
+      "rateLimited": "The atlas needs a breather — try sharing again shortly.",
+      "failed": "Couldn't share that map — try again.",
+      "offline": "Couldn't reach the atlas — check your connection and retry."
+    }
+  },
+  "Maps": {
+    "title": "My <em>Maps</em>",
+    "newMap": "New map",
+    "empty": "No maps yet. Draft one with the atlas, or draw it stop by stop.",
+    "planWithAi": "Plan with AI",
+    "buildManually": "Build manually",
+    "imported": "Imported {title}",
+    "card": {
+      "view": "View",
+      "viewTrip": "View {title}",
+      "edit": "Edit {title}",
+      "share": "Share {title}",
+      "duplicate": "Duplicate {title}",
+      "duplicateHint": "Duplicate",
+      "export": "Download a backup of {title}",
+      "exportHint": "Download backup",
+      "delete": "Delete {title}",
+      "summary": "{stops, plural, one {# stop} other {# stops}} · {nights, plural, one {# night} other {# nights}} · Updated {updated}",
+      "sharedOn": "Shared {when} · <link>open link</link>",
+      "shareStale": "Edited since you shared it. Share again for an up-to-date link.",
+      "deleteTitle": "Delete {title}?",
+      "deleteBody": "This removes it from My Maps on this device. Any link you've already shared keeps working.",
+      "cancel": "Cancel",
+      "confirmDelete": "Delete"
+    },
+    "import": {
+      "button": "Import",
+      "fileLabel": "Map backup file",
+      "too_large": "That file is far too big to be a Grand Tour map.",
+      "not_json": "That file isn't a Grand Tour backup. Pick a .json map file.",
+      "not_a_trip": "That file doesn't hold a map this atlas can read (up to 5 stops)."
+    }
+  },
+  "Trip": {
+    "nights": "{count, plural, one {# night} other {# nights}}",
+    "summary": "{nights, plural, one {# night} other {# nights}} · {cities, plural, one {# city} other {# cities}} · {countries, plural, one {# country} other {# countries}}",
+    "perPerson": "{amount} per person",
+    "perDay": "{amount} per day",
+    "panel": {
+      "label": "Trip details",
+      "expandSheet": "Expand trip details",
+      "collapseSheet": "Collapse trip details",
+      "expandCard": "Expand trip card",
+      "collapseCard": "Collapse trip card",
+      "expandHint": "Expand",
+      "collapseHint": "Collapse",
+      "theRoute": "The route",
+      "routeLabel": "Route",
+      "back": "Route",
+      "eyebrow": {
+        "demo": "Example route",
+        "shared": "Shared route",
+        "own": "Your map"
+      },
+      "headline": "{nights, plural, one {# night} other {# nights}} · {cities, plural, one {# city} other {# cities}} · {distance}"
+    },
+    "actions": {
+      "remix": "Remix this trip",
+      "createOwn": "Create your own",
+      "edit": "Edit",
+      "share": "Share",
+      "sharing": "Sharing…",
+      "editRoute": "Edit this route",
+      "tools": "Trip tools",
+      "customize": "Customize",
+      "myMaps": "My maps",
+      "packing": "Packing",
+      "notes": "Notes",
+      "poster": "Poster",
+      "calendar": "Calendar"
+    },
+    "stats": {
+      "nights": "Nights",
+      "cities": "Cities",
+      "inCountries": "in {count, plural, one {# country} other {# countries}}",
+      "totalRoute": "Total route",
+      "budget": "Budget / person"
+    },
+    "itinerary": {
+      "label": "Itinerary",
+      "legLabel": "{mode}, {duration}",
+      "stopLine": "{dates}{nights, plural, one {# night} other {# nights}} · {country}"
+    },
+    "city": {
+      "stopOf": "Stop {number} of {count} · {country}",
+      "tabs": {
+        "overview": "Overview",
+        "itinerary": "Days",
+        "food": "Food",
+        "practical": "Practical",
+        "planner": "Planner"
+      },
+      "whyVisit": "Why visit",
+      "mustSee": "Must see",
+      "hiddenGems": "Hidden gems",
+      "dayByDay": "Day by day",
+      "eatLocal": "Eat like a local",
+      "dailyBudget": "Daily budget",
+      "gettingAround": "Getting around",
+      "whereToStay": "Where to stay",
+      "localTips": "Local tips",
+      "budgetCalculator": "Budget calculator",
+      "spendingStyle": "Spending style — <b>{style}</b>",
+      "spendStyles": {
+        "backpacker": "Backpacker",
+        "comfortable": "Comfortable",
+        "indulgent": "Indulgent"
+      },
+      "budgetTotal": "total · {perDay}/day × {nights, plural, one {# night} other {# nights}}",
+      "checklist": "Attraction checklist",
+      "planned": "{done}/{total} planned"
+    },
+    "tools": {
+      "packingTitle": "Packing checklist",
+      "packed": "Packed",
+      "addItem": "Add a packing item",
+      "addItemPlaceholder": "Add your own…",
+      "addItemButton": "Add item",
+      "removeItem": "Remove {item}",
+      "notesTitle": "Trip notes",
+      "notesPlaceholder": "Booking codes, addresses, ideas…",
+      "notesPrivacy": "Saved in this browser only, never in the shared link.",
+      "restoreSuggestions": "Restore {count, plural, one {# removed suggestion} other {# removed suggestions}}"
+    },
+    "packing": {
+      "passport": "Passport & ID",
+      "insurance": "Travel insurance details",
+      "shoes": "Comfortable walking shoes",
+      "powerBank": "Power bank",
+      "bottle": "Refillable water bottle",
+      "dayPack": "Day pack",
+      "rainLayer": "Light rain layer",
+      "adapter": "Power adapter for type {type} sockets ({countries})",
+      "universalAdapter": "Universal travel adapter",
+      "train": "Rail tickets saved offline",
+      "bus": "Bus tickets saved offline",
+      "flight": "Boarding passes & a clear liquids bag",
+      "ferry": "Ferry booking & a motion-sickness remedy",
+      "car": "Driving licence (and an international permit if needed)",
+      "cash": "A little local cash for each country",
+      "laundry": "Travel laundry kit"
+    },
+    "sharedNote": {
+      "views": "Opened {count, plural, one {# time} other {# times}}.",
+      "expiry": "This link stays live for {days} days after its last visit."
+    },
+    "map": {
+      "label": "Route map",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "fitRoute": "Fit the whole route",
+      "marker": "{name}, stop {number}",
+      "ghostMarker": "{name}, locked suggestion",
+      "basemapDown": "The basemap is out of reach. Your route is still here.",
+      "retry": "Retry"
+    },
+    "legend": {
+      "title": "Legend",
+      "stop": "Stop",
+      "selected": "Selected stop",
+      "locked": "Locked suggestion"
+    },
+    "poster": {
+      "title": "Share your route",
+      "description": "A clean poster of the journey — sized for Instagram (4:5), no app chrome, follows your theme. Or print the full itinerary for the road.",
+      "alt": "Route poster for {title}",
+      "failed": "The press jammed on this one. Close and open the poster again to retry.",
+      "print": "Print itinerary",
+      "share": "Share…",
+      "download": "Download PNG",
+      "eyebrow": "FIELD ATLAS",
+      "summary": "{nights, plural, one {# night} other {# nights}} · {cities, plural, one {# city} other {# cities}} · {countries, plural, one {# country} other {# countries}} · {distance}",
+      "brand": "Grand Tour"
+    },
+    "print": {
+      "eyebrow": "Grand Tour itinerary",
+      "stop": "Stop {number} · {country}",
+      "dayByDay": "Day by day",
+      "mustSee": "Must see",
+      "hiddenGems": "Hidden gems",
+      "eat": "Eat",
+      "tips": "Tips",
+      "stay": "Stay: {stay}.",
+      "gettingAround": "Getting around: {transport}."
+    },
+    "og": {
+      "alt": "A Grand Tour route map",
+      "eyebrow": "FIELD ATLAS",
+      "expired": "This map has expired",
+      "summary": "{cities, plural, one {# city} other {# cities}} · {nights, plural, one {# night} other {# nights}} · {countries, plural, one {# country} other {# countries}}"
+    },
+    "sketchLabel": "Route sketch: {stops}"
+  },
+  "Legal": {
+    "navLabel": "Legal",
+    "contact": "Contact",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "about": "About",
+    "footerCredit": "Grand Tour · Map data © OpenStreetMap contributors",
+    "onThisPage": "On this page",
+    "lastUpdated": "Last updated {date}",
+    "copy": "Copy",
+    "copied": "Copied",
+    "aiNotice": "<strong>You're planning with an AI.</strong> Its suggestions can be wrong or out of date. Check prices, visas, opening hours and safety advice before you travel.",
+    "termsNotice": "By {action} you agree to the <terms>Terms</terms> and <privacy>Privacy notice</privacy>.",
+    "termsActions": {
+      "sharing": "sharing this link",
+      "drafting": "choosing a pace and drafting a route"
+    },
+    "report": {
+      "link": "Report this map",
+      "subject": "Report a map: {url}",
+      "body": "Map: {url}\n\nReason (illegal content, spam or scam, copyright, personal information, child safety, other):\n\nWhat's wrong and why:\n\nYour name (optional):\n\nI believe the information in this report is accurate and complete."
+    },
+    "termsPage": {
+      "eyebrow": "Terms of use",
+      "title": "Terms"
+    },
+    "privacyPage": {
+      "eyebrow": "Privacy notice",
+      "title": "Privacy"
+    }
+  },
+  "Contact": {
+    "eyebrow": "Get in touch",
+    "title": "Contact",
+    "inbox": "One inbox for feedback, privacy requests and map reports.",
+    "operator": "Grand Tour is run by {operator}, an individual based in {country}. We usually reply within a few working days.",
+    "write": {
+      "title": "What to write about",
+      "feedback": "<strong>Feedback and bugs.</strong> What you tried, what happened, and the page or map link if there is one.",
+      "report": "<strong>Report a map.</strong> Use “Report this map” on the map itself, or send its link and what’s wrong with it.",
+      "privacy": "<strong>Privacy requests.</strong> Access, correction or deletion of your data, including removing a map you shared (send its link). See the <link>Privacy notice</link>."
+    },
+    "grievance": {
+      "title": "Grievance Officer",
+      "body": "{operator}, {country} · {email}. Complaints are acknowledged within {hours} hours and resolved within {days} days."
+    },
+    "faq": {
+      "title": "Before you write",
+      "lost": "<strong>Lost a map?</strong> Unshared maps live only in the browser where you made them, so we can’t restore them.",
+      "expired": "<strong>Link stopped working?</strong> Shared maps expire {days} days after their last view. Share the map again from My Maps for a fresh link.",
+      "stops": "<strong>Need more than {max} stops?</strong> Longer itineraries are coming with sign-up; for now, split a long journey into two maps."
+    }
+  },
+  "About": {
+    "eyebrow": "Field notes",
+    "title": "Every journey deserves a map <em>worth sharing</em>",
+    "lede": "Grand Tour turns a trip idea into an interactive route map: cities, nights, trains and flights, drawn by AI or by hand. Free, and no account needed.",
+    "planWithAi": "Plan with AI",
+    "buildManually": "Build manually",
+    "example": {
+      "eyebrow": "An example route",
+      "stats": "{cities, plural, one {# stop} other {# stops}} · {nights, plural, one {# night} other {# nights}} · {countries, plural, one {# country} other {# countries}}",
+      "open": "Open the live map"
+    },
+    "start": {
+      "title": "Your next grand tour starts here",
+      "body": "Up to {max} stops, one link, no account."
+    },
+    "how": {
+      "eyebrow": "How it works",
+      "title": "From a hunch to a shared map in minutes",
+      "step": "Step {number}",
+      "describe": {
+        "title": "Describe",
+        "body": "Tell the AI planner where, how long and what pace, or add cities by hand."
+      },
+      "shape": {
+        "title": "Shape",
+        "body": "Reorder stops, pick trains, flights or drives, and set nights in each place."
+      },
+      "share": {
+        "title": "Share",
+        "body": "Send one link to your travel companions, or save the route as a poster."
+      }
+    },
+    "faq": {
+      "eyebrow": "Questions",
+      "title": "Before you set off",
+      "free": {
+        "q": "Is it free?",
+        "a": "Yes. Guest maps are free, with up to {max} stops each."
+      },
+      "account": {
+        "q": "Do I need an account?",
+        "a": "No. Your maps are saved in this browser. Sharing creates a link anyone can open, no sign-up needed."
+      },
+      "links": {
+        "q": "How long do shared links last?",
+        "a": "A shared map stays live for {days} days after its last view, so links in active use keep working."
+      },
+      "ai": {
+        "q": "Is the AI always right?",
+        "a": "No. It drafts a sensible route, but check transport, prices, visas and opening hours before you book."
+      },
+      "data": {
+        "q": "What happens to my data?",
+        "a": "Unshared maps never leave your browser. See the <link>Privacy notice</link> for what shared maps and the AI planner send to us."
+      }
+    }
+  }
+}

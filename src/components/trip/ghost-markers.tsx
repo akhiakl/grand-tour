@@ -1,6 +1,7 @@
 "use client";
 
 import L from "leaflet";
+import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Marker } from "react-leaflet";
 
@@ -17,6 +18,7 @@ function GhostMarker({
   readonly ghost: GhostStop;
   readonly onSelect: () => void;
 }) {
+  const t = useTranslations("Trip.map");
   const icon = useMemo(
     () =>
       L.divIcon({
@@ -32,7 +34,7 @@ function GhostMarker({
     <Marker
       position={ghost.ll}
       icon={icon}
-      title={`${ghost.name}, locked suggestion`}
+      title={t("ghostMarker", { name: ghost.name })}
       autoPanOnFocus={false}
       eventHandlers={{ click: onSelect }}
     />

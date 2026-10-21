@@ -3,7 +3,6 @@ import {
   labelSide,
   makeMercatorView,
   routePath,
-  tripStats,
   type LatLng,
   type PosterPoint,
   type Trip,
@@ -34,9 +33,14 @@ export interface PosterFonts {
 }
 
 /** The viewer's units and currency, applied to the poster's stats line. */
-export interface PosterFormat {
-  money: (usd: readonly [number, number]) => string;
-  distance: (km: number) => string;
+/** Poster wording, translated and unit-formatted by the caller. */
+export interface PosterCopy {
+  eyebrow: string;
+  /** Nights · cities · countries · distance line. */
+  summary: string;
+  /** The whole-trip budget line, in the viewer's currency. */
+  perPerson: string;
+  brand: string;
 }
 
 /** The basemap window (frame-inset, between header and footer). */
@@ -79,6 +83,7 @@ function drawHeader(
   trip: Trip,
   theme: PosterTheme,
   fonts: PosterFonts,
+  copy: PosterCopy,
 ) {
   ctx.textBaseline = "alphabetic";
   ctx.textAlign = "left";
@@ -86,7 +91,7 @@ function drawHeader(
   ctx.fillStyle = theme.brass;
   ctx.font = `600 22px ${fonts.sans}`;
   ctx.letterSpacing = "8px";
-  ctx.fillText("FIELD ATLAS", EDGE, 132);
+  ctx.fillText(copy.eyebrow, EDGE, 132);
   ctx.letterSpacing = "0px";
 
   const words = trip.title.split(" ");
@@ -189,27 +194,19 @@ function drawAttribution(
 
 function drawFooter(
   ctx: CanvasRenderingContext2D,
-  trip: Trip,
   theme: PosterTheme,
   fonts: PosterFonts,
-  format: PosterFormat,
+  copy: PosterCopy,
 ) {
-  const stats = tripStats(trip);
   ctx.textAlign = "center";
   ctx.textBaseline = "alphabetic";
 
   ctx.fillStyle = theme.ink;
   ctx.font = `400 28px ${fonts.sans}`;
-  ctx.fillText(
-    `${stats.nights} nights · ${stats.cities} cities · ${stats.countries} ${
-      stats.countries === 1 ? "country" : "countries"
-    } · ${format.distance(stats.totalKm)}`,
-    POSTER_WIDTH / 2,
-    1158,
-  );
+  ctx.fillText(copy.summary, POSTER_WIDTH / 2, 1158);
   ctx.fillStyle = theme.inkSoft;
   ctx.font = `400 25px ${fonts.sans}`;
-  ctx.fillText(`${format.money(stats.budget)} per person`, POSTER_WIDTH / 2, 1198);
+  ctx.fillText(copy.perPerson, POSTER_WIDTH / 2, 1198);
 
   ctx.strokeStyle = theme.brass;
   ctx.lineWidth = 2;
@@ -220,7 +217,7 @@ function drawFooter(
 
   ctx.fillStyle = theme.brass;
   ctx.font = `italic 500 27px ${fonts.display}`;
-  ctx.fillText("Grand Tour", POSTER_WIDTH / 2, 1276);
+  ctx.fillText(copy.brand, POSTER_WIDTH / 2, 1276);
 }
 
 /**
@@ -232,7 +229,7 @@ export async function drawPoster(
   trip: Trip,
   theme: PosterTheme,
   fonts: PosterFonts,
-  format: PosterFormat,
+  copy: PosterCopy,
 ) {
   canvas.width = POSTER_WIDTH;
   canvas.height = POSTER_HEIGHT;
@@ -254,8 +251,8 @@ export async function drawPoster(
   const hasTiles = await drawBasemap(ctx, view, WIN, theme.mapFilter, theme.paper);
   if (hasTiles) fadeTileEdges(ctx, WIN, theme.paper);
   drawFrame(ctx, theme);
-  drawHeader(ctx, trip, theme, fonts);
+  drawHeader(ctx, trip, theme, fonts, copy);
   drawRoute(ctx, trip, theme, fonts, toCanvas);
   if (hasTiles) drawAttribution(ctx, theme, fonts);
-  drawFooter(ctx, trip, theme, fonts, format);
+  drawFooter(ctx, theme, fonts, copy);
 }

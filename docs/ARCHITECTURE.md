@@ -15,6 +15,7 @@ are the standard for any Next.js project we start.
 | `/maps/[id]`                     | **Map View**    | Immersive view of one of _your_ local trips, no share link needed. `TripExperience actions="own"`: Edit (in place) + Share.                                                                                                                       |
 | `/t/[id]`                        | **Shared View** | Public, read-only view of a shared Redis snapshot. `TripExperience actions="shared"`: Remix (forks a copy) + Create your own + Report this map.                                                                                                   |
 | `/privacy`, `/terms`, `/contact` | **Legal**       | Policy and contact pages on the shared `LegalPage` shell; facts come from `@/lib/legal`.                                                                                                                                                          |
+| `/offline`                       | **Offline**     | Served by the service worker (`public/sw.js`) for pages never opened before the connection dropped.                                                                                                                                               |
 
 `TripExperience` (full-bleed map + floating atlas card) is hosted by three of these routes,
 distinguished only by its `actions` prop (`"demo" | "shared" | "own"`, see
@@ -31,6 +32,9 @@ src/
     ui/                 shadcn primitives — dumb, style-token-driven, no app logic.
     …                   Feature components — data and handlers via props only.
   hooks/                Shared client hooks.
+  i18n/                 next-intl config: `request.ts` (server config, single
+                        locale), `config.ts` (locales), `messages/en.json`
+                        (EVERY UI string), `app-config.d.ts` (typed keys).
   lib/                  Framework-agnostic core. One folder per domain,
                         structured as an "internal package":
     trip/
@@ -110,6 +114,30 @@ Do NOT create the workspace until a second consumer actually exists.
 - Static analysis: SonarQube Cloud Automatic Analysis ("Sonar way" gate)
   via its GitHub App; scope in `.sonarcloud.properties`. Coverage is
   gated by vitest only.
+
+## Copy and i18n
+
+All UI copy lives in `src/i18n/messages/en.json` and is read with
+next-intl (`useTranslations` in client/server components,
+`getTranslations` in server components and metadata, `createTranslator`
+where no request context exists: `global-error.tsx`, OG images). Keys are
+type-checked against the English catalog. There is no locale routing yet:
+`request.ts` serves the one locale. `lib` code never returns UI text; it
+returns message keys (`DraftIssueKey`, `PackingKey`) for components to
+translate, and formats dates in the locale it is given. Tests resolve copy
+from the real catalog through the `next-intl` mocks in `vitest.setup.ts`.
+
+One exception: the Privacy and Terms policy text (summary and sections in
+`src/app/privacy/page.tsx` and `src/app/terms/page.tsx`) stays inline as a
+versioned legal document. Their page chrome and metadata use the catalog.
+
+## Offline
+
+`public/sw.js` (registered in production by `components/service-worker`)
+keeps opened maps readable offline: pages network-first with a cached
+fallback, hashed assets cache-first, basemap tiles stale-while-revalidate
+(capped at 1,500). API calls are never cached except `/api/rates`. Bump
+`VERSION` in the worker when its caching rules change.
 
 ## Security headers
 

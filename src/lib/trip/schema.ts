@@ -6,6 +6,9 @@ export const GUEST_MAX_CITIES = 5;
 /** Hard cap for any trip payload accepted by the API. */
 export const MAX_TRIP_PAYLOAD_BYTES = 50 * 1024;
 
+/** Shared snapshots stay live this long after their most recent visit. */
+export const SHARE_TTL_DAYS = 60;
+
 /** Every trip starts life named after the app itself. */
 export const DEFAULT_TRIP_TITLE = "Grand Tour";
 
@@ -40,6 +43,8 @@ export const TripSchema = z
     title: z.string().trim().min(1).max(80),
     cities: z.array(CitySchema).min(2).max(GUEST_MAX_CITIES),
     legs: z.array(LegSchema),
+    /** Optional first day (YYYY-MM-DD); dates the itinerary when set. */
+    startDate: z.iso.date().optional(),
     createdBy: z.enum(["guest", "user"]).default("guest"),
     createdAt: z.number(),
   })

@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronUp, Moon, Sun } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import type { ReactNode } from "react";
 
@@ -13,13 +14,8 @@ import { cn } from "@/lib/utils";
 import { TitleWithAccent } from "./intro-splash";
 import type { ExperienceVariant } from "./panel-actions";
 
-const EYEBROW: Record<ExperienceVariant, string> = {
-  demo: "Example route",
-  shared: "Shared route",
-  own: "Your map",
-};
-
 function ThemeToggle() {
+  const t = useTranslations("Theme");
   const { resolvedTheme, setTheme } = useTheme();
   const mounted = useMounted();
   const isDark = mounted && resolvedTheme === "dark";
@@ -27,7 +23,7 @@ function ThemeToggle() {
   return (
     <button
       type="button"
-      aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
+      aria-label={isDark ? t("toLight") : t("toDark")}
       onClick={() => setTheme(isDark ? "light" : "dark")}
       className="grid size-9 shrink-0 place-items-center rounded-full border border-line text-ink-soft transition-colors outline-none hover:bg-accent hover:text-ink focus-visible:ring-2 focus-visible:ring-ring [&_svg]:size-4"
     >
@@ -46,13 +42,14 @@ function CollapseToggle({
   readonly controls: string;
   readonly onToggle: () => void;
 }) {
+  const t = useTranslations("Trip.panel");
   return (
     <button
       type="button"
       aria-expanded={!collapsed}
       aria-controls={controls}
-      aria-label={collapsed ? "Expand trip card" : "Collapse trip card"}
-      title={collapsed ? "Expand" : "Collapse"}
+      aria-label={collapsed ? t("expandCard") : t("collapseCard")}
+      title={collapsed ? t("expandHint") : t("collapseHint")}
       onClick={onToggle}
       className="hidden size-9 shrink-0 place-items-center rounded-full border border-line text-ink-soft transition-colors outline-none hover:bg-accent hover:text-ink focus-visible:ring-2 focus-visible:ring-ring lg:grid [&_svg]:size-4"
     >
@@ -87,6 +84,7 @@ export function PanelHead({
   readonly bodyId: string;
   readonly onCollapsedChange: (collapsed: boolean) => void;
 }) {
+  const t = useTranslations("Trip.panel");
   const stats = tripStats(trip);
   const { distance } = useUnits();
 
@@ -94,12 +92,16 @@ export function PanelHead({
     <header className="flex flex-col gap-3 px-5 pt-2 pb-4 lg:px-7 lg:pt-7">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="eyebrow">{EYEBROW[variant]}</p>
+          <p className="eyebrow">{t(`eyebrow.${variant}`)}</p>
           <h1 className="truncate font-display text-2xl font-medium tracking-tight lg:text-[30px] lg:leading-tight lg:whitespace-normal">
             <TitleWithAccent title={trip.title} />
           </h1>
           <p className="mt-0.5 text-xs text-ink-soft lg:hidden">
-            {stats.nights} nights · {stats.cities} cities · {distance(stats.totalKm)}
+            {t("headline", {
+              nights: stats.nights,
+              cities: stats.cities,
+              distance: distance(stats.totalKm),
+            })}
           </p>
         </div>
         <div className="flex shrink-0 gap-2">

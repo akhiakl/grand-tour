@@ -8,6 +8,7 @@ import {
   useReducedMotion,
   type PanInfo,
 } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 
 import { DESKTOP_QUERY, useMediaQuery } from "@/hooks/use-media-query";
@@ -51,6 +52,7 @@ export function PanelShell({
   readonly onInsetsChange: (insets: MapInsets) => void;
   readonly children: ReactNode;
 }) {
+  const t = useTranslations("Trip.panel");
   const isDesktop = useMediaQuery(DESKTOP_QUERY);
   const reducedMotion = useReducedMotion();
   const dragControls = useDragControls();
@@ -141,7 +143,7 @@ export function PanelShell({
       <button
         type="button"
         aria-expanded={expanded}
-        aria-label={expanded ? "Collapse trip details" : "Expand trip details"}
+        aria-label={expanded ? t("collapseSheet") : t("expandSheet")}
         onPointerDown={(event) => dragControls.start(event)}
         onClick={() => {
           if (dragged.current) {

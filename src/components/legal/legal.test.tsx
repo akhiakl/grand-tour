@@ -53,7 +53,7 @@ describe("notices", () => {
   });
 
   it("names the action and links the terms and privacy notice", () => {
-    render(<TermsNotice action="sharing this link" />);
+    render(<TermsNotice action="sharing" />);
     expect(screen.getByText(/By sharing this link you agree/)).toBeVisible();
     expect(screen.getByRole("link", { name: "Terms" })).toHaveAttribute(
       "href",

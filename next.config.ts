@@ -1,5 +1,6 @@
 import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
 
 import { securityHeaders } from "./src/lib/http/security-headers";
 
@@ -15,13 +16,23 @@ const nextConfig: NextConfig = {
           vercelPreview: process.env.VERCEL_ENV === "preview",
         }),
       },
+      {
+        // The worker must update promptly; never serve it from HTTP cache.
+        source: "/sw.js",
+        headers: [
+          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
+          { key: "Content-Type", value: "application/javascript; charset=utf-8" },
+        ],
+      },
     ];
   },
 };
 
 // Source-map upload only runs when SENTRY_AUTH_TOKEN is present (CI);
 // local and tokenless builds are unaffected.
-export default withSentryConfig(nextConfig, {
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
+
+export default withSentryConfig(withNextIntl(nextConfig), {
   // For all available options, see:
   // https://www.npmjs.com/package/@sentry/webpack-plugin#options
 

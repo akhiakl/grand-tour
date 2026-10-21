@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 
 import { EditorPage } from "@/components/editor/editor-page";
 
-export const metadata: Metadata = {
-  title: "Build a trip",
-  description:
-    "Draw your route stop by stop: cities, nights, legs and the notes that make each one yours.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Metadata.new");
+  return {
+    title: t("title"),
+    description: t("description"),
+    robots: { index: false },
+  };
+}
 
 export default function NewPage() {
   return (

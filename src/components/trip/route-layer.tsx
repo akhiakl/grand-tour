@@ -2,6 +2,7 @@
 
 import { useReducedMotion } from "framer-motion";
 import L from "leaflet";
+import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import { Marker, Polyline } from "react-leaflet";
 
@@ -13,8 +14,8 @@ import { MODE_META } from "./mode";
 
 const ARC_SEGMENTS = 20;
 
-function badgeIcon(leg: Leg) {
-  const { emoji, label } = MODE_META[leg.mode];
+function badgeIcon(leg: Leg, label: string) {
+  const { emoji } = MODE_META[leg.mode];
   return L.divIcon({
     className: "marker-anchor",
     html: `<span class="leg-badge" role="img" aria-label="${escapeHtml(label)}, ${escapeHtml(leg.duration)}">${emoji}</span>`,
@@ -29,6 +30,7 @@ function badgeIcon(leg: Leg) {
  */
 export function RouteLayer({ trip }: { readonly trip: Trip }) {
   const reducedMotion = useReducedMotion();
+  const modes = useTranslations("Modes");
   const stops = useMemo(
     () => trip.cities.map((city) => city.ll as LatLng),
     [trip.cities],
@@ -73,7 +75,7 @@ export function RouteLayer({ trip }: { readonly trip: Trip }) {
           <Marker
             key={`${leg.label}-${i}`}
             position={position}
-            icon={badgeIcon(leg)}
+            icon={badgeIcon(leg, modes(leg.mode))}
             interactive={false}
           />
         ))}

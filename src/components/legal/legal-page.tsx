@@ -1,5 +1,6 @@
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 
 import { LEGAL_LAST_UPDATED } from "@/lib/legal";
@@ -31,6 +32,8 @@ export function LegalPage({
   /** Policies show their revision date; the contact page doesn't. */
   readonly updated?: boolean;
 }) {
+  const t = useTranslations("Legal");
+  const common = useTranslations("Common");
   return (
     <div className="flex min-h-dvh flex-col">
       <main className="mx-auto grid w-full max-w-5xl flex-1 gap-10 px-4 py-10 sm:px-6 lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-14 lg:py-16">
@@ -39,7 +42,7 @@ export function LegalPage({
             href="/"
             className="eyebrow inline-flex w-fit items-center gap-1 text-muted-foreground transition-colors hover:text-brass-text"
           >
-            <ArrowLeft className="size-3" /> Field Atlas
+            <ArrowLeft className="size-3" /> {common("backToAtlas")}
           </Link>
           <p className="eyebrow">{eyebrow}</p>
           <h1 className="font-display text-4xl font-medium tracking-tight text-ink sm:text-5xl">
@@ -47,12 +50,12 @@ export function LegalPage({
           </h1>
           {updated && (
             <p className="text-sm text-muted-foreground">
-              Last updated {LEGAL_LAST_UPDATED}
+              {t("lastUpdated", { date: LEGAL_LAST_UPDATED })}
             </p>
           )}
         </header>
 
-        <nav aria-label="On this page" className="hidden lg:block">
+        <nav aria-label={t("onThisPage")} className="hidden lg:block">
           <ol className="sticky top-8 flex flex-col gap-2 text-sm text-ink-soft">
             {sections.map(({ id, title: label }) => (
               <li key={id}>

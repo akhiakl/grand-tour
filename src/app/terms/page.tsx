@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 
 import { LegalPage, type LegalSection } from "@/components/legal/legal-page";
 import {
@@ -10,10 +12,10 @@ import {
 } from "@/lib/legal";
 import { GUEST_MAX_CITIES } from "@/lib/trip";
 
-export const metadata: Metadata = {
-  title: "Terms",
-  description: "The rules for using Grand Tour and sharing maps with it.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Metadata.terms");
+  return { title: t("title"), description: t("description") };
+}
 
 const mail = <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>;
 
@@ -149,11 +151,14 @@ const SECTIONS: readonly LegalSection[] = [
   },
 ];
 
+// The policy text itself stays here as a versioned legal document; only
+// the page chrome is read from the catalog (see docs/ARCHITECTURE.md).
 export default function TermsPage() {
+  const t = useTranslations("Legal.termsPage");
   return (
     <LegalPage
-      eyebrow="Terms of use"
-      title="Terms"
+      eyebrow={t("eyebrow")}
+      title={t("title")}
       sections={SECTIONS}
       summary={
         <p>

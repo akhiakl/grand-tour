@@ -1,9 +1,19 @@
 import { ImageResponse } from "next/og";
+import { createTranslator } from "next-intl";
 
+import { DEFAULT_LOCALE } from "@/i18n/config";
+import messages from "@/i18n/messages/en.json";
 import { makeProjector, tripStats, type LatLng } from "@/lib/trip";
 import { getTrip } from "@/lib/trip/service";
 
-export const alt = "A Grand Tour route map";
+// Image routes render outside the request's i18n context; read the catalog.
+const t = createTranslator({
+  locale: DEFAULT_LOCALE,
+  messages,
+  namespace: "Trip.og",
+});
+
+export const alt = t("alt");
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -37,7 +47,7 @@ function fallbackImage() {
           color: PALETTE.brass,
         }}
       >
-        FIELD ATLAS
+        {t("eyebrow")}
       </div>
       <div
         style={{
@@ -47,7 +57,7 @@ function fallbackImage() {
           fontWeight: 600,
         }}
       >
-        This map has expired
+        {t("expired")}
       </div>
     </div>,
     size,
@@ -99,7 +109,7 @@ export default async function Image({
             fontWeight: 600,
           }}
         >
-          FIELD ATLAS
+          {t("eyebrow")}
         </div>
         <div
           style={{
@@ -112,7 +122,11 @@ export default async function Image({
           {trip.title}
         </div>
         <div style={{ display: "flex", fontSize: 26, color: PALETTE.inkSoft }}>
-          {`${stats.cities} cities · ${stats.nights} nights · ${stats.countries} countries`}
+          {t("summary", {
+            cities: stats.cities,
+            nights: stats.nights,
+            countries: stats.countries,
+          })}
         </div>
       </div>
 

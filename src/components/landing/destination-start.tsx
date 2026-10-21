@@ -1,5 +1,6 @@
 import { PenLine, Sparkles, X } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { planHref } from "@/lib/ai";
@@ -20,6 +21,7 @@ export function DestinationStart({
   readonly primary: boolean;
   readonly onClear: () => void;
 }) {
+  const t = useTranslations("Landing");
   const place = destination.country
     ? `${destination.name}, ${destination.country}`
     : destination.name;
@@ -33,22 +35,22 @@ export function DestinationStart({
         <button
           type="button"
           onClick={onClear}
-          aria-label="Clear destination"
+          aria-label={t("clearDestination")}
           className="rounded-full p-1 text-muted-foreground outline-none hover:text-ink focus-visible:ring-2 focus-visible:ring-ring"
         >
           <X className="size-4" />
         </button>
       </div>
       <fieldset className="flex gap-2">
-        <legend className="sr-only">Start a route to {place}</legend>
+        <legend className="sr-only">{t("startTo", { place })}</legend>
         <Button asChild variant={primary ? "brass" : "outline"} className="flex-1">
           <Link href={planHref(place)}>
-            <Sparkles /> Plan with AI
+            <Sparkles /> {t("planWithAi")}
           </Link>
         </Button>
         <Button asChild variant="outline" className="flex-1">
           <Link href={`/new?${startCityQuery(destination)}`}>
-            <PenLine /> Build manually
+            <PenLine /> {t("buildManually")}
           </Link>
         </Button>
       </fieldset>

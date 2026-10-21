@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { cache } from "react";
 
 import { TripExperience } from "@/components/trip/trip-experience";
@@ -19,12 +20,19 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   const trip = await loadTrip(id);
-  if (!trip) return { title: "Map not found" };
+  const t = await getTranslations("Metadata.shared");
+  // Shared maps are private-by-link: unfurl them, never index them.
+  if (!trip) return { title: t("notFound"), robots: { index: false } };
 
   const stats = tripStats(trip);
   return {
     title: trip.title,
-    description: `${stats.cities} cities · ${stats.nights} nights · ${stats.countries} countries — a route drawn with Grand Tour.`,
+    description: t("description", {
+      cities: stats.cities,
+      nights: stats.nights,
+      countries: stats.countries,
+    }),
+    robots: { index: false, follow: false },
   };
 }
 
@@ -37,7 +45,7 @@ export default async function SharedTripPage({
   const trip = await loadTrip(id);
   if (!trip) notFound();
 
-  await incrViews(id);
+  const views = await incrViews(id);
 
-  return <TripExperience trip={trip} actions="shared" />;
+  return <TripExperience trip={trip} actions="shared" shareId={id} views={views} />;
 }

@@ -3,6 +3,7 @@
 import "leaflet/dist/leaflet.css";
 
 import L from "leaflet";
+import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef } from "react";
 import { MapContainer, Marker, useMapEvents } from "react-leaflet";
 
@@ -58,6 +59,7 @@ function CityMarker({
   readonly onSelect: (index: number) => void;
   readonly onHover?: (index: number | null) => void;
 }) {
+  const t = useTranslations("Trip.map");
   const marker = useRef<L.Marker>(null);
   const icon = useMemo(
     () =>
@@ -86,7 +88,7 @@ function CityMarker({
       icon={icon}
       // Leaflet applies `alt` only to <img> icons; `title` names a divIcon
       // for screen readers and shows the full name over a truncated label.
-      title={`${city.name}, stop ${index + 1}`}
+      title={t("marker", { name: city.name, number: index + 1 })}
       autoPanOnFocus={false}
       eventHandlers={{
         click: () => onSelect(index),

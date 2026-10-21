@@ -3,6 +3,7 @@
 import { RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { AiNotice, TermsNotice } from "@/components/legal/notices";
@@ -12,14 +13,15 @@ import { useGenerateTrip, type GeneratedDraft } from "@/hooks/use-generate-trip"
 import { writeAiHandoff, type GenerateRequest } from "@/lib/ai";
 
 import { ChatBubble } from "./chat-bubble";
-import { DaysStep, DestinationStep, VIBE_COPY, VibeStep } from "./chat-steps";
+import { DaysStep, DestinationStep, VibeStep } from "./chat-steps";
 
 type Answers = Partial<GenerateRequest>;
 
 function DraftingBubble() {
+  const t = useTranslations("Chat");
   return (
     <ChatBubble from="atlas">
-      <p className="mb-2">Drafting your route…</p>
+      <p className="mb-2">{t("drafting")}</p>
       <div aria-hidden className="flex w-56 flex-col gap-2">
         <Skeleton className="h-3 w-full" />
         <Skeleton className="h-3 w-4/5" />
@@ -36,19 +38,16 @@ function FailureBubble({
   readonly rateLimited: boolean;
   readonly onRetry: () => void;
 }) {
+  const t = useTranslations("Chat");
   return (
     <ChatBubble from="atlas">
-      <p role="alert">
-        {rateLimited
-          ? "The atlas needs a breather. Too many drafts in a short while; give it a minute and try again."
-          : "That route didn't come together. Try once more, or start from a blank page."}
-      </p>
+      <p role="alert">{rateLimited ? t("rateLimited") : t("failed")}</p>
       <div className="mt-3 flex flex-wrap gap-2">
         <Button type="button" size="sm" variant="brass" onClick={onRetry}>
-          <RotateCcw /> Try again
+          <RotateCcw /> {t("retry")}
         </Button>
         <Button asChild size="sm" variant="outline">
-          <Link href="/new">Build it by hand</Link>
+          <Link href="/new">{t("byHand")}</Link>
         </Button>
       </div>
     </ChatBubble>
@@ -67,17 +66,20 @@ export function AiChat({
   readonly initialDestination?: string;
 }) {
   const router = useRouter();
+  const t = useTranslations("Chat");
+  const vibes = useTranslations("Vibes");
   const [answers, setAnswers] = useState<Answers>({
     destination: initialDestination,
   });
 
-  const onDrafted = ({ trip, suggestedExtra }: GeneratedDraft) => {
-    writeAiHandoff({
-      title: trip.title,
-      cities: trip.cities,
-      legs: trip.legs,
-      suggestedExtra,
-    });
+  const onDrafted = (
+    { trip, suggestedExtra }: GeneratedDraft,
+    request: GenerateRequest,
+  ) => {
+    writeAiHandoff(
+      { title: trip.title, cities: trip.cities, legs: trip.legs, suggestedExtra },
+      request,
+    );
     router.push("/new?from=ai");
   };
   const { generate, status } = useGenerateTrip({ onDrafted });
@@ -96,21 +98,14 @@ export function AiChat({
     <div className="flex flex-col gap-4">
       <AiNotice />
       <div aria-live="polite" className="flex flex-col gap-3">
-        <ChatBubble from="atlas">
-          Where should this journey go? A country, a region, or a string of cities
-          all work.
-        </ChatBubble>
+        <ChatBubble from="atlas">{t("askDestination")}</ChatBubble>
         {destination && <ChatBubble from="guest">{destination}</ChatBubble>}
 
-        {destination && (
-          <ChatBubble from="atlas">
-            How many days do you have, from 2 to 30?
-          </ChatBubble>
-        )}
-        {days && <ChatBubble from="guest">{days} days</ChatBubble>}
+        {destination && <ChatBubble from="atlas">{t("askDays")}</ChatBubble>}
+        {days && <ChatBubble from="guest">{t("answerDays", { days })}</ChatBubble>}
 
-        {days && <ChatBubble from="atlas">And the pace?</ChatBubble>}
-        {vibe && <ChatBubble from="guest">{VIBE_COPY[vibe].label}</ChatBubble>}
+        {days && <ChatBubble from="atlas">{t("askPace")}</ChatBubble>}
+        {vibe && <ChatBubble from="guest">{vibes(`${vibe}.label`)}</ChatBubble>}
 
         {status === "drafting" && <DraftingBubble />}
         {(status === "rate_limited" || status === "failed") && (
@@ -130,7 +125,7 @@ export function AiChat({
       {days && !vibe && (
         <>
           <VibeStep onAnswer={(value) => answer({ vibe: value })} />
-          <TermsNotice action="choosing a pace and drafting a route" />
+          <TermsNotice action="drafting" />
         </>
       )}
     </div>

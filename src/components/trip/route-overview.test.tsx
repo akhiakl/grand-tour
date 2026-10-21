@@ -20,9 +20,26 @@ describe("StatsGrid", () => {
     expect(screen.getByText(/km$/)).toBeInTheDocument();
     expect(screen.getByText("Budget / person")).toBeInTheDocument();
   });
+
+  it("shows the date span beside the nights for a dated trip", () => {
+    render(<StatsGrid trip={{ ...trip, startDate: "2027-05-01" }} />);
+    // Three 3-night stops: May 1 to May 10.
+    expect(screen.getByText(/^May 1\s?–\s?10$/)).toBeInTheDocument();
+  });
 });
 
 describe("Itinerary", () => {
+  it("dates each stop when the trip has a start date", () => {
+    render(
+      <Itinerary
+        trip={{ ...trip, startDate: "2027-05-01" }}
+        selectedIndex={null}
+        onSelect={vi.fn()}
+      />,
+    );
+    expect(screen.getByText(/^May 4\s?–\s?7 · 3 nights/)).toBeInTheDocument();
+  });
+
   it("lists stops with the legs between them", () => {
     render(<Itinerary trip={trip} selectedIndex={1} onSelect={vi.fn()} />);
     const list = screen.getByRole("list", { name: "Itinerary" });

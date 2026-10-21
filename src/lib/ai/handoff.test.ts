@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { makeAiTrip } from "@/test/fixtures/ai";
+import { makeAiTrip, makeGenerateRequest } from "@/test/fixtures/ai";
 
 import { clearAiHandoff, readAiHandoff, writeAiHandoff } from "./handoff";
 
@@ -32,5 +32,18 @@ describe("AI handoff", () => {
   it("returns null for a payload that fails schema validation", () => {
     window.localStorage.setItem("trips:ai-handoff", JSON.stringify({ nope: true }));
     expect(readAiHandoff()).toBeNull();
+  });
+
+  it("carries the chat answers along, dropping them if invalid", () => {
+    const trip = makeAiTrip();
+    const request = makeGenerateRequest();
+    writeAiHandoff(trip, request);
+    expect(readAiHandoff()).toEqual({ ...trip, request });
+
+    window.localStorage.setItem(
+      "trips:ai-handoff",
+      JSON.stringify({ ...trip, request: { destination: "" } }),
+    );
+    expect(readAiHandoff()).toEqual(trip);
   });
 });

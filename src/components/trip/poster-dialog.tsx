@@ -1,6 +1,7 @@
 "use client";
 
-import { Download, Share2 } from "lucide-react";
+import { Download, Printer, Share2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -13,9 +14,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useUnits } from "@/components/units/units-provider";
-import type { Trip } from "@/lib/trip";
+import { tripFileSlug, tripStats, type Trip } from "@/lib/trip";
 
-import { drawPoster, type PosterFonts, type PosterTheme } from "./draw-poster";
+import {
+  drawPoster,
+  type PosterCopy,
+  type PosterFonts,
+  type PosterTheme,
+} from "./draw-poster";
 
 function readTheme(): PosterTheme {
   const styles = getComputedStyle(document.documentElement);
@@ -51,12 +57,6 @@ async function readFonts(): Promise<PosterFonts> {
   return { display, sans };
 }
 
-const slug = (title: string) =>
-  title
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "") || "grand-tour";
-
 function PosterPreview({
   url,
   failed,
@@ -66,13 +66,14 @@ function PosterPreview({
   readonly failed: boolean;
   readonly title: string;
 }) {
+  const t = useTranslations("Trip.poster");
   if (url) {
     return (
       // Freshly drawn on a canvas — a plain img is the right tool here.
       // eslint-disable-next-line @next/next/no-img-element
       <img
         src={url}
-        alt={`Route poster for ${title}`}
+        alt={t("alt", { title })}
         className="max-h-[55dvh] w-auto rounded-lg border border-line shadow-soft"
       />
     );
@@ -80,7 +81,7 @@ function PosterPreview({
   if (failed) {
     return (
       <p role="alert" className="max-w-xs text-center text-sm text-ink-soft">
-        The press jammed on this one. Close and open the poster again to retry.
+        {t("failed")}
       </p>
     );
   }
@@ -101,6 +102,18 @@ export function PosterDialog({
   const [canShare, setCanShare] = useState(false);
   const [failed, setFailed] = useState(false);
   const { money, distance } = useUnits();
+  const t = useTranslations("Trip.poster");
+  const perPersonText = useTranslations("Trip");
+  const stats = tripStats(trip);
+  const eyebrow = t("eyebrow");
+  const summary = t("summary", {
+    nights: stats.nights,
+    cities: stats.cities,
+    countries: stats.countries,
+    distance: distance(stats.totalKm),
+  });
+  const perPerson = perPersonText("perPerson", { amount: money(stats.budget) });
+  const brand = t("brand");
 
   useEffect(() => {
     if (!open) return;
@@ -110,7 +123,8 @@ export function PosterDialog({
     const render = async () => {
       const fonts = await readFonts();
       const canvas = document.createElement("canvas");
-      await drawPoster(canvas, trip, readTheme(), fonts, { money, distance });
+      const copy: PosterCopy = { eyebrow, summary, perPerson, brand };
+      await drawPoster(canvas, trip, readTheme(), fonts, copy);
       const rendered = await new Promise<Blob | null>((resolve) =>
         canvas.toBlob(resolve, "image/png"),
       );
@@ -121,7 +135,7 @@ export function PosterDialog({
       setBlob(rendered);
       setUrl(objectUrl);
 
-      const file = new File([rendered], `${slug(trip.title)}-route.png`, {
+      const file = new File([rendered], `${tripFileSlug(trip.title)}-route.png`, {
         type: "image/png",
       });
       setCanShare(navigator.canShare?.({ files: [file] }) ?? false);
@@ -138,19 +152,19 @@ export function PosterDialog({
       setUrl(null);
       setFailed(false);
     };
-  }, [open, trip, money, distance]);
+  }, [open, trip, eyebrow, summary, perPerson, brand]);
 
   const download = () => {
     if (!url) return;
     const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = `${slug(trip.title)}-route.png`;
+    anchor.download = `${tripFileSlug(trip.title)}-route.png`;
     anchor.click();
   };
 
   const share = async () => {
     if (!blob) return;
-    const file = new File([blob], `${slug(trip.title)}-route.png`, {
+    const file = new File([blob], `${tripFileSlug(trip.title)}-route.png`, {
       type: "image/png",
     });
     await navigator
@@ -162,11 +176,8 @@ export function PosterDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Share your route</DialogTitle>
-          <DialogDescription>
-            A clean poster of the journey — sized for Instagram (4:5), no app chrome,
-            follows your theme.
-          </DialogDescription>
+          <DialogTitle>{t("title")}</DialogTitle>
+          <DialogDescription>{t("description")}</DialogDescription>
         </DialogHeader>
 
         <div className="grid min-h-64 place-items-center">
@@ -174,13 +185,16 @@ export function PosterDialog({
         </div>
 
         <DialogFooter>
+          <Button variant="ghost" onClick={() => window.print()}>
+            <Printer /> {t("print")}
+          </Button>
           {canShare && (
             <Button variant="outline" onClick={share} disabled={!blob}>
-              <Share2 /> Share…
+              <Share2 /> {t("share")}
             </Button>
           )}
           <Button variant="brass" onClick={download} disabled={!url}>
-            <Download /> Download PNG
+            <Download /> {t("download")}
           </Button>
         </DialogFooter>
       </DialogContent>

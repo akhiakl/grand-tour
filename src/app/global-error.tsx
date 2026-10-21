@@ -1,12 +1,27 @@
 "use client";
 
 import * as Sentry from "@sentry/nextjs";
+import { createTranslator } from "next-intl";
 import { useEffect } from "react";
 
+import { DEFAULT_LOCALE } from "@/i18n/config";
+import messages from "@/i18n/messages/en.json";
+
 /**
- * Last-resort error boundary — replaces the root layout, so globals.css is
- * not available here; styles must be inline, in-voice and actionable.
+ * Last-resort error boundary — replaces the root layout, so globals.css and
+ * the i18n provider are not available here: styles are inline and copy is
+ * read straight from the catalog.
  */
+const t = createTranslator({
+  locale: DEFAULT_LOCALE,
+  messages,
+  namespace: "Errors.global",
+});
+const common = createTranslator({
+  locale: DEFAULT_LOCALE,
+  messages,
+  namespace: "Common",
+});
 export default function GlobalError({
   error,
   reset,
@@ -19,7 +34,7 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <html lang="en">
+    <html lang={DEFAULT_LOCALE}>
       <body
         style={{
           minHeight: "100vh",
@@ -42,14 +57,13 @@ export default function GlobalError({
               fontWeight: 600,
             }}
           >
-            Off the map
+            {common("offTheMap")}
           </p>
           <h1 style={{ fontSize: "2rem", margin: "0.75rem 0 0.5rem" }}>
-            We lost the trail for a moment.
+            {t("title")}
           </h1>
           <p style={{ color: "#4a5568", maxWidth: "26rem", margin: "0 auto" }}>
-            Something went wrong on our side. Your maps are safe — try picking up
-            where you left off.
+            {t("body")}
           </p>
           <button
             onClick={reset}
@@ -64,7 +78,7 @@ export default function GlobalError({
               cursor: "pointer",
             }}
           >
-            Try again
+            {t("action")}
           </button>
         </main>
       </body>
