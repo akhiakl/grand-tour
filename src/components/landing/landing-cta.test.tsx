@@ -20,4 +20,12 @@ describe("LandingCta", () => {
       "/new",
     );
   });
+
+  it("points first-time visitors to how it works", () => {
+    render(<LandingCta />);
+    expect(screen.getByRole("link", { name: /how it works/i })).toHaveAttribute(
+      "href",
+      "/about",
+    );
+  });
 });

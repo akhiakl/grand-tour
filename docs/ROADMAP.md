@@ -44,8 +44,8 @@ in `docs/RELEASE.md`. Do not wire any host to auto-deploy `main`.
 | 7    | Landing page + polish pass                         | ✅ done |
 | 8    | Playwright e2e                                     | ✅ done |
 | 9    | UX & a11y hardening (design-review follow-ups)     | 🟨 wip  |
-| 10   | Legal pages, report link, AI notice, analytics     | 🟨 wip  |
-| 11   | `/about` story page + static first paint on `/`    | ⬜ next |
+| 10   | Legal pages, report link, AI notice, analytics     | ✅ done |
+| 11   | `/about` story page, motion limits on the map      | 🟨 wip  |
 
 ---
 
