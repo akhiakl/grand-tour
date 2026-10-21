@@ -5,15 +5,24 @@ import type { ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 
-/** In-voice dead end (404, expired, missing locally) with one way back. */
+type Action =
+  | { readonly href: string; readonly label: string }
+  | { readonly onClick: () => void; readonly label: string };
+
+/**
+ * In-voice dead end (404, expired, missing locally, an error) with one way
+ * forward, plus an optional way back.
+ */
 export function OffTheMap({
   title,
   children,
   action,
+  secondary,
 }: {
   readonly title: string;
   readonly children: ReactNode;
-  readonly action: { readonly href: string; readonly label: string };
+  readonly action: Action;
+  readonly secondary?: { readonly href: string; readonly label: string };
 }) {
   const t = useTranslations("Common");
   return (
@@ -25,9 +34,22 @@ export function OffTheMap({
           {title}
         </h1>
         <p className="max-w-sm text-muted-foreground">{children}</p>
-        <Button asChild variant="brass" className="mt-2">
-          <Link href={action.href}>{action.label}</Link>
-        </Button>
+        <div className="mt-2 flex flex-wrap justify-center gap-2">
+          {"href" in action ? (
+            <Button asChild variant="brass">
+              <Link href={action.href}>{action.label}</Link>
+            </Button>
+          ) : (
+            <Button type="button" variant="brass" onClick={action.onClick}>
+              {action.label}
+            </Button>
+          )}
+          {secondary && (
+            <Button asChild variant="outline">
+              <Link href={secondary.href}>{secondary.label}</Link>
+            </Button>
+          )}
+        </div>
       </div>
     </main>
   );

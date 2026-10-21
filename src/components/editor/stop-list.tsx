@@ -2,7 +2,7 @@
 
 import { Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -24,6 +24,7 @@ import { useStopDrag } from "./use-stop-drag";
 
 export function StopList({
   cities,
+  keys,
   legs,
   onAddCity,
   onRemoveCity,
@@ -37,6 +38,8 @@ export function StopList({
   onActivate,
 }: {
   readonly cities: City[];
+  /** Stable per-stop ids (`DraftTrip.keys`), so rows follow their stop. */
+  readonly keys: readonly string[];
   readonly legs: Leg[];
   readonly onAddCity: (city: City) => void;
   readonly onRemoveCity: (index: number) => void;
@@ -54,6 +57,11 @@ export function StopList({
   const issueText = useTranslations("Editor.issues");
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const [announcement, setAnnouncement] = useState("");
+  const addCardRef = useRef<HTMLDivElement>(null);
+
+  // Focus a control once React has rendered the change that creates it.
+  const focusAfterRender = (find: () => HTMLElement | null | undefined) =>
+    requestAnimationFrame(() => find()?.focus());
 
   // The open detail panel follows its stop through reorders and deletes,
   // and screen readers hear where the stop went.
@@ -71,9 +79,9 @@ export function StopList({
     );
   };
 
-  // Rows are keyed by position, so after a move the focused button would
-  // belong to the neighbour; hand focus to the moved stop's button instead
-  // (its other move button when it reached an end of the list).
+  // The row moves with its stop, so focus stays on the pressed button;
+  // when the stop reaches an end of the list that button disables, so
+  // hand focus to its other move button.
   const moveWithButton = (from: number, to: number, direction: "up" | "down") => {
     moveCity(from, to);
     requestAnimationFrame(() => {
@@ -90,8 +98,16 @@ export function StopList({
     return key ? issueText(key) : undefined;
   };
 
+  // The removed row took focus with it: land on the stop that slid into
+  // its place (or the new last stop), or the search when none are left.
   const removeCity = (index: number) => {
     onRemoveCity(index);
+    const left = cities.length - 1;
+    focusAfterRender(() =>
+      left > 0
+        ? document.getElementById(`stop-${Math.min(index, left - 1)}-name`)
+        : addCardRef.current?.querySelector("input"),
+    );
     setExpandedIndex((current) =>
       current === null ? null : indexAfterRemove(current, index),
     );
@@ -112,7 +128,7 @@ export function StopList({
       </div>
 
       {cities.map((city, index) => (
-        <div key={index} onFocusCapture={() => onActivate?.(index)}>
+        <div key={keys[index]} onFocusCapture={() => onActivate?.(index)}>
           <StopRow
             city={city}
             index={index}
@@ -146,7 +162,7 @@ export function StopList({
         </div>
       ))}
 
-      <Card className="gap-3">
+      <Card ref={addCardRef} className="gap-3">
         {canAddCity ? (
           <>
             <p className="text-sm text-muted-foreground">{t("searchNext")}</p>
@@ -166,7 +182,12 @@ export function StopList({
               variant="ghost"
               size="sm"
               className="self-start"
-              onClick={() => onAddCity(blankCity(t("newStopName")))}
+              onClick={() => {
+                onAddCity(blankCity(t("newStopName")));
+                focusAfterRender(() =>
+                  document.getElementById(`stop-${cities.length}-name`),
+                );
+              }}
             >
               <Plus /> {t("addBlank")}
             </Button>

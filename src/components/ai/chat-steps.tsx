@@ -73,6 +73,8 @@ export function DaysStep({
         min={MIN_DAYS}
         max={MAX_DAYS}
         value={value}
+        // Typing replaces the suggested 7 rather than appending to it.
+        onFocus={(e) => e.target.select()}
         onChange={(e) => setValue(e.target.value)}
         className="w-28"
       />

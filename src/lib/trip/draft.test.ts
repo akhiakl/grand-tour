@@ -30,6 +30,7 @@ describe("createBlankDraft", () => {
       title: DEFAULT_TRIP_TITLE,
       cities: [],
       legs: [],
+      keys: [],
     });
   });
 });
@@ -41,7 +42,32 @@ describe("draftFromTrip", () => {
       title: "Old Roads",
       cities: trip.cities,
       legs: trip.legs,
+      keys: [expect.any(String), expect.any(String), expect.any(String)],
     });
+  });
+
+  it("gives every stop a distinct key", () => {
+    const { keys } = draftFromTrip(makeTrip(3));
+    expect(new Set(keys).size).toBe(3);
+  });
+});
+
+describe("stop keys", () => {
+  it("follow their stop through add, insert, move and remove", () => {
+    let draft = addCity(createBlankDraft(), makeCity({ name: "A" }));
+    draft = addCity(draft, makeCity({ name: "C" }));
+    draft = insertCityAt(draft, 1, makeCity({ name: "B" }));
+    const [a, b, c] = draft.keys;
+    expect(new Set([a, b, c]).size).toBe(3);
+
+    draft = moveCity(draft, 0, 2);
+    expect(draft.cities.map((city) => city.name)).toEqual(["B", "C", "A"]);
+    expect(draft.keys).toEqual([b, c, a]);
+
+    draft = removeCityAt(draft, 1);
+    expect(draft.keys).toEqual([b, a]);
+    expect(updateStartDate(draft, "2026-05-01").keys).toEqual([b, a]);
+    expect(updateStartDate(draft, "").keys).toEqual([b, a]);
   });
 });
 
@@ -95,6 +121,7 @@ describe("removeCityAt", () => {
         makeCity({ name: "C" }),
       ],
       legs: [makeLeg({ label: "A to B" }), makeLeg({ label: "B to C" })],
+      keys: ["a", "b", "c"],
     };
     const result = removeCityAt(draft, 2);
     expect(result.legs).toEqual([makeLeg({ label: "A to B" })]);
@@ -106,6 +133,7 @@ describe("insertCityAt", () => {
     title: "T",
     cities: [makeCity({ name: "A" }), makeCity({ name: "C" })],
     legs: [makeLeg({ label: "A to C" })],
+    keys: ["a", "c"],
   });
 
   it("puts the stop back between its neighbours, keeping legs by position", () => {

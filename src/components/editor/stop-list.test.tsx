@@ -7,10 +7,15 @@ import { makeCity, makeLeg } from "@/test/fixtures/trip";
 import { StopList } from "./stop-list";
 
 vi.mock("./city-search", () => ({
-  CitySearch: () => <div data-testid="city-search" />,
+  CitySearch: () => (
+    <div data-testid="city-search">
+      <input aria-label="Search for a city" />
+    </div>
+  ),
 }));
 
 const props = {
+  keys: ["a", "b", "c", "d", "e"],
   onAddCity: vi.fn(),
   onRemoveCity: vi.fn(),
   onMoveCity: vi.fn(),
@@ -20,7 +25,7 @@ const props = {
 };
 
 beforeEach(() => {
-  Object.values(props).forEach((fn) => fn.mockClear());
+  vi.clearAllMocks();
 });
 
 describe("StopList", () => {
@@ -230,5 +235,45 @@ describe("StopList", () => {
     expect(props.onUpdateCity).toHaveBeenLastCalledWith(0, { nights: 0 });
     await userEvent.type(nights, "45");
     expect(props.onUpdateCity).toHaveBeenLastCalledWith(0, { nights: 30 });
+  });
+
+  describe("keyboard focus", () => {
+    const two = [makeCity({ name: "Vienna" }), makeCity({ name: "Prague" })];
+
+    it("lands on the stop that slid into a removed stop's place", async () => {
+      render(<StopList {...props} cities={two} legs={[makeLeg()]} canAddCity />);
+      await userEvent.click(screen.getByRole("button", { name: "Remove Vienna" }));
+      await waitFor(() =>
+        expect(document.getElementById("stop-0-name")).toHaveFocus(),
+      );
+    });
+
+    it("lands on the search when the last stop is removed", async () => {
+      const { rerender } = render(
+        <StopList {...props} cities={[two[0]]} legs={[]} canAddCity />,
+      );
+      await userEvent.click(screen.getByRole("button", { name: "Remove Vienna" }));
+      rerender(<StopList {...props} cities={[]} legs={[]} canAddCity />);
+      await waitFor(() =>
+        expect(
+          screen.getByRole("textbox", { name: "Search for a city" }),
+        ).toHaveFocus(),
+      );
+    });
+
+    it("moves to the new stop's name after adding a blank stop", async () => {
+      const { rerender } = render(
+        <StopList {...props} cities={[two[0]]} legs={[]} canAddCity />,
+      );
+      props.onAddCity.mockImplementation(() =>
+        rerender(<StopList {...props} cities={two} legs={[makeLeg()]} canAddCity />),
+      );
+      await userEvent.click(
+        screen.getByRole("button", { name: "Or add a blank stop" }),
+      );
+      await waitFor(() =>
+        expect(document.getElementById("stop-1-name")).toHaveFocus(),
+      );
+    });
   });
 });

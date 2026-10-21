@@ -105,6 +105,17 @@ describe("AiChat", () => {
       "/new",
     );
     expect(router.push).not.toHaveBeenCalled();
+    // Focus moves to the way forward, not the page body.
+    expect(screen.getByRole("button", { name: /try again/i })).toHaveFocus();
+  });
+
+  it("replaces the suggested day count when the guest types", async () => {
+    const user = userEvent.setup();
+    render(<AiChat />);
+    await user.type(screen.getByLabelText("Destination"), "Austria{Enter}");
+
+    await user.keyboard("10");
+    expect(screen.getByLabelText("Number of days")).toHaveValue(10);
   });
 
   it("keeps Next disabled until the answer is valid", async () => {

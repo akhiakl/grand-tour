@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { PageLoading } from "@/components/page-loading";
 import { ShareDialog } from "@/components/share/share-dialog";
 import { UpsellModal } from "@/components/upsell/upsell-modal";
 import type { GeneratedDraft } from "@/hooks/use-generate-trip";
@@ -106,7 +107,7 @@ function resolveInitialState(searchParams: URLSearchParams): {
     const aiTrip = readAiHandoff();
     if (aiTrip) {
       return {
-        draft: { title: aiTrip.title, cities: aiTrip.cities, legs: aiTrip.legs },
+        draft: draftFromTrip(aiTrip),
         localId: null,
         createdAt: Date.now(),
         ghostNames: aiTrip.suggestedExtra,
@@ -131,7 +132,7 @@ function resolveInitialState(searchParams: URLSearchParams): {
  * the browser — resolve it after mount so server and client HTML agree.
  */
 export function EditorPage() {
-  return useMounted() ? <EditorWorkspace /> : null;
+  return useMounted() ? <EditorWorkspace /> : <PageLoading />;
 }
 
 function EditorWorkspace() {
@@ -269,6 +270,7 @@ function EditorWorkspace() {
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_26rem]">
         <StopList
           cities={draft.cities}
+          keys={draft.keys}
           legs={draft.legs}
           canAddCity={canAddCity(draft)}
           onLimitReached={() => setUpsellOpen(true)}
