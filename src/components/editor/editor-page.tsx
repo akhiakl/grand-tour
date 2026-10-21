@@ -28,6 +28,7 @@ import {
   moveCity,
   removeCityAt,
   saveLocalTrip,
+  startCityFromParams,
   tripFingerprint,
   updateCityAt,
   updateLegAt,
@@ -109,8 +110,10 @@ function resolveInitialState(searchParams: URLSearchParams): {
     }
   }
 
+  // /new?city=…: a destination picked on the landing becomes stop 1.
+  const startCity = startCityFromParams(searchParams);
   return {
-    draft: createBlankDraft(),
+    draft: startCity ? addCity(createBlankDraft(), startCity) : createBlankDraft(),
     localId: null,
     createdAt: Date.now(),
     ghostNames: [] as string[],

@@ -55,7 +55,14 @@
     "group": "Start your own route",
     "planWithAi": "Plan with AI",
     "buildManually": "Build manually",
-    "howItWorks": "Free, no account needed · How it works"
+    "howItWorks": "Free, no account needed · How it works",
+    "welcomeBack": "Welcome back",
+    "continue": "Continue {title}",
+    "searchLabel": "Where to?",
+    "searchPlaceholder": "Know where? Search a city…",
+    "searchPlaceholderReturning": "Or plan somewhere new…",
+    "clearDestination": "Clear destination",
+    "startTo": "Start a route to {place}"
   },
   "Errors": {
     "notFound": {
@@ -154,7 +161,8 @@
     "search": {
       "placeholder": "Search for a city…",
       "unreachable": "Couldn't reach the map atlas — try again in a moment.",
-      "noResults": "No cities found."
+      "noResults": "No cities found.",
+      "label": "Search for a city"
     },
     "stop": {
       "flag": "Flag",

@@ -18,9 +18,12 @@ const DEBOUNCE_MS = 500;
 export function CitySearch({
   onSelect,
   placeholder,
+  label,
 }: {
   readonly onSelect: (result: CitySearchResult) => void;
   readonly placeholder?: string;
+  /** Accessible name; the placeholder alone disappears once typing starts. */
+  readonly label?: string;
 }) {
   const t = useTranslations("Editor.search");
   const [query, setQuery] = useState("");
@@ -78,6 +81,7 @@ export function CitySearch({
             }
           }}
           placeholder={placeholder ?? t("placeholder")}
+          aria-label={label ?? t("label")}
           role="combobox"
           aria-expanded={open}
           aria-controls="city-search-results"
@@ -108,7 +112,7 @@ export function CitySearch({
         <ul
           id="city-search-results"
           role="listbox"
-          className="frost absolute z-20 mt-2 max-h-64 w-full overflow-y-auto rounded-xl border border-line p-1 shadow-soft"
+          className="absolute z-20 mt-2 bg-card-solid max-h-64 w-full overflow-y-auto rounded-xl border border-line p-1 shadow-soft"
         >
           {error && (
             <li className="px-3 py-2 text-sm text-muted-foreground">

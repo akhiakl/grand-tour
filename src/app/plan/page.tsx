@@ -4,13 +4,19 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
 import { AiChat } from "@/components/ai/ai-chat";
+import { destinationFromParam } from "@/lib/ai";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("Metadata.plan");
   return { title: t("title"), description: t("description") };
 }
 
-export default async function PlanPage() {
+export default async function PlanPage({
+  searchParams,
+}: {
+  readonly searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const { destination } = await searchParams;
   const t = await getTranslations("Plan");
   const common = await getTranslations("Common");
   return (
@@ -29,7 +35,7 @@ export default async function PlanPage() {
         </h1>
         <p className="text-sm text-ink-soft">{t("lede")}</p>
       </header>
-      <AiChat />
+      <AiChat initialDestination={destinationFromParam(destination)} />
     </main>
   );
 }

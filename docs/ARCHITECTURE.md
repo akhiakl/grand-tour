@@ -5,15 +5,17 @@ are the standard for any Next.js project we start.
 
 ## Routes (named — never "home page")
 
-| Route        | Name                | What it is                                                                                                                                 |
-| ------------ | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `/`          | **Demo Experience** | The sample trip, full immersive view. Becomes the real **Landing** page in Step 7 (hero + CTAs).                                           |
-| `/new`       | **Editor**          | Manual trip builder (`?remix=`, `?from=ai`).                                                                                               |
-| `/maps`      | **My Maps**         | Index of this device's local trips.                                                                                                        |
-| `/maps/[id]` | **Map View**        | Immersive read-only-ish view of one of _your_ local trips — no share link needed. `TripExperience actions="own"`: Edit (in place) + Share. |
-| `/t/[id]`    | **Shared View**     | Public, read-only view of a shared Redis snapshot. `TripExperience actions="shared"`: Remix (forks a copy) + Create your own.              |
-| `/plan`      | **AI Chat**         | Three questions → one `/api/generate` call → Editor (`?from=ai`).                                                                          |
-| `/offline`   | **Offline**         | Served by the service worker (`public/sw.js`) for pages never opened before the connection dropped.                                        |
+| Route                            | Name            | What it is                                                                                                                                                                                                                                        |
+| -------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`                              | **Landing**     | The sample trip in the immersive view (`actions="demo"`), with the landing card as its main actions: "Continue <latest map>" for returning visitors, Plan with AI / Build manually, and a destination search that hands off to `/plan` or `/new`. |
+| `/about`                         | **About**       | Static story page: how it works, the example route as a sketch, FAQ, CTA. No live map.                                                                                                                                                            |
+| `/plan`                          | **AI Chat**     | Three-question planner (`?destination=` pre-answers the first question).                                                                                                                                                                          |
+| `/new`                           | **Editor**      | Manual trip builder (`?remix=`, `?from=ai`, `?city=…&lat=&lng=` for a first stop).                                                                                                                                                                |
+| `/maps`                          | **My Maps**     | Index of this device's local trips.                                                                                                                                                                                                               |
+| `/maps/[id]`                     | **Map View**    | Immersive view of one of _your_ local trips, no share link needed. `TripExperience actions="own"`: Edit (in place) + Share.                                                                                                                       |
+| `/t/[id]`                        | **Shared View** | Public, read-only view of a shared Redis snapshot. `TripExperience actions="shared"`: Remix (forks a copy) + Create your own + Report this map.                                                                                                   |
+| `/privacy`, `/terms`, `/contact` | **Legal**       | Policy and contact pages on the shared `LegalPage` shell; facts come from `@/lib/legal`.                                                                                                                                                          |
+| `/offline`                       | **Offline**     | Served by the service worker (`public/sw.js`) for pages never opened before the connection dropped.                                                                                                                                               |
 
 `TripExperience` (full-bleed map + floating atlas card) is hosted by three of these routes,
 distinguished only by its `actions` prop (`"demo" | "shared" | "own"`, see
@@ -45,6 +47,10 @@ src/
       prompt.ts         Internal module (not exported; tests reach it relatively).
     http/
       index.ts          PUBLIC API — rate limiting, client IP (server concerns).
+    units/              Display units: km/mi, currency formatting, live rates.
+    geo-search/         City search (Photon) behind `searchCities`.
+    legal/              Operator and contact facts, report-a-map link.
+    analytics/          Cookieless Vercel Web Analytics behind `trackEvent`.
     utils.ts            cn() — kept at this path for shadcn compatibility.
   test/
     fixtures/           ALL reused mock data/builders. Never define shared

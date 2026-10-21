@@ -37,6 +37,26 @@ function rebuildLegs(cities: City[], legs: Leg[]): Leg[] {
   );
 }
 
+/** A stop with only placeholders filled in; callers set what they know. */
+export function blankCity(name = ""): City {
+  return {
+    name,
+    country: "",
+    flag: "",
+    ll: [0, 0],
+    nights: 1,
+    why: "",
+    must: [],
+    gems: [],
+    food: [],
+    days: [],
+    budget: [0, 0],
+    transport: "",
+    stay: "",
+    tips: [],
+  };
+}
+
 export function createBlankDraft(): DraftTrip {
   return { title: DEFAULT_TRIP_TITLE, cities: [], legs: [] };
 }

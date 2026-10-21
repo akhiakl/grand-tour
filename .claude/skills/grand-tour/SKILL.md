@@ -68,9 +68,14 @@ status table before starting work. Visual truth: `reference/grand-tour.html`.
   `components/units` holds `UnitsProvider`/`useUnits` (prefs in
   localStorage `prefs:display`, rates fetched only for non-USD) and the
   `UnitsDialog` picker in the atlas card head.
-- `components/landing`: `landing-cta` (Plan with AI / Build manually on
-  `/`; passed to `TripExperience` via its `cta` slot as the example
-  route's primary actions).
+- `components/landing`: `landing-cta` (passed to `TripExperience` via its
+  `cta` slot as the example route's primary actions): `welcome-back`
+  ("Continue <latest map>" takes the brass slot when this browser has
+  saved maps), Plan with AI / Build manually, then a destination search
+  (`editor/city-search`) whose pick swaps in `destination-start`: AI via
+  `planHref` (`/plan?destination=`, read by `destinationFromParam` in
+  `lib/ai`) or the editor via `startCityQuery` (`/new?city=…&lat=&lng=`,
+  read by `startCityFromParams` in `lib/trip`).
 - `lib/legal`: operator and contact facts (`CONTACT_EMAIL`,
   `OPERATOR_NAME`, grievance timelines, `LEGAL_LAST_UPDATED`) and
   `reportMapMailto`. `components/legal`: `LegalPage` shell (summary,

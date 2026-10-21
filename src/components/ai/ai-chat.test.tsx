@@ -44,6 +44,13 @@ async function answerAll() {
 }
 
 describe("AiChat", () => {
+  it("skips the first question when a destination is passed in", () => {
+    render(<AiChat initialDestination="Kyoto, Japan" />);
+    expect(screen.getByText("Kyoto, Japan")).toBeInTheDocument();
+    expect(screen.queryByLabelText("Destination")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Number of days")).toBeVisible();
+  });
+
   it("says up front that the planner is an AI", () => {
     render(<AiChat />);
     expect(screen.getByText("You're planning with an AI.")).toBeVisible();

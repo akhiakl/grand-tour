@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
+  blankCity,
   GUEST_MAX_CITIES,
   indexAfterMove,
   indexAfterRemove,
@@ -19,23 +20,6 @@ import {
 import { CitySearch } from "./city-search";
 import { LegRow } from "./leg-row";
 import { StopRow } from "./stop-row";
-
-const blankCity = (name: string): City => ({
-  name,
-  country: "",
-  flag: "",
-  ll: [0, 0],
-  nights: 1,
-  why: "",
-  must: [],
-  gems: [],
-  food: [],
-  days: [],
-  budget: [0, 0],
-  transport: "",
-  stay: "",
-  tips: [],
-});
 
 export function StopList({
   cities,

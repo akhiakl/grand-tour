@@ -43,11 +43,15 @@ checked before merging the `1.0.0` release PR.
 - [x] Step 1 — scaffold, tokens/fonts/theme, Zod schema
 - [x] Step 2 — Redis service layer, `/api/trips`, `/api/generate`, rate limits
 - [x] Step 3 — immersive map experience (reference design), drawer, rail
-- [ ] Step 4 — manual editor, Nominatim search, localStorage store, My Maps
-- [ ] Step 5 — `/t/[id]` shared view, OG image, expired page, remix flow
-- [ ] Step 6 — AI chat, ghost-stops upsell
-- [ ] Step 7 — landing page with both CTAs, polish pass
-- [ ] Step 8 — Playwright e2e: all four journeys green in CI
+- [x] Step 4 — manual editor, Photon city search, localStorage store, My Maps
+- [x] Step 5 — `/t/[id]` shared view, OG image, expired page, remix flow
+- [x] Step 6 — AI chat, ghost-stops upsell
+- [x] Step 7 — landing page with both CTAs, polish pass
+- [x] Step 8 — Playwright e2e: all four journeys green in CI
+- [ ] Step 9 — UX & a11y hardening (design-review follow-ups)
+- [x] Step 10 — legal pages, report link, AI notice, analytics
+- [x] Step 11 — `/about` story page, map motion under 5s
+- [x] Step 12 — landing destination search, returning visitors
 
 ### Guest limit verified at all three layers
 
