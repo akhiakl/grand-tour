@@ -178,8 +178,9 @@ host there. No nonces, so pages stay static (inline scripts allowed).
 Lighthouse mobile simulates a slow phone, so script that runs before first
 paint counts against every metric. Keep it out of the startup bundle:
 
-- The map engine (MapLibre + Leaflet), dialogs and the print itinerary
-  mount once the page is idle (`usePageIdle`).
+- The map engine (MapLibre + Leaflet), dialogs, the print itinerary,
+  packing/notes tools and the units dialog mount once the page is idle
+  (`usePageIdle`); a stop's detail loads when it is opened.
 - Framer Motion features load lazily (`MotionProvider` + `m.*`;
   `motion.*` is lint-rejected).
 - Import Zod as `import * as z from "zod"`; the named `z` drags every
