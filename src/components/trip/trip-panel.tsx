@@ -1,13 +1,14 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import { useEffect, useId, useState, type ReactNode } from "react";
 
 import { LegalLinks } from "@/components/legal/legal-links";
 import { ReportMapLink } from "@/components/legal/report-map-link";
+import { usePageIdle } from "@/hooks/use-page-idle";
 import { stopDates, type Trip, type TripToolsScope } from "@/lib/trip";
 
-import { CityDetail } from "./city-detail";
 import type { MapInsets } from "./fit-padding";
 import {
   PrimaryActions,
@@ -20,7 +21,13 @@ import { PanelShell } from "./panel-shell";
 import { Itinerary, StatsGrid } from "./route-overview";
 import { SharedLinkNote } from "./shared-link-note";
 import { downloadTripCalendar } from "./trip-calendar";
-import { TripTools } from "./trip-tools";
+
+// Neither is on screen at first paint: a stop's detail opens on demand and
+// the tools wait for idle, so their code stays out of the startup bundle.
+const CityDetail = dynamic(() =>
+  import("./city-detail").then((mod) => mod.CityDetail),
+);
+const TripTools = dynamic(() => import("./trip-tools").then((mod) => mod.TripTools));
 
 /**
  * Everything about the trip that isn't the map: title, actions, stats and
@@ -70,6 +77,7 @@ export function TripPanel({
   const [tool, setTool] = useState<ToolId | null>(null);
   const [collapsed, setCollapsed] = useState(false);
   const bodyId = useId();
+  const idle = usePageIdle();
   const city = selected === null ? null : trip.cities[selected];
   const dates = stopDates(trip);
 
@@ -142,13 +150,16 @@ export function TripPanel({
             onBack={() => onSelect(null)}
           />
         )}
-        {/* Always mounted so ticks and notes survive a detour to a stop. */}
-        <TripTools
-          trip={trip}
-          scope={toolsScope}
-          active={city ? null : tool}
-          onBack={() => setTool(null)}
-        />
+        {/* Mounted once idle (or when a tool opens), then kept, so ticks and
+            notes survive a detour to a stop. */}
+        {(idle || tool) && (
+          <TripTools
+            trip={trip}
+            scope={toolsScope}
+            active={city ? null : tool}
+            onBack={() => setTool(null)}
+          />
+        )}
         {!city && !tool && (
           <>
             <SecondaryActions

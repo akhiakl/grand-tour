@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import type { ReactNode } from "react";
 
-import { UnitsDialog } from "@/components/units/units-dialog";
+import { UnitsButton } from "@/components/units/units-button";
 import { useUnits } from "@/components/units/units-provider";
 import { useMounted } from "@/hooks/use-mounted";
 import { tripStats, type Trip } from "@/lib/trip";
@@ -105,7 +105,7 @@ export function PanelHead({
           </p>
         </div>
         <div className="flex shrink-0 gap-2">
-          <UnitsDialog />
+          <UnitsButton />
           <ThemeToggle />
           <CollapseToggle
             collapsed={collapsed}
