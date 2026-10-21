@@ -68,6 +68,19 @@ export function addCity(draft: DraftTrip, city: City): DraftTrip {
   return { ...draft, cities, legs: rebuildLegs(cities, draft.legs) };
 }
 
+/** Puts a stop back at `index` (clamped to the list), e.g. to undo a removal. */
+export function insertCityAt(
+  draft: DraftTrip,
+  index: number,
+  city: City,
+): DraftTrip {
+  if (!canAddCity(draft)) return draft;
+  const at = Math.min(Math.max(index, 0), draft.cities.length);
+  const cities = [...draft.cities.slice(0, at), city, ...draft.cities.slice(at)];
+  const legs = [...draft.legs.slice(0, at), defaultLeg(), ...draft.legs.slice(at)];
+  return { ...draft, cities, legs: rebuildLegs(cities, legs) };
+}
+
 export function removeCityAt(draft: DraftTrip, index: number): DraftTrip {
   const cities = draft.cities.filter((_, i) => i !== index);
   return { ...draft, cities, legs: rebuildLegs(cities, draft.legs) };

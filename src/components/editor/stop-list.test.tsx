@@ -65,6 +65,35 @@ describe("StopList", () => {
     expect(props.onMoveCity).toHaveBeenCalledWith(0, 1);
   });
 
+  it("announces where a moved stop went", async () => {
+    const cities = [makeCity({ name: "Vienna" }), makeCity({ name: "Prague" })];
+    render(<StopList {...props} cities={cities} legs={[makeLeg()]} canAddCity />);
+
+    await userEvent.click(screen.getByRole("button", { name: "Move Prague up" }));
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Prague moved to stop 1 of 2.",
+    );
+  });
+
+  it("marks the stop being edited as active", async () => {
+    const onActivate = vi.fn();
+    const cities = [makeCity({ name: "Vienna" }), makeCity({ name: "Prague" })];
+    render(
+      <StopList
+        {...props}
+        cities={cities}
+        legs={[makeLeg()]}
+        canAddCity
+        onActivate={onActivate}
+      />,
+    );
+
+    await userEvent.click(
+      screen.getByLabelText("City", { selector: "#stop-1-name" }),
+    );
+    expect(onActivate).toHaveBeenCalledWith(1);
+  });
+
   it("disables move buttons at the ends of the list", () => {
     const cities = [makeCity({ name: "Vienna" }), makeCity({ name: "Prague" })];
     render(<StopList {...props} cities={cities} legs={[makeLeg()]} canAddCity />);

@@ -17,6 +17,9 @@ import {
   draftIssues,
   draftToTrip,
   getLocalTrip,
+  indexAfterMove,
+  indexAfterRemove,
+  insertCityAt,
   isShareable,
   moveCity,
   removeCityAt,
@@ -110,6 +113,8 @@ function EditorWorkspace() {
   const [localId, setLocalId] = useState(initial.localId);
   const [upsellOpen, setUpsellOpen] = useState(false);
   const [createdAt] = useState(initial.createdAt);
+  // The stop being edited (focused in the list or picked on the map).
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   // The AI draft is now in state; consume the handoff so a later visit to
   // /new?from=ai starts blank. Cleared here, not while rendering (see
@@ -142,6 +147,41 @@ function EditorWorkspace() {
 
   const issues = draftIssues(draft);
 
+  const handleMove = (from: number, to: number) => {
+    update((d) => moveCity(d, from, to));
+    setActiveIndex((i) => (i === null ? null : indexAfterMove(i, from, to)));
+  };
+
+  // Undo restores the exact draft when nothing changed since; otherwise
+  // it puts the stop back where it was.
+  const handleRemove = (index: number) => {
+    const before = draft;
+    const city = before.cities[index];
+    const after = removeCityAt(before, index);
+    setDraft(after);
+    setActiveIndex((i) => (i === null ? null : indexAfterRemove(i, index)));
+    toast(`Removed ${city.name || "stop"}`, {
+      action: {
+        label: "Undo",
+        onClick: () =>
+          setDraft((current) =>
+            current === after ? before : insertCityAt(current, index, city),
+          ),
+      },
+    });
+  };
+
+  // A stop picked on the map scrolls its row into view.
+  const selectFromMap = (index: number) => {
+    setActiveIndex(index);
+    document.getElementById(`stop-${index}-name`)?.scrollIntoView({
+      block: "nearest",
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
+    });
+  };
+
   const handleShare = () => {
     if (Object.keys(issues).length > 0) {
       focusFirstIssue(issues);
@@ -171,8 +211,10 @@ function EditorWorkspace() {
           onLimitReached={() => setUpsellOpen(true)}
           issues={issues}
           onAddCity={(city: City) => update((d) => addCity(d, city))}
-          onRemoveCity={(index) => update((d) => removeCityAt(d, index))}
-          onMoveCity={(from, to) => update((d) => moveCity(d, from, to))}
+          onRemoveCity={handleRemove}
+          onMoveCity={handleMove}
+          activeIndex={activeIndex}
+          onActivate={setActiveIndex}
           onUpdateCity={(index, patch) =>
             update((d) => updateCityAt(d, index, patch))
           }
@@ -186,6 +228,8 @@ function EditorWorkspace() {
             draft={draft}
             ghostNames={initial.ghostNames}
             onGhostSelect={() => setUpsellOpen(true)}
+            selectedIndex={activeIndex}
+            onCitySelect={selectFromMap}
           />
         </div>
       </div>

@@ -29,14 +29,18 @@ export function EditorMapPreview({
   draft,
   ghostNames = [],
   onGhostSelect,
+  selectedIndex,
+  onCitySelect,
 }: {
   readonly draft: DraftTrip;
+  /** The stop being edited; the map flies to it. */
+  readonly selectedIndex: number | null;
+  readonly onCitySelect: (index: number) => void;
   /** AI overflow stops; never saved with the trip. */
   readonly ghostNames?: readonly string[];
   readonly onGhostSelect?: () => void;
 }) {
   const debounced = useDebouncedDraft(draft);
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   // Placed from the same debounced draft as the route, so the ghost fan
   // moves together with the route's end while the guest edits.
   const ghosts = useMemo(
@@ -66,8 +70,13 @@ export function EditorMapPreview({
   return (
     <TripMap
       trip={previewTrip}
-      selectedIndex={selectedIndex}
-      onCitySelect={setSelectedIndex}
+      // The debounced draft can briefly have fewer stops than the live one.
+      selectedIndex={
+        selectedIndex !== null && selectedIndex < debounced.cities.length
+          ? selectedIndex
+          : null
+      }
+      onCitySelect={onCitySelect}
       ghosts={ghosts}
       onGhostSelect={onGhostSelect}
     />

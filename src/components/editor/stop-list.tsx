@@ -18,6 +18,7 @@ import {
 import { CitySearch } from "./city-search";
 import { LegRow } from "./leg-row";
 import { StopRow } from "./stop-row";
+import { useStopDrag } from "./use-stop-drag";
 
 export function StopList({
   cities,
@@ -30,6 +31,8 @@ export function StopList({
   canAddCity,
   onLimitReached,
   issues = {},
+  activeIndex = null,
+  onActivate,
 }: {
   readonly cities: City[];
   readonly legs: Leg[];
@@ -41,13 +44,19 @@ export function StopList({
   readonly canAddCity: boolean;
   readonly onLimitReached: () => void;
   readonly issues?: DraftIssues;
+  /** The stop being edited; the map preview follows it. */
+  readonly activeIndex?: number | null;
+  readonly onActivate?: (index: number) => void;
 }) {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
-  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [announcement, setAnnouncement] = useState("");
 
-  // The open detail panel follows its stop through reorders and deletes.
+  // The open detail panel follows its stop through reorders and deletes,
+  // and screen readers hear where the stop went.
   const moveCity = (from: number, to: number) => {
     onMoveCity(from, to);
+    const name = cities[from]?.name || "Stop";
+    setAnnouncement(`${name} moved to stop ${to + 1} of ${cities.length}.`);
     setExpandedIndex((current) =>
       current === null ? null : indexAfterMove(current, from, to),
     );
@@ -60,8 +69,13 @@ export function StopList({
     );
   };
 
+  const drag = useStopDrag(moveCity);
+
   return (
     <div className="flex flex-col gap-2">
+      <p role="status" aria-live="polite" className="sr-only">
+        {announcement}
+      </p>
       <div className="flex items-center justify-between">
         <h2 className="font-display text-lg font-medium">Stops</h2>
         <span className="eyebrow">
@@ -70,7 +84,7 @@ export function StopList({
       </div>
 
       {cities.map((city, index) => (
-        <div key={index}>
+        <div key={index} onFocusCapture={() => onActivate?.(index)}>
           <StopRow
             city={city}
             index={index}
@@ -83,18 +97,11 @@ export function StopList({
             onRemove={() => removeCity(index)}
             onMoveUp={() => moveCity(index, index - 1)}
             onMoveDown={() => moveCity(index, index + 1)}
-            draggable
-            dragging={draggedIndex === index}
-            onDragStart={() => setDraggedIndex(index)}
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={(e) => {
-              e.preventDefault();
-              if (draggedIndex !== null && draggedIndex !== index) {
-                moveCity(draggedIndex, index);
-              }
-              setDraggedIndex(null);
-            }}
-            onDragEnd={() => setDraggedIndex(null)}
+            {...drag.rowProps(index)}
+            dragging={drag.dragged === index}
+            dropSide={drag.dropSide(index)}
+            gripProps={drag.gripProps(index)}
+            active={activeIndex === index}
             errors={{
               name: issues[`cities.${index}.name`],
               nights: issues[`cities.${index}.nights`],

@@ -8,7 +8,7 @@ import {
   MoveUp,
   Trash2,
 } from "lucide-react";
-import type { DragEventHandler } from "react";
+import type { DragEventHandler, PointerEventHandler } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -18,6 +18,7 @@ import { clampNights, type City } from "@/lib/trip";
 import { cn } from "@/lib/utils";
 
 import { StopRowDetails } from "./stop-row-details";
+import type { DropSide } from "./use-stop-drag";
 
 /** Inline validation messages for the always-visible fields. */
 export type StopRowErrors = { readonly name?: string; readonly nights?: string };
@@ -39,6 +40,9 @@ export function StopRow({
   onDrop,
   onDragEnd,
   dragging,
+  dropSide = null,
+  gripProps,
+  active = false,
   errors = {},
 }: {
   readonly city: City;
@@ -56,6 +60,15 @@ export function StopRow({
   readonly onDrop: DragEventHandler<HTMLDivElement>;
   readonly onDragEnd: DragEventHandler<HTMLDivElement>;
   readonly dragging: boolean;
+  /** Where a dragged stop would land relative to this one. */
+  readonly dropSide?: DropSide;
+  /** Holding the grip is what makes the row draggable. */
+  readonly gripProps?: {
+    readonly onPointerDown: PointerEventHandler<HTMLDivElement>;
+    readonly onPointerUp: PointerEventHandler<HTMLDivElement>;
+  };
+  /** The stop being edited, shown on the map. */
+  readonly active?: boolean;
   readonly errors?: StopRowErrors;
 }) {
   const nameErrorId = `stop-${index}-name-error`;
@@ -68,12 +81,26 @@ export function StopRow({
       onDragOver={onDragOver}
       onDrop={onDrop}
       onDragEnd={onDragEnd}
-      className={cn("gap-3 transition-opacity", dragging && "opacity-40")}
+      className={cn(
+        "relative gap-3 transition-opacity",
+        dragging && "opacity-40",
+        active && "border-brass/60",
+      )}
     >
+      {dropSide && (
+        <span
+          aria-hidden
+          className={cn(
+            "pointer-events-none absolute inset-x-4 h-0.5 rounded-full bg-brass",
+            dropSide === "before" ? "-top-1.5" : "-bottom-1.5",
+          )}
+        />
+      )}
       <div className="flex flex-wrap items-end gap-3">
         <div
-          className="mt-6 cursor-grab text-muted-foreground active:cursor-grabbing"
+          className="mt-6 cursor-grab touch-none text-muted-foreground active:cursor-grabbing"
           aria-hidden
+          {...gripProps}
         >
           <GripVertical className="size-5" />
         </div>
