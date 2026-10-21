@@ -131,54 +131,58 @@ export function EditorHeader({
         />
       </div>
 
-      <div className="flex flex-wrap items-center justify-end gap-2">
+      {/* Full width below the title on phones (undo/redo left, actions
+          right); beside it from `sm`, with the stale-share hint above. */}
+      <div className="flex w-full flex-col gap-2 sm:w-auto sm:items-end">
         {shareStale && (
-          <p className="flex w-full items-center justify-end gap-1.5 text-xs text-brass-text">
+          <p className="flex items-center gap-1.5 text-xs text-brass-text">
             <RefreshCw className="size-3.5 shrink-0" aria-hidden />
             {t("shareStale")}
           </p>
         )}
-        <div className="flex">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            aria-label={t("undo")}
-            title={t("undoHint")}
-            aria-keyshortcuts="Control+Z Meta+Z"
-            disabled={!history.canUndo}
-            onClick={history.onUndo}
-          >
-            <Undo2 />
+        <div className="flex items-center gap-2">
+          <div className="mr-auto flex sm:mr-0">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              aria-label={t("undo")}
+              title={t("undoHint")}
+              aria-keyshortcuts="Control+Z Meta+Z"
+              disabled={!history.canUndo}
+              onClick={history.onUndo}
+            >
+              <Undo2 />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              aria-label={t("redo")}
+              title={t("redoHint")}
+              aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z Control+Y"
+              disabled={!history.canRedo}
+              onClick={history.onRedo}
+            >
+              <Redo2 />
+            </Button>
+          </div>
+          <Button asChild variant="outline">
+            <Link href="/maps">
+              <Map /> {t("myMaps")}
+            </Link>
           </Button>
           <Button
             type="button"
-            variant="ghost"
-            size="icon"
-            aria-label={t("redo")}
-            title={t("redoHint")}
-            aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z Control+Y"
-            disabled={!history.canRedo}
-            onClick={history.onRedo}
+            variant="brass"
+            size="lg"
+            disabled={!canShare || sharing}
+            onClick={onShare}
           >
-            <Redo2 />
+            {sharing ? <Loader2 className="animate-spin" /> : <Share2 />}
+            {t("share")}
           </Button>
         </div>
-        <Button asChild variant="outline">
-          <Link href="/maps">
-            <Map /> {t("myMaps")}
-          </Link>
-        </Button>
-        <Button
-          type="button"
-          variant="brass"
-          size="lg"
-          disabled={!canShare || sharing}
-          onClick={onShare}
-        >
-          {sharing ? <Loader2 className="animate-spin" /> : <Share2 />}
-          {t("share")}
-        </Button>
       </div>
     </header>
   );

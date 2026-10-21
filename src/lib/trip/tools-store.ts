@@ -11,6 +11,8 @@ const MAX_CUSTOM_ITEMS = 30;
 const ToolsSchema = z.object({
   checked: z.array(z.string()).default([]),
   custom: z.array(z.string().max(80)).max(MAX_CUSTOM_ITEMS).default([]),
+  /** Suggested packing items (by id) the viewer removed from their list. */
+  hidden: z.array(z.string()).default([]),
   notes: z.string().max(MAX_NOTES_LENGTH).default(""),
 });
 
@@ -23,6 +25,7 @@ export type TripToolsScope =
 export const EMPTY_TRIP_TOOLS: TripToolsState = {
   checked: [],
   custom: [],
+  hidden: [],
   notes: "",
 };
 
@@ -52,7 +55,10 @@ export function writeTripTools(scope: TripToolsScope, state: TripToolsState): vo
   if (!hasStorage()) return;
   const key = tripToolsKey(scope);
   const empty =
-    state.checked.length === 0 && state.custom.length === 0 && !state.notes;
+    state.checked.length === 0 &&
+    state.custom.length === 0 &&
+    state.hidden.length === 0 &&
+    !state.notes;
   try {
     if (empty) window.localStorage.removeItem(key);
     else window.localStorage.setItem(key, JSON.stringify(state));

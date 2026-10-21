@@ -68,4 +68,22 @@ describe("TripTools", () => {
       "Gate B",
     );
   });
+
+  it("removes a suggested item and can restore it", async () => {
+    const first = renderTools("packing");
+    await userEvent.click(screen.getByRole("button", { name: "Remove Power bank" }));
+    expect(
+      screen.queryByRole("checkbox", { name: "Power bank" }),
+    ).not.toBeInTheDocument();
+    first.unmount();
+
+    renderTools("packing");
+    expect(
+      screen.queryByRole("checkbox", { name: "Power bank" }),
+    ).not.toBeInTheDocument();
+    await userEvent.click(
+      screen.getByRole("button", { name: "Restore 1 removed suggestion" }),
+    );
+    expect(screen.getByRole("checkbox", { name: "Power bank" })).toBeInTheDocument();
+  });
 });

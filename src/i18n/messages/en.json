@@ -200,7 +200,7 @@
       "labelPlaceholder": "Railjet via Linz",
       "duration": "Duration",
       "durationPlaceholder": "~2h 30m",
-      "crowFlies": "≈ {distance} as the crow flies",
+      "crowFlies": "{distance} as the crow flies",
       "useEstimate": "Use estimate ({estimate} by {mode})"
     },
     "redraft": {
@@ -380,7 +380,8 @@
       "removeItem": "Remove {item}",
       "notesTitle": "Trip notes",
       "notesPlaceholder": "Booking codes, addresses, ideas…",
-      "notesPrivacy": "Saved in this browser only, never in the shared link."
+      "notesPrivacy": "Saved in this browser only, never in the shared link.",
+      "restoreSuggestions": "Restore {count, plural, one {# removed suggestion} other {# removed suggestions}}"
     },
     "packing": {
       "passport": "Passport & ID",

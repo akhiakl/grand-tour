@@ -248,8 +248,10 @@ function EditorWorkspace() {
           }
         />
 
-        <div className="order-first flex flex-col gap-4 lg:sticky lg:top-8 lg:order-none lg:self-start">
-          <div className="relative isolate h-64 overflow-hidden rounded-2xl border border-line lg:h-[32rem]">
+        {/* On mobile this column dissolves into the grid: the map leads,
+            the redraft card follows the stops. */}
+        <div className="contents lg:sticky lg:top-8 lg:flex lg:flex-col lg:gap-4 lg:self-start">
+          <div className="relative isolate order-first h-64 overflow-hidden rounded-2xl border border-line lg:order-none lg:h-[32rem]">
             <EditorMapPreview
               draft={draft}
               ghostNames={ghostNames}

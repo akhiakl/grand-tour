@@ -67,7 +67,7 @@ function PackingItem({
   readonly item: string;
   readonly checked: boolean;
   readonly onToggle: () => void;
-  readonly onRemove?: () => void;
+  readonly onRemove: () => void;
 }) {
   const t = useTranslations("Trip.tools");
   return (
@@ -82,16 +82,14 @@ function PackingItem({
       >
         {item}
       </label>
-      {onRemove && (
-        <button
-          type="button"
-          onClick={onRemove}
-          aria-label={t("removeItem", { item })}
-          className="rounded-full p-1 text-ink-soft outline-none hover:text-ink focus-visible:ring-2 focus-visible:ring-ring [&_svg]:size-3.5"
-        >
-          <X />
-        </button>
-      )}
+      <button
+        type="button"
+        onClick={onRemove}
+        aria-label={t("removeItem", { item })}
+        className="rounded-full p-1 text-ink-soft outline-none hover:text-ink focus-visible:ring-2 focus-visible:ring-ring [&_svg]:size-3.5"
+      >
+        <X />
+      </button>
     </li>
   );
 }
@@ -146,7 +144,7 @@ export function TripTools(props: ToolsProps) {
 }
 
 /** A checklist row: a suggested item (translated) or one the viewer added. */
-type ChecklistItem = { id: string; label: string; custom: boolean };
+type ChecklistItem = { id: string; label: string };
 
 const customId = (text: string) => `custom:${text}`;
 
@@ -167,13 +165,13 @@ function ToolsBody({ trip, scope, active, onBack }: ToolsProps) {
   const label = useSuggestedLabel();
   const [state, setState] = useState<TripToolsState>(() => readTripTools(scope));
   const suggested = useMemo(() => packingList(trip), [trip]);
+  const hidden = new Set(state.hidden);
+  const hiddenCount = suggested.filter((item) => hidden.has(item.id)).length;
   const items: ChecklistItem[] = [
-    ...suggested.map((item) => ({ id: item.id, label: label(item), custom: false })),
-    ...state.custom.map((text) => ({
-      id: customId(text),
-      label: text,
-      custom: true,
-    })),
+    ...suggested
+      .filter((item) => !hidden.has(item.id))
+      .map((item) => ({ id: item.id, label: label(item) })),
+    ...state.custom.map((text) => ({ id: customId(text), label: text })),
   ];
   const checked = new Set(state.checked);
 
@@ -199,10 +197,12 @@ function ToolsBody({ trip, scope, active, onBack }: ToolsProps) {
     update({ custom: [...state.custom, text] });
   };
 
-  const removeItem = (text: string) =>
+  // Own items are deleted; suggestions are hidden so they can come back.
+  const removeItem = (id: string) =>
     update({
-      custom: state.custom.filter((c) => c !== text),
-      checked: state.checked.filter((c) => c !== customId(text)),
+      custom: state.custom.filter((text) => customId(text) !== id),
+      hidden: id.startsWith("custom:") ? state.hidden : [...state.hidden, id],
+      checked: state.checked.filter((c) => c !== id),
     });
 
   const done = items.filter((item) => checked.has(item.id)).length;
@@ -236,10 +236,19 @@ function ToolsBody({ trip, scope, active, onBack }: ToolsProps) {
               item={item.label}
               checked={checked.has(item.id)}
               onToggle={() => toggle(item.id)}
-              onRemove={item.custom ? () => removeItem(item.label) : undefined}
+              onRemove={() => removeItem(item.id)}
             />
           ))}
         </ul>
+        {hiddenCount > 0 && (
+          <button
+            type="button"
+            onClick={() => update({ hidden: [] })}
+            className="w-fit rounded text-xs text-brass-text underline underline-offset-2 outline-none hover:text-ink focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            {t("restoreSuggestions", { count: hiddenCount })}
+          </button>
+        )}
         <AddItemForm onAdd={addItem} />
       </ToolSection>
 

@@ -26,9 +26,22 @@ describe("read/write trip tools", () => {
   const scope = { kind: "shared", id: "abc12345" } as const;
 
   it("round-trips ticks, custom items and notes", () => {
-    const state = { checked: ["Power bank"], custom: ["Snorkel"], notes: "Gate B" };
+    const state = {
+      checked: ["powerBank"],
+      custom: ["Snorkel"],
+      hidden: ["laundry"],
+      notes: "Gate B",
+    };
     writeTripTools(scope, state);
     expect(readTripTools(scope)).toEqual(state);
+  });
+
+  it("reads records saved before items could be hidden", () => {
+    window.localStorage.setItem(
+      tripToolsKey(scope),
+      JSON.stringify({ checked: ["powerBank"], custom: [], notes: "" }),
+    );
+    expect(readTripTools(scope).hidden).toEqual([]);
   });
 
   it("reads missing, corrupt or invalid records as empty", () => {
