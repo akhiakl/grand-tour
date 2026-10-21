@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { AiChat } from "@/components/ai/ai-chat";
+import { destinationFromParam } from "@/lib/ai";
 
 export const metadata: Metadata = {
   title: "Plan with AI",
@@ -10,7 +11,13 @@ export const metadata: Metadata = {
     "Three questions, one drafted route. Tell the atlas where, how long and what pace; then make it yours.",
 };
 
-export default function PlanPage() {
+export default async function PlanPage({
+  searchParams,
+}: {
+  readonly searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const { destination } = await searchParams;
+
   return (
     <main className="mx-auto flex min-h-dvh max-w-xl flex-col gap-8 px-4 py-10 sm:px-6">
       <header className="flex flex-col gap-2">
@@ -27,7 +34,7 @@ export default function PlanPage() {
           Three questions, one drafted route. You edit everything after.
         </p>
       </header>
-      <AiChat />
+      <AiChat initialDestination={destinationFromParam(destination)} />
     </main>
   );
 }

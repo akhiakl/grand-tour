@@ -60,9 +60,16 @@ function FailureBubble({
  * call to /api/generate, then lands the draft in the editor with the
  * overflow stops as ghost stops: AI drafts, the guest edits.
  */
-export function AiChat() {
+export function AiChat({
+  initialDestination,
+}: {
+  /** From the landing's destination search: the first question is answered. */
+  readonly initialDestination?: string;
+}) {
   const router = useRouter();
-  const [answers, setAnswers] = useState<Answers>({});
+  const [answers, setAnswers] = useState<Answers>({
+    destination: initialDestination,
+  });
 
   const onDrafted = ({ trip, suggestedExtra }: GeneratedDraft) => {
     writeAiHandoff({
