@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { TermsNotice } from "@/components/legal/notices";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -82,6 +83,7 @@ export function ShareDialog({
             <Share2 /> {t("nativeShare")}
           </Button>
         )}
+        <TermsNotice action="sharing this link" />
       </DialogContent>
     </Dialog>
   );

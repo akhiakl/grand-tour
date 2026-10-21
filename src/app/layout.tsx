@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { ServiceWorker } from "@/components/service-worker";
+import { SiteAnalytics } from "@/components/site-analytics";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { UnitsProvider } from "@/components/units/units-provider";
@@ -75,6 +76,7 @@ export default async function RootLayout({
             <ServiceWorker />
           </NextIntlClientProvider>
         </ThemeProvider>
+        <SiteAnalytics />
       </body>
     </html>
   );

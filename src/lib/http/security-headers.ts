@@ -19,6 +19,9 @@ export interface SecurityHeaderOptions {
 const OPENFREEMAP = "https://tiles.openfreemap.org";
 const PHOTON = "https://photon.komoot.io";
 const VERCEL_LIVE = "https://vercel.live";
+// Vercel Web Analytics loads its debug script from here in development;
+// in production it is served first-party from /_vercel/insights.
+const VERCEL_SCRIPTS = "https://va.vercel-scripts.com";
 
 function originOf(url: string | undefined): string | null {
   if (!url?.trim()) return null;
@@ -45,7 +48,7 @@ export function contentSecurityPolicy(options: SecurityHeaderOptions): string {
     "script-src": [
       "'self'",
       "'unsafe-inline'",
-      ...(options.dev ? ["'unsafe-eval'"] : []),
+      ...(options.dev ? ["'unsafe-eval'", VERCEL_SCRIPTS] : []),
       ...preview,
     ],
     "style-src": ["'self'", "'unsafe-inline'"],

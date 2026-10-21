@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { trackEvent } from "@/lib/analytics";
 import { markLocalTripShared, type Trip } from "@/lib/trip";
 
 /**
@@ -37,6 +38,7 @@ export function useShareTrip({
       if (response.status === 201) {
         const { id } = (await response.json()) as { id: string };
         if (localId) markLocalTripShared(localId, id);
+        trackEvent("share_created");
         setShareId(id);
         setSharedTitle(trip.title);
         setDialogOpen(true);

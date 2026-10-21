@@ -82,6 +82,22 @@ checked before merging the `1.0.0` release PR.
 - [ ] Branch protection on `main` with all required checks + review
 - [ ] Domain + HTTPS, favicon, metadata/robots sane
 
+### Legal, contact & analytics
+
+- [ ] `OPERATOR_NAME` in `src/lib/legal/operator.ts` set to the operator's
+      real name (IT Rules 2021 require a named Grievance Officer)
+- [ ] `hello@akhiakl.in` forwards to a monitored inbox
+- [ ] Privacy notice names the production AI provider and the Vercel,
+      Upstash and Sentry regions; reviewed by an Indian tech lawyer
+- [ ] Terms name the city whose courts have jurisdiction
+- [ ] Sentry verified to send no IPs or request bodies and to write
+      nothing to the visitor's device (the notice promises no cookies)
+- [ ] Vercel and Sentry log retention checked against CERT-In's 180 days
+- [ ] Vercel Web Analytics enabled on the project; custom events need
+      Pro, otherwise only page views are recorded
+- [ ] Search the code for `TODO(legal)` / `TODO(analytics)`; each is
+      resolved or consciously deferred
+
 ### Launch
 
 - [ ] Merge the `1.0.0` release PR → tag + GitHub Release published

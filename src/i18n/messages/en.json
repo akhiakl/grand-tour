@@ -38,7 +38,8 @@
   "Landing": {
     "group": "Start your own route",
     "planWithAi": "Plan with AI",
-    "buildManually": "Build manually"
+    "buildManually": "Build manually",
+    "howItWorks": "Free, no account needed · How it works"
   },
   "Errors": {
     "notFound": {

@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import type { GenerateRequest } from "@/lib/ai";
+import { trackEvent } from "@/lib/analytics";
 import type { Trip } from "@/lib/trip";
 
 export type GenerateStatus = "idle" | "drafting" | "rate_limited" | "failed";
@@ -35,6 +36,7 @@ export function useGenerateTrip({
       });
 
       if (response.ok) {
+        trackEvent("ai_route_generated");
         // Stays "drafting": the chat navigates away; other callers reset().
         onDrafted((await response.json()) as GeneratedDraft, request);
         return;

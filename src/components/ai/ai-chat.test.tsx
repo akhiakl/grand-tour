@@ -44,6 +44,11 @@ async function answerAll() {
 }
 
 describe("AiChat", () => {
+  it("says up front that the planner is an AI", () => {
+    render(<AiChat />);
+    expect(screen.getByText("You're planning with an AI.")).toBeVisible();
+  });
+
   it("asks three questions, makes one request and lands the draft in the editor", async () => {
     const draft = makeGeneratedDraft(["Ljubljana"]);
     fetchMock.mockResolvedValue(jsonResponse(draft, 200));

@@ -12,8 +12,12 @@ const jsonResponse = (body: unknown, status: number) =>
     json: () => Promise.resolve(body),
   }) as Response;
 
+const trackEvent = vi.hoisted(() => vi.fn());
+vi.mock("@/lib/analytics", () => ({ trackEvent }));
+
 afterEach(() => {
   vi.unstubAllGlobals();
+  trackEvent.mockClear();
 });
 
 describe("useGenerateTrip", () => {
@@ -31,6 +35,7 @@ describe("useGenerateTrip", () => {
     expect(url).toBe("/api/generate");
     expect(JSON.parse(init.body)).toEqual(makeGenerateRequest());
     expect(onDrafted).toHaveBeenCalledWith(draft, makeGenerateRequest());
+    expect(trackEvent).toHaveBeenCalledWith("ai_route_generated");
     expect(result.current.status).toBe("drafting");
   });
 
@@ -47,6 +52,7 @@ describe("useGenerateTrip", () => {
 
     expect(result.current.status).toBe(expected);
     expect(onDrafted).not.toHaveBeenCalled();
+    expect(trackEvent).not.toHaveBeenCalled();
   });
 
   it("treats a network error as failed and can reset to idle", async () => {

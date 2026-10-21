@@ -3,6 +3,8 @@
 import { useTranslations } from "next-intl";
 import { useEffect, useId, useState, type ReactNode } from "react";
 
+import { LegalLinks } from "@/components/legal/legal-links";
+import { ReportMapLink } from "@/components/legal/report-map-link";
 import { stopDates, type Trip, type TripToolsScope } from "@/lib/trip";
 
 import { CityDetail } from "./city-detail";
@@ -169,6 +171,9 @@ export function TripPanel({
               />
             </section>
             {variant === "shared" && <SharedLinkNote views={views} />}
+            <LegalLinks className="border-t border-line pt-4">
+              {variant === "shared" && <ReportMapLink />}
+            </LegalLinks>
           </>
         )}
       </div>

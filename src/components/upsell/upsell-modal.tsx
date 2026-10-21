@@ -2,6 +2,7 @@
 
 import { Lock } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useEffect } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { trackEvent } from "@/lib/analytics";
 import { GUEST_MAX_CITIES, SHARE_TTL_DAYS } from "@/lib/trip";
 
 const LOCKED_FEATURES = ["stops", "permanent", "pdf", "themes"] as const;
@@ -30,6 +32,11 @@ export function UpsellModal({
   readonly onOpenChange: (open: boolean) => void;
 }) {
   const t = useTranslations("Upsell");
+  // Each time a guest hits the ceiling: the demand signal for the paid tier.
+  useEffect(() => {
+    if (open) trackEvent("upsell_shown");
+  }, [open]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>

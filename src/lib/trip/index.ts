@@ -17,6 +17,7 @@ export * from "./packing";
 export * from "./poster-layout";
 export * from "./sample";
 export * from "./schema";
+export * from "./sketch";
 export * from "./stats";
 export * from "./tools-store";
 export * from "./trip-file";

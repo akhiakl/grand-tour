@@ -71,6 +71,22 @@ status table before starting work. Visual truth: `reference/grand-tour.html`.
 - `components/landing`: `landing-cta` (Plan with AI / Build manually on
   `/`; passed to `TripExperience` via its `cta` slot as the example
   route's primary actions).
+- `lib/legal`: operator and contact facts (`CONTACT_EMAIL`,
+  `OPERATOR_NAME`, grievance timelines, `LEGAL_LAST_UPDATED`) and
+  `reportMapMailto`. `components/legal`: `LegalPage` shell (summary,
+  contents, sections, footer) behind `/privacy`, `/terms`, `/contact`;
+  `LegalLinks` (atlas card + footers), `ReportMapLink` (shared view),
+  `AiNotice` (chat) and `TermsNotice` (chat pace step, share dialog).
+  Open `TODO(legal)` items gate v1.0.0 (see `docs/RELEASE.md`).
+- `lib/analytics`: cookieless Vercel Web Analytics behind `trackEvent`
+  (`ai_route_generated`, `share_created`, `upsell_shown`) and
+  `withoutQuery` (strips query strings before sending);
+  `components/site-analytics` mounts it in the root layout.
+- `components/about` + `/about`: the scrolling story page (hero with
+  `trip/route-sketch`, `how-it-works`, example route, `about-faq` with
+  native `<details>`, closing CTA, `legal/site-footer`). No live map on
+  it, so nothing traps scrolling. `lib/trip/sketch` (`sketchRoute`) is
+  the pure projection behind `RouteSketch` (server-rendered SVG).
 - `components/off-the-map`: shared in-voice dead end (global 404,
   expired share, map missing on this device).
 - `components/ai`: `ai-chat` (`/plan`, 3 questions → one `/api/generate`

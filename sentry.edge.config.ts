@@ -17,11 +17,10 @@ if (dsn) {
     // Enable logs to be sent to Sentry (dev only — noisy/costly in prod)
     enableLogs: process.env.NODE_ENV === "development",
 
+    // No IPs, user details or request bodies: the privacy notice promises it.
     dataCollection: {
-      // To disable sending user data and HTTP bodies, uncomment the lines below. For more info visit:
-      // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#dataCollection
-      // userInfo: false,
-      // httpBodies: [],
+      userInfo: false,
+      httpBodies: [],
     },
   });
 }
