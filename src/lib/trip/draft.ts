@@ -21,9 +21,18 @@ export type DraftTrip = {
   legs: Leg[];
   /** YYYY-MM-DD, or absent for an undated trip. */
   startDate?: string;
+  /** One stable id per stop, for list keys and focus; never saved. */
+  keys: string[];
 };
 
 const MAX_NIGHTS = 30;
+
+let lastKey = 0;
+const newKey = () => `stop-${++lastKey}`;
+
+function insertAt<T>(items: readonly T[], at: number, item: T): T[] {
+  return [...items.slice(0, at), item, ...items.slice(at)];
+}
 
 /**
  * Rebuilds legs to `cities.length - 1`, reusing existing legs positionally;
@@ -58,12 +67,17 @@ export function blankCity(name = ""): City {
 }
 
 export function createBlankDraft(): DraftTrip {
-  return { title: DEFAULT_TRIP_TITLE, cities: [], legs: [] };
+  return { title: DEFAULT_TRIP_TITLE, cities: [], legs: [], keys: [] };
 }
 
-export function draftFromTrip(trip: Trip): DraftTrip {
+export function draftFromTrip(
+  trip: Pick<Trip, "title" | "cities" | "legs" | "startDate">,
+): DraftTrip {
   const { title, cities, legs, startDate } = trip;
-  return startDate ? { title, cities, legs, startDate } : { title, cities, legs };
+  const keys = cities.map(newKey);
+  return startDate
+    ? { title, cities, legs, startDate, keys }
+    : { title, cities, legs, keys };
 }
 
 export function canAddCity(draft: DraftTrip): boolean {
@@ -73,7 +87,8 @@ export function canAddCity(draft: DraftTrip): boolean {
 export function addCity(draft: DraftTrip, city: City): DraftTrip {
   if (!canAddCity(draft)) return draft;
   const cities = [...draft.cities, city];
-  return { ...draft, cities, legs: rebuildLegs(cities, draft.legs) };
+  const keys = [...draft.keys, newKey()];
+  return { ...draft, cities, keys, legs: rebuildLegs(cities, draft.legs) };
 }
 
 /** Puts a stop back at `index` (clamped to the list), e.g. to undo a removal. */
@@ -84,15 +99,17 @@ export function insertCityAt(
 ): DraftTrip {
   if (!canAddCity(draft)) return draft;
   const at = Math.min(Math.max(index, 0), draft.cities.length);
-  const cities = [...draft.cities.slice(0, at), city, ...draft.cities.slice(at)];
+  const cities = insertAt(draft.cities, at, city);
+  const keys = insertAt(draft.keys, at, newKey());
   // A gap where the new leg goes; rebuildLegs drafts it from the distance.
-  const legs = [...draft.legs.slice(0, at), undefined, ...draft.legs.slice(at)];
-  return { ...draft, cities, legs: rebuildLegs(cities, legs) };
+  const legs = insertAt<Leg | undefined>(draft.legs, at, undefined);
+  return { ...draft, cities, keys, legs: rebuildLegs(cities, legs) };
 }
 
 export function removeCityAt(draft: DraftTrip, index: number): DraftTrip {
   const cities = draft.cities.filter((_, i) => i !== index);
-  return { ...draft, cities, legs: rebuildLegs(cities, draft.legs) };
+  const keys = draft.keys.filter((_, i) => i !== index);
+  return { ...draft, cities, keys, legs: rebuildLegs(cities, draft.legs) };
 }
 
 export function moveCity(draft: DraftTrip, from: number, to: number): DraftTrip {
@@ -108,7 +125,10 @@ export function moveCity(draft: DraftTrip, from: number, to: number): DraftTrip 
   const cities = [...draft.cities];
   const [moved] = cities.splice(from, 1);
   cities.splice(to, 0, moved);
-  return { ...draft, cities, legs: rebuildLegs(cities, draft.legs) };
+  const keys = [...draft.keys];
+  const [movedKey] = keys.splice(from, 1);
+  keys.splice(to, 0, movedKey);
+  return { ...draft, cities, keys, legs: rebuildLegs(cities, draft.legs) };
 }
 
 /** Where a stop at `index` sits after the stop at `from` moves to `to`. */
@@ -159,8 +179,10 @@ export function updateTitle(draft: DraftTrip, title: string): DraftTrip {
 
 /** Sets the first day (YYYY-MM-DD); an empty value makes the trip undated. */
 export function updateStartDate(draft: DraftTrip, startDate: string): DraftTrip {
-  const { title, cities, legs } = draft;
-  return startDate ? { title, cities, legs, startDate } : { title, cities, legs };
+  const { title, cities, legs, keys } = draft;
+  return startDate
+    ? { title, cities, legs, keys, startDate }
+    : { title, cities, legs, keys };
 }
 
 /**

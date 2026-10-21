@@ -64,8 +64,11 @@ checked before merging the `1.0.0` release PR.
 - [x] All CI checks green on `main` (Lint, Typecheck, Tests & coverage,
       Build, e2e) and SonarQube quality gate passing
 - [x] Coverage ≥ 85% overall
-- [ ] Keyboard audit: ESC closes drawer/modals, focus trapped & restored,
-      full tab-through of editor and chat
+- [x] Keyboard audit: ESC closes drawer/modals, focus trapped & restored,
+      full tab-through of editor and chat (focus now lands on the next
+      stop after a removal, on a new blank stop, and on Retry when a
+      draft fails; Sonner returns focus to the last control when tabbing
+      out of a toast, by design)
 - [ ] Lighthouse: a11y ≥ 95, performance ≥ 85 on `/`, `/new`, `/t/[id]`
       (a11y 96–100 and desktop performance 98 everywhere; mobile
       performance ~62 / 74 / 63 on `/`, `/new`, `/t` under Lighthouse's
@@ -76,7 +79,10 @@ checked before merging the `1.0.0` release PR.
 - [x] `prefers-reduced-motion` honored everywhere (splash, route, drawers)
 - [x] Responsive at 360 / 768 / 1280; no horizontal scroll
       (e2e `responsive.spec.ts`)
-- [ ] Loading, error, empty and expired states designed in-voice
+- [x] Loading, error, empty and expired states designed in-voice
+      (`PageLoading` while local maps load; `app/error.tsx` keeps the
+      layout with Retry; `/t/[id]` has no `loading.tsx` on purpose, so
+      expired links keep their 404 status)
 
 ### Infrastructure (production values)
 

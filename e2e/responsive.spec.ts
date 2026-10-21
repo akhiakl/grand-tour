@@ -11,6 +11,7 @@ const PAGES = [
   "/new?city=Vienna&country=Austria&lat=48.2082&lng=16.3738",
   "/maps",
   "/privacy",
+  "/terms",
   "/contact",
   `/t/${SHARE_ID}`,
 ];

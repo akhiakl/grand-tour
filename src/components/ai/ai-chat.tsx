@@ -4,7 +4,7 @@ import { RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { AiNotice, TermsNotice } from "@/components/legal/notices";
 import { Button } from "@/components/ui/button";
@@ -39,11 +39,21 @@ function FailureBubble({
   readonly onRetry: () => void;
 }) {
   const t = useTranslations("Chat");
+  const retryRef = useRef<HTMLButtonElement>(null);
+  // The pace button that sent the request is gone; put focus on the way
+  // forward instead of leaving it on the page body.
+  useEffect(() => retryRef.current?.focus(), []);
   return (
     <ChatBubble from="atlas">
       <p role="alert">{rateLimited ? t("rateLimited") : t("failed")}</p>
       <div className="mt-3 flex flex-wrap gap-2">
-        <Button type="button" size="sm" variant="brass" onClick={onRetry}>
+        <Button
+          ref={retryRef}
+          type="button"
+          size="sm"
+          variant="brass"
+          onClick={onRetry}
+        >
           <RotateCcw /> {t("retry")}
         </Button>
         <Button asChild size="sm" variant="outline">

@@ -2,7 +2,8 @@
   "Common": {
     "appName": "Grand Tour",
     "backToAtlas": "Field Atlas",
-    "offTheMap": "Off the map"
+    "offTheMap": "Off the map",
+    "loading": "Unfolding the map…"
   },
   "Metadata": {
     "titleTemplate": "%s · Grand Tour",

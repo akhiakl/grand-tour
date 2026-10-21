@@ -101,7 +101,7 @@ export function MapsPage() {
 
       {mounted && records.length === 0 && (
         <div className="mt-16 flex flex-col items-center gap-3 text-center">
-          <Compass className="size-10 text-muted-foreground" />
+          <Compass aria-hidden className="size-10 text-muted-foreground" />
           <p className="text-muted-foreground">{t("empty")}</p>
           <div className="flex flex-wrap justify-center gap-2">
             <Button asChild variant="brass">
