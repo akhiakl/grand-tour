@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { makeCity } from "@/test/fixtures/trip";
 
-import { sketchRoute } from ".";
+import { sketchRoute } from "./sketch";
 
 const BOX = { width: 400, height: 300, padding: 40 };
 

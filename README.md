@@ -6,6 +6,16 @@
 Craft a beautiful, interactive travel route map — drawn by AI or by hand —
 and share it with a single link. Guest-first: no accounts, no user database.
 
+## What's in it
+
+- **Landing (`/`)**: the sample route on a live map; continue your latest
+  map, start with AI or by hand, or search a destination first.
+- **AI planner (`/plan`)** and **manual editor (`/new`)**, up to 5 stops
+  as a guest; maps save in your browser (**My Maps**, `/maps`).
+- **Share links (`/t/{id}`)**: immutable snapshots, live 60 days after
+  the last view, with remix, poster export and a report link.
+- **About, Privacy, Terms, Contact** pages; cookieless analytics.
+
 ## Stack
 
 Next.js (App Router) · TypeScript strict · Tailwind CSS v4 · shadcn/ui ·
@@ -47,7 +57,8 @@ typecheck; commit messages must follow
 - [docs/BRANCHING.md](./docs/BRANCHING.md) — branching strategy
 - [docs/RELEASE.md](./docs/RELEASE.md) — versioning, deploy policy and
   the MVP launch checklist
-- `.claude/skills/` — project skills (grand-tour, nextjs, tailwind, shadcn)
+- `.claude/skills/` — project skills (grand-tour, grand-tour-engineering,
+  grand-tour-testing, nextjs, tailwind, shadcn)
 
 ## Environment variables
 
@@ -59,4 +70,5 @@ typecheck; commit messages must follow
 | `UPSTASH_REDIS_REST_URL`    | Shared trip snapshots                     |
 | `UPSTASH_REDIS_REST_TOKEN`  | Shared trip snapshots                     |
 | `NEXT_PUBLIC_MAP_STYLE_URL` | Self-hosted map style (optional)          |
+| `RATES_API_URL`             | Exchange-rate source (optional)           |
 | `NEXT_PUBLIC_SENTRY_DSN`    | Sentry monitoring (optional; no-op unset) |

@@ -64,6 +64,12 @@ route maps — populated by AI chat or manually — shared via short links
 - **Monitoring**: Sentry (`@sentry/nextjs`) via the instrumentation hooks;
   fully gated on `NEXT_PUBLIC_SENTRY_DSN` — never add monitoring calls in
   components; error boundaries and `onRequestError` cover capture.
+- **Analytics**: cookieless Vercel Web Analytics behind `@/lib/analytics`
+  (`trackEvent`, query strings stripped). No cookies or trackers: adding
+  one means updating `/privacy` and likely a consent banner.
+- **Legal**: `/privacy`, `/terms`, `/contact` read operator facts from
+  `@/lib/legal`. Open `TODO(legal)` items gate `v1.0.0` (`docs/RELEASE.md`);
+  new data flows to third parties must be added to the Privacy processor list.
 - Default trip title is "Grand Tour" (`DEFAULT_TRIP_TITLE`); users can set a
   custom title per trip.
 
