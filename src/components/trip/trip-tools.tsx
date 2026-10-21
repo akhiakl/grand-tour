@@ -27,6 +27,9 @@ export function BackToRoute({ onBack }: { readonly onBack: () => void }) {
   return (
     <button
       type="button"
+      // Shown when the guest opens a stop or tool in place of the
+      // itinerary; focus moves into the view they just opened.
+      // eslint-disable-next-line jsx-a11y/no-autofocus
       autoFocus
       onClick={onBack}
       className="-ml-1 flex w-fit items-center gap-1.5 rounded-full px-1 text-sm text-ink-soft transition-colors outline-none hover:text-ink focus-visible:ring-2 focus-visible:ring-ring [&_svg]:size-4"

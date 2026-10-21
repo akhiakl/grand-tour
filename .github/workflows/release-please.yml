@@ -13,11 +13,8 @@ permissions:
   pull-requests: write
 
 jobs:
-  release-please:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: googleapis/release-please-action@v5
-        with:
-          # GITHUB_TOKEN-created PRs don't trigger CI; set a repo PAT as
-          # RELEASE_PLEASE_TOKEN so required checks run on release PRs.
-          token: ${{ secrets.RELEASE_PLEASE_TOKEN || secrets.GITHUB_TOKEN }}
+  release:
+    # Set a repo PAT as RELEASE_PLEASE_TOKEN so required checks run on
+    # release PRs (GITHUB_TOKEN-created PRs don't trigger CI).
+    uses: akhiakl/ci-workflows/.github/workflows/release-please.yml@47cd9620ed2b9d879185db5fd2887c5db64cff79 # v1
+    secrets: inherit

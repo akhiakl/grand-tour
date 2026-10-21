@@ -55,3 +55,4 @@ coverage/
 # Playwright
 /test-results/
 /playwright-report/
+/ci-results/
