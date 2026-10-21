@@ -1,6 +1,8 @@
 import { ArrowLeft, ArrowRight, PenLine, Sparkles } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 
 import { AboutFaq } from "@/components/about/about-faq";
 import { HowItWorks } from "@/components/about/how-it-works";
@@ -9,23 +11,23 @@ import { RouteSketch } from "@/components/trip/route-sketch";
 import { Button } from "@/components/ui/button";
 import { GUEST_MAX_CITIES, SAMPLE_TRIP, tripStats } from "@/lib/trip";
 
-export const metadata: Metadata = {
-  title: "How it works",
-  description:
-    "Draw a travel route with AI or by hand, shape every leg, and share it as one link. Free, no account needed.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Metadata.about");
+  return { title: t("title"), description: t("description") };
+}
 
 function StartButtons() {
+  const t = useTranslations("About");
   return (
     <div className="flex flex-wrap gap-2">
       <Button asChild variant="brass" size="lg">
         <Link href="/plan">
-          <Sparkles /> Plan with AI
+          <Sparkles /> {t("planWithAi")}
         </Link>
       </Button>
       <Button asChild variant="outline" size="lg">
         <Link href="/new">
-          <PenLine /> Build manually
+          <PenLine /> {t("buildManually")}
         </Link>
       </Button>
     </div>
@@ -33,13 +35,14 @@ function StartButtons() {
 }
 
 function ExampleRoute() {
+  const t = useTranslations("About.example");
   const stats = tripStats(SAMPLE_TRIP);
   const route = SAMPLE_TRIP.cities.map((city) => city.name).join(" → ");
 
   return (
     <section aria-labelledby="example-title" className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <p className="eyebrow">An example route</p>
+        <p className="eyebrow">{t("eyebrow")}</p>
         <h2
           id="example-title"
           className="font-display text-3xl font-medium tracking-tight"
@@ -55,11 +58,14 @@ function ExampleRoute() {
         <div className="flex flex-col gap-3">
           <p className="text-ink">{route}</p>
           <p className="text-sm text-ink-soft">
-            {stats.cities} stops · {stats.nights} nights · {stats.countries}{" "}
-            countries
+            {t("stats", {
+              cities: stats.cities,
+              nights: stats.nights,
+              countries: stats.countries,
+            })}
           </p>
           <span className="inline-flex items-center gap-1 text-sm font-medium text-brass-text">
-            Open the live map
+            {t("open")}
             <ArrowRight
               aria-hidden
               className="size-4 transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none"
@@ -72,6 +78,8 @@ function ExampleRoute() {
 }
 
 export default function AboutPage() {
+  const t = useTranslations("About");
+  const common = useTranslations("Common");
   return (
     <div className="flex min-h-dvh flex-col">
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-20 px-4 py-10 sm:px-6 lg:py-16">
@@ -81,18 +89,15 @@ export default function AboutPage() {
               href="/"
               className="eyebrow inline-flex w-fit items-center gap-1 text-muted-foreground transition-colors hover:text-brass-text"
             >
-              <ArrowLeft className="size-3" /> Field Atlas
+              <ArrowLeft className="size-3" /> {common("backToAtlas")}
             </Link>
-            <p className="eyebrow">Field notes</p>
+            <p className="eyebrow">{t("eyebrow")}</p>
             <h1 className="font-display text-4xl font-medium tracking-tight text-balance text-ink sm:text-5xl">
-              Every journey deserves a map{" "}
-              <em className="text-azure">worth sharing</em>
+              {t.rich("title", {
+                em: (chunks) => <em className="text-azure">{chunks}</em>,
+              })}
             </h1>
-            <p className="max-w-prose text-lg text-ink-soft">
-              Grand Tour turns a trip idea into an interactive route map: cities,
-              nights, trains and flights, drawn by AI or by hand. Free, and no
-              account needed.
-            </p>
+            <p className="max-w-prose text-lg text-ink-soft">{t("lede")}</p>
             <StartButtons />
           </div>
           <RouteSketch
@@ -113,10 +118,10 @@ export default function AboutPage() {
             id="start-title"
             className="font-display text-3xl font-medium tracking-tight"
           >
-            Your next grand tour starts here
+            {t("start.title")}
           </h2>
           <p className="text-ink-soft">
-            Up to {GUEST_MAX_CITIES} stops, one link, no account.
+            {t("start.body", { max: GUEST_MAX_CITIES })}
           </p>
           <StartButtons />
         </section>

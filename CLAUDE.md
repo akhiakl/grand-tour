@@ -68,7 +68,8 @@ route maps — populated by AI chat or manually — shared via short links
   custom title per trip.
 - **Copy**: every UI string lives in `src/i18n/messages/en.json` (next-intl,
   single locale, typed keys) — never hardcode copy in components; `lib`
-  returns message keys, not text. See `docs/ARCHITECTURE.md` → Copy and i18n.
+  returns message keys, not text. Only the Privacy/Terms policy text stays
+  inline. See `docs/ARCHITECTURE.md` → Copy and i18n.
 - **Viewer state** (packing ticks, own items, notes) is per trip in
   localStorage (`trip-tools:*`), never in the shared snapshot.
 

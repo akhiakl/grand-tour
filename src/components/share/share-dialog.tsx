@@ -83,7 +83,7 @@ export function ShareDialog({
             <Share2 /> {t("nativeShare")}
           </Button>
         )}
-        <TermsNotice action="sharing this link" />
+        <TermsNotice action="sharing" />
       </DialogContent>
     </Dialog>
   );

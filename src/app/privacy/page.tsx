@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 
 import { LegalPage, type LegalSection } from "@/components/legal/legal-page";
 import {
@@ -9,11 +11,10 @@ import {
   OPERATOR_NAME,
 } from "@/lib/legal";
 
-export const metadata: Metadata = {
-  title: "Privacy",
-  description:
-    "What Grand Tour collects, who processes it, how long it is kept and how to reach us.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Metadata.privacy");
+  return { title: t("title"), description: t("description") };
+}
 
 const mail = <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>;
 
@@ -222,11 +223,14 @@ const SECTIONS: readonly LegalSection[] = [
   },
 ];
 
+// The policy text itself stays here as a versioned legal document; only
+// the page chrome is read from the catalog (see docs/ARCHITECTURE.md).
 export default function PrivacyPage() {
+  const t = useTranslations("Legal.privacyPage");
   return (
     <LegalPage
-      eyebrow="Privacy notice"
-      title="Privacy"
+      eyebrow={t("eyebrow")}
+      title={t("title")}
       sections={SECTIONS}
       summary={
         <p>

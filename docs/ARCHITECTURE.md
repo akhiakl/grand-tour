@@ -121,6 +121,10 @@ returns message keys (`DraftIssueKey`, `PackingKey`) for components to
 translate, and formats dates in the locale it is given. Tests resolve copy
 from the real catalog through the `next-intl` mocks in `vitest.setup.ts`.
 
+One exception: the Privacy and Terms policy text (summary and sections in
+`src/app/privacy/page.tsx` and `src/app/terms/page.tsx`) stays inline as a
+versioned legal document. Their page chrome and metadata use the catalog.
+
 ## Offline
 
 `public/sw.js` (registered in production by `components/service-worker`)

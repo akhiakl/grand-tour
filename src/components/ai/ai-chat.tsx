@@ -118,7 +118,7 @@ export function AiChat() {
       {days && !vibe && (
         <>
           <VibeStep onAnswer={(value) => answer({ vibe: value })} />
-          <TermsNotice action="choosing a pace and drafting a route" />
+          <TermsNotice action="drafting" />
         </>
       )}
     </div>
