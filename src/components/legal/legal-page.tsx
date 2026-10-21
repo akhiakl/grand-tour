@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 
 import { LEGAL_LAST_UPDATED } from "@/lib/legal";
 
-import { LegalLinks } from "./legal-links";
+import { SiteFooter } from "./site-footer";
 
 export interface LegalSection {
   readonly id: string;
@@ -87,12 +87,7 @@ export function LegalPage({
         </article>
       </main>
 
-      <footer className="border-t border-line">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-6 text-xs text-muted-foreground sm:px-6">
-          <span>Grand Tour · Map data © OpenStreetMap contributors</span>
-          <LegalLinks />
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

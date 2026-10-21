@@ -11,4 +11,5 @@ export * from "./local-store";
 export * from "./poster-layout";
 export * from "./sample";
 export * from "./schema";
+export * from "./sketch";
 export * from "./stats";

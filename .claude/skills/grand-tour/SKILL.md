@@ -75,6 +75,11 @@ status table before starting work. Visual truth: `reference/grand-tour.html`.
   (`ai_route_generated`, `share_created`, `upsell_shown`) and
   `withoutQuery` (strips query strings before sending);
   `components/site-analytics` mounts it in the root layout.
+- `components/about` + `/about`: the scrolling story page (hero with
+  `trip/route-sketch`, `how-it-works`, example route, `about-faq` with
+  native `<details>`, closing CTA, `legal/site-footer`). No live map on
+  it, so nothing traps scrolling. `lib/trip/sketch` (`sketchRoute`) is
+  the pure projection behind `RouteSketch` (server-rendered SVG).
 - `components/off-the-map`: shared in-voice dead end (global 404,
   expired share, map missing on this device).
 - `components/ai`: `ai-chat` (`/plan`, 3 questions → one `/api/generate`

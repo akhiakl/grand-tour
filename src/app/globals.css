@@ -240,9 +240,11 @@ input[type="range"] {
 }
 
 /* The route — brass, dashed, with a marching-ants drift.
-   Pane-scoped because Leaflet doesn't reliably forward path classNames. */
+   Pane-scoped because Leaflet doesn't reliably forward path classNames.
+   The drift settles after 4 runs (under 5s, WCAG 2.2.2) rather than
+   needing a pause control on the map. */
 .atlas-map .leaflet-overlay-pane path {
-  animation: route-dash 1.2s linear infinite;
+  animation: route-dash 1.2s linear 4;
   fill: none;
   stroke: var(--brass);
   stroke-dasharray: 7 8;
@@ -381,7 +383,8 @@ input[type="range"] {
   border-radius: 50%;
   background: var(--brass);
   opacity: 0;
-  animation: marker-pulse 2.6s ease-out infinite;
+  /* Two pulses (under 5s, WCAG 2.2.2), then the dot rests. */
+  animation: marker-pulse 2.4s ease-out 2;
 }
 
 @keyframes marker-pulse {
