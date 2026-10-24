@@ -111,7 +111,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: akhiakl/ci-workflows/setup-pnpm@47cd9620ed2b9d879185db5fd2887c5db64cff79 # v1
-      - uses: akhiakl/ci-workflows/playwright-browsers@47cd9620ed2b9d879185db5fd2887c5db64cff79 # v1
+      - uses: akhiakl/ci-workflows/playwright-browsers@1984db16417cc763ea3e0904bfca2533e0ab0869 # v1
 
       - run: pnpm build
       # Starts the fake Upstash server and `next start`; API routes, map
