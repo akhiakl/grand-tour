@@ -155,7 +155,7 @@ jobs:
       pull-requests: write
     steps:
       # One sticky comment listing what failed and why, per check.
-      - uses: akhiakl/ci-workflows/gate@47cd9620ed2b9d879185db5fd2887c5db64cff79 # v1
+      - uses: akhiakl/ci-workflows/gate@1984db16417cc763ea3e0904bfca2533e0ab0869 # v1
         with:
           marker: "<!-- grand-tour-quality-gate -->"
           title: Quality Gate
