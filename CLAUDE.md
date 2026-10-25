@@ -160,7 +160,7 @@ another transport can wrap it later.
 ## Build order
 
 `docs/ROADMAP.md` is the authoritative step-by-step plan (deliverables,
-contracts, definition of done per step). One step = one `feature/*` PR,
+contracts, definition of done per step). One step = one `feat/*` PR,
 reviewed before the next starts. Releases are semver via release-please;
 production deploys only from published releases, and `v1.0.0` is gated on
 the MVP checklist in `docs/RELEASE.md` — never wire deploys to `main`.
@@ -168,5 +168,6 @@ the MVP checklist in `docs/RELEASE.md` — never wire deploys to `main`.
 ## Git
 
 See `docs/BRANCHING.md` for branching and `docs/ARCHITECTURE.md` for the
-folder structure, module boundaries and portability rules. Work happens on `feature/*` branches off `main`;
-Conventional Commits only.
+folder structure, module boundaries and portability rules. Work happens on `<type>/<kebab-description>` branches off `main`
+(`feat/share-links`, `fix/focus-after-remove`; the type matches the PR
+title type); Conventional Commits only.

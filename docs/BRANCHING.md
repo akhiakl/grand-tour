@@ -5,21 +5,23 @@ deployable.
 
 ## Branches
 
-| Branch      | Purpose                                              |
-| ----------- | ---------------------------------------------------- |
-| `main`      | Protected. Always green, always deployable.          |
-| `feature/*` | New features (e.g. `feature/init`, `feature/editor`) |
-| `fix/*`     | Bug fixes                                            |
-| `chore/*`   | Tooling, deps, CI, refactors with no behavior change |
-| `docs/*`    | Documentation-only changes                           |
+| Branch                       | Purpose                                                                   |
+| ---------------------------- | ------------------------------------------------------------------------- |
+| `main`                       | Protected. Always green, always deployable.                               |
+| `<type>/<kebab-description>` | Everything else; `<type>` is the Conventional Commit type of the PR title |
+
+Types: `feat`, `fix`, `chore`, `refactor`, `test`, `docs` (the types the
+PR title check allows). A `feat:` PR comes from `feat/<name>`, a
+`fix:` PR from `fix/<name>`, so the branch and the squash commit agree.
 
 Naming: lowercase, kebab-case, scoped to one deliverable —
-`feature/share-links`, not `feature/misc-stuff`.
+`feat/share-links`, `fix/focus-after-remove`, `docs/conventional-branch-names`;
+not `feat/misc-stuff`.
 
 ## Workflow
 
 1. Branch off latest `main`:
-   `git checkout main && git pull && git checkout -b feature/<name>`
+   `git checkout main && git pull && git checkout -b <type>/<name>`
 2. Commit small and often using **Conventional Commits**
    (enforced by commitlint): `feat: …`, `fix: …`, `chore: …`,
    `refactor: …`, `test: …`, `docs: …`. Optional scope:
