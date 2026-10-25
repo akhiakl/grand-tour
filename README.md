@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/akhiakl/grand-tour/actions/workflows/ci.yml/badge.svg)](https://github.com/akhiakl/grand-tour/actions/workflows/ci.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=akhiakl_grand-tour&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=akhiakl_grand-tour)
+[![Better Stack Badge](https://incidents.betterstack.com/status-badges/v1/monitor/31vg1.svg)](https://incidents.betterstack.com/?utm_source=status_badge)
 
 Craft a beautiful, interactive travel route map — drawn by AI or by hand —
 and share it with a single link. Guest-first: no accounts, no user database.
