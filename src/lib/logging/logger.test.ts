@@ -74,6 +74,12 @@ describe("server logger", () => {
     expect(remote.flush).toHaveBeenCalledTimes(1);
   });
 
+  it("does not throw when Better Stack rejects the flush", async () => {
+    remote.flush.mockReturnValueOnce(Promise.reject(new Error("network down")));
+
+    await expect(flushLogs()).resolves.toBeUndefined();
+  });
+
   it("stops waiting on a stalled Better Stack after the timeout", async () => {
     vi.useFakeTimers();
     remote.flush.mockReturnValueOnce(new Promise<void>(() => {}));

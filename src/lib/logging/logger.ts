@@ -36,12 +36,14 @@ export function emit(
 
 /**
  * Serverless functions can freeze once they respond, so send pending lines
- * first. Capped so a slow Better Stack never holds up an error response.
+ * first. A slow or failing Better Stack never holds up or breaks an error
+ * response: the wait is capped and a rejected send is swallowed.
  */
 export function flushLogs(timeoutMs = 2000): Promise<void> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<void>((resolve) => {
     timer = setTimeout(resolve, timeoutMs);
   });
-  return Promise.race([remote.flush(), timeout]).finally(() => clearTimeout(timer));
+  const flushed = remote.flush().catch(() => {});
+  return Promise.race([flushed, timeout]).finally(() => clearTimeout(timer));
 }
