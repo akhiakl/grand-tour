@@ -110,8 +110,9 @@ checked before merging the `1.0.0` release PR.
 - [ ] Sentry verified to send no IPs or request bodies and to write
       nothing to the visitor's device (the notice promises no cookies)
 - [ ] Better Stack set up: uptime monitors (1 min, email alerts) on `/`,
-      a live `/t/{id}` and `/api/health`; Vercel log drain on, with
-      180-day retention (log drains may need a paid Vercel plan)
+      a live `/t/{id}` and `/api/health`; the Better Stack integration
+      added in Vercel (Marketplace; needs a Vercel Pro or Enterprise plan)
+      with a 180-day retention source
 - [ ] CERT-In's 180-day log rule checked with the lawyer, including
       whether logs must stay in India (Better Stack's region)
 - [ ] Sentry alert rules created (new issue, error spike)
