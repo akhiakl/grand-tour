@@ -47,8 +47,9 @@ least new code, and reply so a busy human gets it in one read.
 - Moved or merged code keeps its validation and error handling.
 - Lazy about the solution, never about finishing: callers, tests, fixtures,
   docs and copy keys the change breaks are part of the change.
-- A deliberate limit gets a comment `shortcut: <the limit>, <when to
-upgrade>`; `grand-tour-review` lists them as a debt ledger.
+- Mark a deliberate limit with a comment:
+  `shortcut: <limit>, <when to upgrade>`. `grand-tour-review` lists them
+  as a debt ledger.
 - Never cut: validation at trust boundaries, error handling that prevents
   data loss, security, accessibility, anything the user asked for.
 
