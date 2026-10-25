@@ -17,6 +17,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@logtail/next": "^0.5.1",
     "@maplibre/maplibre-gl-leaflet": "^0.1.4",
     "@sentry/nextjs": "^10.69.0",
     "@upstash/ratelimit": "^2.0.8",

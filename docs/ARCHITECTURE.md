@@ -176,6 +176,10 @@ host there. No nonces, so pages stay static (inline scripts allowed).
   `redis.get_trip`, `redis.incr_views`. Attributes are a fixed allowlist:
   never destinations, prompts, model output, trip contents or IPs. They
   appear in the sampled share of transactions only.
+- Better Stack watches uptime (monitors on `/`, a share link and
+  `/api/health`) and receives server error logs from `src/lib/logging`
+  (console plus Better Stack; route pattern, error name and digest only),
+  kept 3 days on the current plan. It is a processor: listed on `/privacy`.
 - `GET /api/health` is the uptime probe: 200 `{status:"ok"}` or 503 when
   Redis does not answer within 2 s. Not rate limited; a healthy answer is
   cached 15 s at the CDN (so Redis sees only a few pings a minute however

@@ -109,7 +109,16 @@ checked before merging the `1.0.0` release PR.
 - [ ] Terms name the city whose courts have jurisdiction
 - [ ] Sentry verified to send no IPs or request bodies and to write
       nothing to the visitor's device (the notice promises no cookies)
-- [ ] Vercel and Sentry log retention checked against CERT-In's 180 days
+- [ ] Better Stack set up: uptime monitors (email alerts) on `/` and
+      `/api/health`, plus one on a live `/t/{id}` once a real share exists;
+      the `Grand Tour server` source and the `BETTER_STACK_SOURCE_TOKEN` /
+      `BETTER_STACK_INGESTING_URL` Production env vars are in place (done)
+- [ ] Log retention: the current Better Stack plan keeps logs 3 days, and
+      `/privacy` says so. If CERT-In's 180-day log rule applies, upgrade the
+      plan, set the source to 180 days and update `/privacy`
+- [ ] CERT-In's 180-day log rule checked with the lawyer, including
+      whether logs must stay in India (Better Stack's region)
+- [ ] Sentry alert rules created (new issue, error spike)
 - [ ] Vercel Web Analytics enabled on the project; custom events need
       Pro, otherwise only page views are recorded
 - [ ] Vercel Speed Insights enabled on the project (feeds the Core Web

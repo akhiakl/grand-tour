@@ -19,8 +19,9 @@ export async function generateMetadata(): Promise<Metadata> {
 const mail = <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>;
 
 // TODO(legal): name the production AI provider and the regions of Vercel,
-// Upstash and Sentry, then have the policy reviewed by an Indian tech
-// lawyer before v1.0.0.
+// Upstash, Sentry and Better Stack (and whether CERT-In's 180-day log rule
+// also expects the logs to stay in India), then have the policy reviewed by
+// an Indian tech lawyer before v1.0.0.
 const PROCESSORS = [
   [
     "Vercel",
@@ -41,6 +42,11 @@ const PROCESSORS = [
     "Sentry",
     "Receives error reports (what broke, browser and page) so we can fix bugs. IP addresses and request bodies are switched off.",
     "Per Sentry's retention, typically 30 to 90 days",
+  ],
+  [
+    "Better Stack",
+    "Regularly checks that the site is up, and keeps server error logs (the page type, error type and a reference number) so we can fix problems. No IP addresses or request contents are sent.",
+    "Logs: 3 days. Uptime checks: no personal data",
   ],
   [
     "Photon by komoot",
@@ -93,7 +99,8 @@ const SECTIONS: readonly LegalSection[] = [
           <li>
             <strong>Technical data.</strong> Like any website, our host sees your IP
             address and browser details with each request. We use them to keep the
-            service running, block abuse and count visits by country.
+            service running, block abuse and count visits by country, and keep server
+            logs for a few days.
           </li>
           <li>
             <strong>Error reports</strong> when something breaks, without your IP
