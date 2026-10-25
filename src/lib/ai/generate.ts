@@ -50,7 +50,7 @@ async function callModel(
   config: ModelConfig,
   attempt: number,
 ): Promise<string> {
-  return Sentry.startSpan(
+  return await Sentry.startSpan(
     {
       name: "ai.chat_completion",
       op: "gen_ai.chat",
@@ -127,7 +127,7 @@ export async function generateTrip(
   const config = modelConfig();
   if (!config) throw new GenerationError("unavailable");
 
-  return Sentry.startSpan(
+  return await Sentry.startSpan(
     {
       name: "ai.generate_trip",
       op: "gen_ai.generate",
