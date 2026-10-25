@@ -6,7 +6,10 @@ import { makeTrip } from "@/test/fixtures/trip";
 const mocks = vi.hoisted(() => ({
   limit: vi.fn(),
   saveTrip: vi.fn(),
+  emit: vi.fn(),
 }));
+
+vi.mock("@/lib/logging", () => ({ emit: mocks.emit }));
 
 vi.mock("@/lib/http", () => ({
   getRatelimiter: () => ({ limit: mocks.limit }),
@@ -88,5 +91,14 @@ describe("POST /api/trips", () => {
     const res = await post(makeTrip());
     expect(res.status).toBe(500);
     expect(await res.json()).toEqual({ error: "save_failed" });
+  });
+
+  it("logs a failed save without the trip or the store's message", async () => {
+    mocks.saveTrip.mockRejectedValue(new Error("redis down"));
+    await post(makeTrip());
+    expect(mocks.emit).toHaveBeenCalledWith("error", "save failed", {
+      route: "/api/trips",
+      status: 500,
+    });
   });
 });

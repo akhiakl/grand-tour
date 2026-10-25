@@ -1,5 +1,6 @@
 import * as z from "zod";
 
+import { emit } from "@/lib/logging";
 import { BASE_CURRENCY, type Rates } from "@/lib/units";
 
 /**
@@ -34,8 +35,13 @@ export async function GET() {
         "Cache-Control": `public, s-maxage=${ONE_DAY}, stale-while-revalidate=${ONE_DAY}`,
       },
     });
-  } catch {
+  } catch (error) {
     // Callers fall back to showing USD.
+    emit("warn", "rates unavailable", {
+      route: "/api/rates",
+      status: 503,
+      reason: error instanceof Error ? error.message : "unknown",
+    });
     return Response.json({ error: "rates_unavailable" }, { status: 503 });
   }
 }
