@@ -19,6 +19,7 @@ describe("PrivacyPage", () => {
       "Upstash",
       "Our AI model provider",
       "Sentry",
+      "Better Stack",
       "Photon by komoot",
       "OpenFreeMap",
       "Frankfurter",

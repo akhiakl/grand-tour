@@ -13,4 +13,4 @@ export const GRIEVANCE_ACK_HOURS = 24;
 export const GRIEVANCE_RESOLVE_DAYS = 15;
 
 /** Shown on the Privacy and Terms pages; bump whenever either changes. */
-export const LEGAL_LAST_UPDATED = "21 October 2026";
+export const LEGAL_LAST_UPDATED = "25 October 2026";
