@@ -36,6 +36,28 @@ route maps — populated by AI chat or manually — shared via short links
   fixtures.
 - Playwright e2e is the LAST build step only.
 
+## Workflow skills (apply automatically, no slash command)
+
+Skills in `.claude/skills` are part of the rules; load them by task:
+
+- **Every coding task:** `grand-tour-engineering` (smallest complete
+  change, surgical edits, ask instead of assuming, where code lives).
+- **Before writing implementation code:** `grand-tour-testing` (test
+  first at the lowest layer; light and dark screenshots of any new or
+  changed screen, checked before sharing).
+- **Before every push or PR, and when asked to review or audit:**
+  `grand-tour-review` on the diff; fix its Must-fix findings first.
+  Mark deliberate limits `shortcut: <limit>, <when to upgrade>`.
+- **Product and stack rules:** `grand-tour` (features, limits, design
+  recipes), `nextjs`, `shadcn`, `tailwind`.
+
+## Model Assignment Rules
+
+- Architecture decisions and reviews: Use Opus
+- Implementation tasks (new features, refactors): Use Sonnet
+- Simple edits, formatting, renaming: Use Haiku
+- Security-sensitive changes: Always escalate to Opus for review
+
 ## Architecture
 
 - Next.js App Router, TypeScript strict, Tailwind v4, shadcn/ui,
