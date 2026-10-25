@@ -58,7 +58,8 @@ typecheck; commit messages must follow
 - [docs/RELEASE.md](./docs/RELEASE.md) — versioning, deploy policy and
   the MVP launch checklist
 - `.claude/skills/` — project skills (grand-tour, grand-tour-engineering,
-  grand-tour-testing, nextjs, tailwind, shadcn)
+  grand-tour-testing, grand-tour-review, nextjs, tailwind, shadcn); they
+  apply automatically, see CLAUDE.md → Workflow skills
 
 ## Environment variables
 
