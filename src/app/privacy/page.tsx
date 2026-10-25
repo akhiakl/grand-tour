@@ -45,8 +45,8 @@ const PROCESSORS = [
   ],
   [
     "Better Stack",
-    "Checks every minute that the site is up, and keeps server error logs (the page type, error type and a reference number) so we can fix problems. No IP addresses or request contents are sent.",
-    "Logs: 180 days. Uptime checks: no personal data",
+    "Regularly checks that the site is up, and keeps server error logs (the page type, error type and a reference number) so we can fix problems. No IP addresses or request contents are sent.",
+    "Logs: 3 days. Uptime checks: no personal data",
   ],
   [
     "Photon by komoot",
@@ -100,7 +100,7 @@ const SECTIONS: readonly LegalSection[] = [
             <strong>Technical data.</strong> Like any website, our host sees your IP
             address and browser details with each request. We use them to keep the
             service running, block abuse and count visits by country, and keep server
-            logs for 180 days.
+            logs for a few days.
           </li>
           <li>
             <strong>Error reports</strong> when something breaks, without your IP
