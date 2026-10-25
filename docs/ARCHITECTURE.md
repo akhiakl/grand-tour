@@ -170,6 +170,14 @@ host there. No nonces, so pages stay static (inline scripts allowed).
   client performance tracing; page speed comes from Vercel Speed Insights.
 - Everything is gated on `NEXT_PUBLIC_SENTRY_DSN`: unset → total no-op.
   Source-map upload happens only when `SENTRY_AUTH_TOKEN` exists (CI).
+- Named server spans show where request time goes: `ai.generate_trip`
+  (attributes: model, days, attempts, outcome, city count) with one
+  `ai.chat_completion` per model call, and `redis.save_trip`,
+  `redis.get_trip`, `redis.incr_views`. Attributes are a fixed allowlist:
+  never destinations, prompts, model output, trip contents or IPs. They
+  appear in the sampled share of transactions only.
+- `GET /api/health` is the uptime probe: 200 `{status:"ok"}` or 503 when
+  Redis does not answer within 2 s; never cached, not rate limited.
 - Keep server sample rates conservative (`tracesSampleRate: 0.1`) to stay
   inside the free tier; raise deliberately, never by default.
 

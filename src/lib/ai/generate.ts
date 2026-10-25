@@ -1,5 +1,7 @@
 import "server-only";
 
+import * as Sentry from "@sentry/nextjs";
+
 import { TripSchema, type Trip } from "@/lib/trip";
 
 import { buildRetryPrompt, buildSystemPrompt, buildUserPrompt } from "./prompt";
@@ -44,6 +46,21 @@ function modelConfig(): ModelConfig | null {
 }
 
 async function callModel(
+  messages: ChatMessage[],
+  config: ModelConfig,
+  attempt: number,
+): Promise<string> {
+  return Sentry.startSpan(
+    {
+      name: "ai.chat_completion",
+      op: "gen_ai.chat",
+      attributes: { "ai.attempt": attempt },
+    },
+    () => requestCompletion(messages, config),
+  );
+}
+
+async function requestCompletion(
   messages: ChatMessage[],
   config: ModelConfig,
 ): Promise<string> {
@@ -101,6 +118,8 @@ function tryParse(content: string): { trip: GeneratedTrip } | { issues: string }
 /**
  * One generation call, one retry with validation errors fed back.
  * Throws GenerationError; never returns a partially valid trip.
+ * Traced as one span; its attributes are a fixed allowlist with no guest
+ * content (destination, prompts and model output stay out of Sentry).
  */
 export async function generateTrip(
   request: GenerateRequest,
@@ -108,23 +127,52 @@ export async function generateTrip(
   const config = modelConfig();
   if (!config) throw new GenerationError("unavailable");
 
+  return Sentry.startSpan(
+    {
+      name: "ai.generate_trip",
+      op: "gen_ai.generate",
+      attributes: { "ai.model": config.model, "trip.days": request.days },
+    },
+    async (span) => {
+      let attempts = 0;
+      const call = (messages: ChatMessage[]) =>
+        callModel(messages, config, ++attempts);
+      try {
+        const result = await draftWithRetry(request, call);
+        span.setAttribute("ai.outcome", "ok");
+        span.setAttribute("trip.cities", result.trip.cities.length);
+        return result;
+      } catch (error) {
+        span.setAttribute(
+          "ai.outcome",
+          error instanceof GenerationError ? error.reason : "error",
+        );
+        throw error;
+      } finally {
+        span.setAttribute("ai.attempts", attempts);
+      }
+    },
+  );
+}
+
+async function draftWithRetry(
+  request: GenerateRequest,
+  call: (messages: ChatMessage[]) => Promise<string>,
+): Promise<GeneratedTrip> {
   const base: ChatMessage[] = [
     { role: "system", content: buildSystemPrompt() },
     { role: "user", content: buildUserPrompt(request) },
   ];
 
-  const first = await callModel(base, config);
+  const first = await call(base);
   const firstResult = tryParse(first);
   if ("trip" in firstResult) return firstResult.trip;
 
-  const second = await callModel(
-    [
-      ...base,
-      { role: "assistant", content: first },
-      { role: "user", content: buildRetryPrompt(firstResult.issues) },
-    ],
-    config,
-  );
+  const second = await call([
+    ...base,
+    { role: "assistant", content: first },
+    { role: "user", content: buildRetryPrompt(firstResult.issues) },
+  ]);
   const secondResult = tryParse(second);
   if ("trip" in secondResult) return secondResult.trip;
 
