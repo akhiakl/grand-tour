@@ -1,7 +1,9 @@
 # Phase 1 roadmap — build order for agents
 
 Execution plan for the remaining Phase 1 work. Each step is one PR on a
-`feature/*` branch off `main`, reviewed before the next step starts.
+`<type>/<name>` branch off `main` (see `docs/BRANCHING.md`), reviewed
+before the next step starts. The per-step `Branch:` lines below are the
+original plan names.
 
 **Before starting any step, read:** `CLAUDE.md` (hard rules),
 `docs/ARCHITECTURE.md` (module boundaries, testing conventions),
