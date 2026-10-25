@@ -45,6 +45,32 @@ describe("POST /api/trips", () => {
     expect(mocks.saveTrip).toHaveBeenCalledOnce();
   });
 
+  it("logs a shared trip without its id or contents", async () => {
+    await post(makeTrip());
+    expect(mocks.emit).toHaveBeenCalledWith("info", "trip shared", {
+      route: "/api/trips",
+    });
+  });
+
+  it("logs a rate-limited request without the caller's address", async () => {
+    mocks.limit.mockResolvedValue({ success: false });
+    await post(makeTrip());
+    expect(mocks.emit).toHaveBeenCalledWith("warn", "request refused", {
+      route: "/api/trips",
+      status: 429,
+      reason: "rate_limited",
+    });
+  });
+
+  it("logs an invalid trip by reason only", async () => {
+    await post({ ...makeTrip(), title: "" });
+    expect(mocks.emit).toHaveBeenCalledWith("warn", "request refused", {
+      route: "/api/trips",
+      status: 400,
+      reason: "invalid_trip",
+    });
+  });
+
   it("returns 429 when the rate limit is exhausted", async () => {
     mocks.limit.mockResolvedValue({ success: false });
     const res = await post(makeTrip());

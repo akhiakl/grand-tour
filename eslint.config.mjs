@@ -20,7 +20,7 @@ const eslintConfig = defineConfig([
 
       // Correctness & hygiene.
       eqeqeq: ["error", "always", { null: "ignore" }],
-      "no-console": ["warn", { allow: ["warn", "error"] }],
+      "no-console": ["warn", { allow: ["info", "warn", "error"] }],
       "prefer-const": "error",
       "object-shorthand": "error",
       "no-nested-ternary": "error",

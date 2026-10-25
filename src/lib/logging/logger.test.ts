@@ -44,6 +44,20 @@ describe("server logger", () => {
     consoleWarn.mockRestore();
   });
 
+  it("writes info lines to console.info and Better Stack", () => {
+    const consoleInfo = vi.spyOn(console, "info").mockImplementation(() => {});
+
+    emit("info", "trip shared", { route: "/api/trips" });
+
+    expect(JSON.parse(String(consoleInfo.mock.calls[0]?.[0]))).toMatchObject({
+      level: "info",
+      message: "trip shared",
+      route: "/api/trips",
+    });
+    expect(remote.info).toHaveBeenCalledWith("trip shared", { route: "/api/trips" });
+    consoleInfo.mockRestore();
+  });
+
   it("forwards the same message and fields to Better Stack", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
 

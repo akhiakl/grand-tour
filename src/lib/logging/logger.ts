@@ -5,7 +5,7 @@ import { Logger, LogLevel } from "@logtail/next";
 /** Primitives only, so request bodies, trip content and whole errors can't be logged by accident. */
 export type LogFields = Record<string, string | number | boolean | undefined>;
 
-export type LogLevelName = "warn" | "error";
+export type LogLevelName = "info" | "warn" | "error";
 
 /**
  * Server logs print to the console and, when BETTER_STACK_SOURCE_TOKEN and
@@ -18,6 +18,14 @@ const remote = new Logger({
   prettyPrint: () => {},
 });
 
+const write = {
+  info: (line: string) => console.info(line),
+  warn: (line: string) => console.warn(line),
+  error: (line: string) => console.error(line),
+};
+
+// shortcut: every line is sent, no sampling, so a flood of refused requests
+// logs one line each. Add sampling if the source nears its plan's ingest cap.
 export function emit(
   level: LogLevelName,
   message: string,
@@ -29,8 +37,7 @@ export function emit(
     ...fields,
     dt: new Date().toISOString(),
   });
-  if (level === "error") console.error(line);
-  else console.warn(line);
+  write[level](line);
   remote[level](message, fields);
 }
 

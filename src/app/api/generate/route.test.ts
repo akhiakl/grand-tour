@@ -77,6 +77,32 @@ describe("POST /api/generate", () => {
     expect(await res.json()).toEqual({ error: "generation_failed" });
   });
 
+  it("logs a generated trip without the prompt or the result", async () => {
+    await post(makeGenerateRequest());
+    expect(mocks.emit).toHaveBeenCalledWith("info", "trip generated", {
+      route: "/api/generate",
+    });
+  });
+
+  it("logs a refused request by reason only", async () => {
+    mocks.limit.mockResolvedValue({ success: false });
+    await post(makeGenerateRequest());
+    expect(mocks.emit).toHaveBeenCalledWith("warn", "request refused", {
+      route: "/api/generate",
+      status: 429,
+      reason: "rate_limited",
+    });
+  });
+
+  it("logs a malformed body by reason only", async () => {
+    await post("not json");
+    expect(mocks.emit).toHaveBeenCalledWith("warn", "request refused", {
+      route: "/api/generate",
+      status: 400,
+      reason: "invalid_json",
+    });
+  });
+
   it("logs why generation failed without the request contents", async () => {
     mocks.generateTrip.mockRejectedValue(new GenerationError("unavailable"));
     await post(makeGenerateRequest());
