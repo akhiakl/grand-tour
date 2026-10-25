@@ -51,6 +51,13 @@ Skills in `.claude/skills` are part of the rules; load them by task:
 - **Product and stack rules:** `grand-tour` (features, limits, design
   recipes), `nextjs`, `shadcn`, `tailwind`.
 
+## Model Assignment Rules
+
+- Architecture decisions and reviews: Use Opus
+- Implementation tasks (new features, refactors): Use Sonnet
+- Simple edits, formatting, renaming: Use Haiku
+- Security-sensitive changes: Always escalate to Opus for review
+
 ## Architecture
 
 - Next.js App Router, TypeScript strict, Tailwind v4, shadcn/ui,
