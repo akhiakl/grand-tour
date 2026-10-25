@@ -177,7 +177,9 @@ host there. No nonces, so pages stay static (inline scripts allowed).
   never destinations, prompts, model output, trip contents or IPs. They
   appear in the sampled share of transactions only.
 - `GET /api/health` is the uptime probe: 200 `{status:"ok"}` or 503 when
-  Redis does not answer within 2 s; never cached, not rate limited.
+  Redis does not answer within 2 s. Not rate limited; a healthy answer is
+  cached 15 s at the CDN (so Redis sees only a few pings a minute however
+  hard it is hit), a failure is never cached.
 - Keep server sample rates conservative (`tracesSampleRate: 0.1`) to stay
   inside the free tier; raise deliberately, never by default.
 
