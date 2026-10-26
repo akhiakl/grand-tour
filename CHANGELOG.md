@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/akhiakl/grand-tour/compare/v0.3.0...v0.3.1) (2026-10-26)
+
+
+### Bug Fixes
+
+* **ci:** deploy with ci-workflows v1.3.0 so pnpm is available ([#89](https://github.com/akhiakl/grand-tour/issues/89)) ([cf496e2](https://github.com/akhiakl/grand-tour/commit/cf496e22813a41c22b5538613690850bf67eda2c))
+
 ## [0.3.0](https://github.com/akhiakl/grand-tour/compare/v0.2.0...v0.3.0) (2026-10-26)
 
 
