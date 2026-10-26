@@ -13,9 +13,6 @@ if (dsn) {
     // Capture 100% in dev, 10% in production — adjust based on traffic volume.
     tracesSampleRate: process.env.NODE_ENV === "development" ? 1.0 : 0.1,
 
-    // Enable logs to be sent to Sentry (dev only — noisy/costly in prod)
-    enableLogs: process.env.NODE_ENV === "development",
-
     // No IPs, user details or request bodies: the privacy notice promises it.
     dataCollection: {
       userInfo: false,
