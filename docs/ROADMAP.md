@@ -251,8 +251,8 @@ desktop and mobile; Lighthouse a11y ≥ 95 on `/`, `/new`, `/maps/[id]`.
 - [ ] Optional: allowlist `ui.shadcn.com` in the remote environment's
       network policy so `shadcn add` works in cloud sessions.
 - [ ] `RELEASE_PLEASE_TOKEN` repo secret (PAT) so CI runs on release PRs.
-- [ ] `DEPLOY_HOOK_URL` repo secret once a host is chosen; disable the
-      host's auto-deploy of `main` (see `docs/RELEASE.md`).
+- [ ] `VERCEL_TOKEN` repo secret for the release deploy; `main` auto-deploy is
+      skipped by Vercel's Ignored Build Step (see `docs/RELEASE.md`).
 
 ## Phase 2 parking lot (do NOT build in Phase 1)
 
