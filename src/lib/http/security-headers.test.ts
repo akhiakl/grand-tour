@@ -45,6 +45,17 @@ describe("contentSecurityPolicy", () => {
     ]);
   });
 
+  it("allows the Userback hosts only when the tester widget is on", () => {
+    const off = contentSecurityPolicy(base);
+    const on = contentSecurityPolicy({ ...base, userback: true });
+
+    expect(off).not.toContain("userback");
+    for (const name of ["script-src", "connect-src", "img-src", "frame-src"]) {
+      expect(directive(on, name)).toContain("https://*.userback.io");
+    }
+    expect(directive(on, "frame-src")).not.toContain("'none'");
+  });
+
   it("ignores malformed or blank URLs", () => {
     const csp = contentSecurityPolicy({
       ...base,

@@ -49,6 +49,11 @@ const PROCESSORS = [
     "Logs: 3 days. Uptime checks: no personal data",
   ],
   [
+    "Userback",
+    "Only while we run a public test: if you press the feedback button, it sends the screenshot or screen recording you choose to capture, your note, and the page's console and network details.",
+    "Per Userback's retention; nothing is sent unless you press the button",
+  ],
+  [
     "Photon by komoot",
     "Answers city searches; your browser sends the text you type.",
     "Under komoot's own policy",

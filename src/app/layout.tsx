@@ -6,6 +6,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { MotionProvider } from "@/components/motion-provider";
 import { ServiceWorker } from "@/components/service-worker";
 import { SiteAnalytics } from "@/components/site-analytics";
+import { TesterFeedback } from "@/components/tester-feedback";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { UnitsProvider } from "@/components/units/units-provider";
@@ -80,6 +81,7 @@ export default async function RootLayout({
           </NextIntlClientProvider>
         </ThemeProvider>
         <SiteAnalytics />
+        <TesterFeedback />
       </body>
     </html>
   );
