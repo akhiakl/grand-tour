@@ -9,5 +9,5 @@ on:
 
 jobs:
   production:
-    uses: akhiakl/ci-workflows/.github/workflows/deploy-hook.yml@1984db16417cc763ea3e0904bfca2533e0ab0869 # v1.1.0
+    uses: akhiakl/ci-workflows/.github/workflows/deploy-hook.yml@v1.1.0
     secrets: inherit
