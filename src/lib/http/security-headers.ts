@@ -23,6 +23,8 @@ const VERCEL_LIVE = "https://vercel.live";
 // in production it is served first-party from /_vercel/insights.
 const VERCEL_SCRIPTS = "https://va.vercel-scripts.com";
 
+const USERBACK = "https://*.userback.io";
+
 function originOf(url: string | undefined): string | null {
   if (!url?.trim()) return null;
   try {
@@ -34,11 +36,13 @@ function originOf(url: string | undefined): string | null {
 
 export function contentSecurityPolicy(options: SecurityHeaderOptions): string {
   const preview = options.vercelPreview ? [VERCEL_LIVE] : [];
+  const userback = [USERBACK];
   const connect = [
     "'self'",
     originOf(options.mapStyleUrl) ?? OPENFREEMAP,
     PHOTON,
     originOf(options.sentryDsn),
+    ...userback,
     ...preview,
     ...(options.dev ? ["ws:"] : []),
   ].filter((source): source is string => source !== null);
@@ -49,15 +53,16 @@ export function contentSecurityPolicy(options: SecurityHeaderOptions): string {
       "'self'",
       "'unsafe-inline'",
       ...(options.dev ? ["'unsafe-eval'", VERCEL_SCRIPTS] : []),
+      ...userback,
       ...preview,
     ],
-    "style-src": ["'self'", "'unsafe-inline'"],
-    "img-src": ["'self'", "data:", "blob:", ...preview],
-    "font-src": ["'self'", "data:", ...preview],
+    "style-src": ["'self'", "'unsafe-inline'", ...userback],
+    "img-src": ["'self'", "data:", "blob:", ...userback, ...preview],
+    "font-src": ["'self'", "data:", ...userback, ...preview],
     "connect-src": connect,
     // MapLibre boots its worker from a blob: wrapper around the bundled file.
     "worker-src": ["'self'", "blob:"],
-    "frame-src": preview.length ? preview : ["'none'"],
+    "frame-src": [...userback, ...preview],
     "object-src": ["'none'"],
     "base-uri": ["'self'"],
     "form-action": ["'self'"],
