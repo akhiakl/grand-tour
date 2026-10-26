@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1](https://github.com/akhiakl/grand-tour/compare/v0.5.0...v0.5.1) (2026-10-26)
+
+
+### Bug Fixes
+
+* **feedback:** evaluate tester-feedback with the Flags SDK ([#97](https://github.com/akhiakl/grand-tour/issues/97)) ([0714ce7](https://github.com/akhiakl/grand-tour/commit/0714ce7d269cac257f90673ed51cec05b10f379b))
+
 ## [0.5.0](https://github.com/akhiakl/grand-tour/compare/v0.4.0...v0.5.0) (2026-10-26)
 
 
