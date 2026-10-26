@@ -23,10 +23,11 @@ describe("contentSecurityPolicy", () => {
       "'self'",
       "https://tiles.openfreemap.org",
       "https://photon.komoot.io",
+      "https://*.userback.io",
     ]);
     expect(directive(csp, "worker-src")).toEqual(["'self'", "blob:"]);
     expect(directive(csp, "frame-ancestors")).toEqual(["'none'"]);
-    expect(directive(csp, "frame-src")).toEqual(["'none'"]);
+    expect(directive(csp, "frame-src")).toEqual(["https://*.userback.io"]);
     expect(directive(csp, "script-src")).not.toContain("'unsafe-eval'");
   });
 
@@ -42,18 +43,16 @@ describe("contentSecurityPolicy", () => {
       "https://maps.example.com",
       "https://photon.komoot.io",
       "https://o1.ingest.sentry.io",
+      "https://*.userback.io",
     ]);
   });
 
-  it("allows the Userback hosts only when the tester widget is on", () => {
-    const off = contentSecurityPolicy(base);
-    const on = contentSecurityPolicy({ ...base, userback: true });
+  it("allows the Userback hosts for the tester widget", () => {
+    const csp = contentSecurityPolicy(base);
 
-    expect(off).not.toContain("userback");
     for (const name of ["script-src", "connect-src", "img-src", "frame-src"]) {
-      expect(directive(on, name)).toContain("https://*.userback.io");
+      expect(directive(csp, name)).toContain("https://*.userback.io");
     }
-    expect(directive(on, "frame-src")).not.toContain("'none'");
   });
 
   it("ignores malformed or blank URLs", () => {
@@ -67,6 +66,7 @@ describe("contentSecurityPolicy", () => {
       "'self'",
       "https://tiles.openfreemap.org",
       "https://photon.komoot.io",
+      "https://*.userback.io",
     ]);
   });
 
@@ -78,10 +78,14 @@ describe("contentSecurityPolicy", () => {
       "'unsafe-inline'",
       "'unsafe-eval'",
       "https://va.vercel-scripts.com",
+      "https://*.userback.io",
       "https://vercel.live",
     ]);
     expect(directive(csp, "connect-src")).toContain("ws:");
-    expect(directive(csp, "frame-src")).toEqual(["https://vercel.live"]);
+    expect(directive(csp, "frame-src")).toEqual([
+      "https://*.userback.io",
+      "https://vercel.live",
+    ]);
   });
 });
 

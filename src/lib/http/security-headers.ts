@@ -12,8 +12,6 @@ export interface SecurityHeaderOptions {
   mapStyleUrl?: string;
   /** `NEXT_PUBLIC_SENTRY_DSN`; its host receives error reports. */
   sentryDsn?: string;
-  /** `NEXT_PUBLIC_USERBACK_TOKEN` is set; the tester widget needs its hosts. */
-  userback?: boolean;
   /** Vercel preview deployments inject the vercel.live toolbar. */
   vercelPreview: boolean;
 }
@@ -38,7 +36,7 @@ function originOf(url: string | undefined): string | null {
 
 export function contentSecurityPolicy(options: SecurityHeaderOptions): string {
   const preview = options.vercelPreview ? [VERCEL_LIVE] : [];
-  const userback = options.userback ? [USERBACK] : [];
+  const userback = [USERBACK];
   const connect = [
     "'self'",
     originOf(options.mapStyleUrl) ?? OPENFREEMAP,

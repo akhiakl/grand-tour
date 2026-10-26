@@ -13,7 +13,6 @@ const nextConfig: NextConfig = {
           dev: process.env.NODE_ENV === "development",
           mapStyleUrl: process.env.NEXT_PUBLIC_MAP_STYLE_URL,
           sentryDsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
-          userback: Boolean(process.env.NEXT_PUBLIC_USERBACK_TOKEN),
           vercelPreview: process.env.VERCEL_ENV === "preview",
         }),
       },
