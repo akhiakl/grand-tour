@@ -6,6 +6,20 @@ import { after } from "next/server";
 /** Primitives only, so request bodies, trip content and whole errors can't be logged by accident. */
 export type LogFields = Record<string, string | number | boolean | undefined>;
 
+/**
+ * Error name and system code (e.g. ECONNRESET) as log fields. The message is
+ * left out on purpose: store and network errors can echo URLs or credentials.
+ */
+export function errorFields(error: unknown): LogFields {
+  if (!(error instanceof Error)) return { errorName: typeof error };
+  const cause = error.cause as { code?: unknown } | undefined;
+  const code = (error as { code?: unknown }).code ?? cause?.code;
+  return {
+    errorName: error.name,
+    errorCode: typeof code === "string" ? code.slice(0, 40) : undefined,
+  };
+}
+
 export type LogLevelName = "info" | "warn" | "error";
 
 /**

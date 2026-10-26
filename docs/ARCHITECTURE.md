@@ -183,6 +183,10 @@ host there. No nonces, so pages stay static (inline scripts allowed).
   shared, viewed). Fields are primitives only: route, status, a fixed
   reason or event, never IPs, ids, prompts or trip contents. Kept 3 days
   on the current plan. It is a processor: listed on `/privacy`.
+- Log every failure path with enough to diagnose it: where (route, `detail`),
+  what the dependency answered (`upstreamStatus`, `upstreamCode`), how long
+  (`durationMs`) and `errorFields(error)` (name and system code, never the
+  message, which can echo URLs or prompts).
 - `GET /api/health` is the uptime probe: 200 `{status:"ok"}` or 503 when
   Redis does not answer within 2 s. Not rate limited; a healthy answer is
   cached 15 s at the CDN (so Redis sees only a few pings a minute however

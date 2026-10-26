@@ -1,7 +1,7 @@
 import { GenerateRequestSchema } from "@/lib/ai";
 import { GenerationError, generateTrip } from "@/lib/ai/generate";
 import { getClientIp, getRatelimiter } from "@/lib/http";
-import { emit } from "@/lib/logging";
+import { emit, errorFields } from "@/lib/logging";
 
 const FAILURE_RESPONSES = {
   unavailable: { status: 503, error: "generation_unavailable" },
@@ -49,6 +49,7 @@ export async function POST(request: Request) {
       route: "/api/generate",
       status: 500,
       reason: "unexpected",
+      ...errorFields(error),
     });
     return Response.json({ error: "generation_failed" }, { status: 500 });
   }

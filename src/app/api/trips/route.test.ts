@@ -9,7 +9,10 @@ const mocks = vi.hoisted(() => ({
   emit: vi.fn(),
 }));
 
-vi.mock("@/lib/logging", () => ({ emit: mocks.emit }));
+vi.mock("@/lib/logging", () => ({
+  emit: mocks.emit,
+  errorFields: (error: Error) => ({ errorName: error.name }),
+}));
 
 vi.mock("@/lib/http", () => ({
   getRatelimiter: () => ({ limit: mocks.limit }),
@@ -125,6 +128,7 @@ describe("POST /api/trips", () => {
     expect(mocks.emit).toHaveBeenCalledWith("error", "save failed", {
       route: "/api/trips",
       status: 500,
+      errorName: "Error",
     });
   });
 });

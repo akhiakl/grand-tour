@@ -1,3 +1,4 @@
+import { emit } from "@/lib/logging";
 import { pingStore } from "@/lib/trip/service";
 
 /**
@@ -9,6 +10,13 @@ import { pingStore } from "@/lib/trip/service";
  */
 export async function GET() {
   const up = await pingStore();
+  if (!up) {
+    emit("error", "health check failed", {
+      route: "/api/health",
+      status: 503,
+      reason: "redis_down",
+    });
+  }
   return Response.json(
     up ? { status: "ok", redis: "up" } : { status: "degraded", redis: "down" },
     {

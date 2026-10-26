@@ -70,6 +70,8 @@ typecheck; commit messages must follow
 | `AI_BASE_URL`               | OpenAI-compatible endpoint (server only)  |
 | `AI_MODEL`                  | Model id for trip generation              |
 | `AI_API_KEY`                | Endpoint key, optional (server only)      |
+| `AI_REASONING_EFFORT`       | low, medium or high; optional             |
+| `AI_MAX_TOKENS`             | Output token cap; optional                |
 | `UPSTASH_REDIS_REST_URL`    | Shared trip snapshots                     |
 | `UPSTASH_REDIS_REST_TOKEN`  | Shared trip snapshots                     |
 | `NEXT_PUBLIC_MAP_STYLE_URL` | Self-hosted map style (optional)          |

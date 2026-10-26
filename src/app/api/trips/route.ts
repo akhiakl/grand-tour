@@ -1,5 +1,5 @@
 import { getClientIp, getRatelimiter } from "@/lib/http";
-import { emit } from "@/lib/logging";
+import { emit, errorFields } from "@/lib/logging";
 import { GUEST_MAX_CITIES, MAX_TRIP_PAYLOAD_BYTES, TripSchema } from "@/lib/trip";
 import { saveTrip } from "@/lib/trip/service";
 
@@ -52,8 +52,12 @@ export async function POST(request: Request) {
     const id = await saveTrip(parsed.data);
     emit("info", "trip shared", { route: ROUTE });
     return Response.json({ id }, { status: 201 });
-  } catch {
-    emit("error", "save failed", { route: ROUTE, status: 500 });
+  } catch (error) {
+    emit("error", "save failed", {
+      route: ROUTE,
+      status: 500,
+      ...errorFields(error),
+    });
     return Response.json({ error: "save_failed" }, { status: 500 });
   }
 }
