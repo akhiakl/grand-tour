@@ -113,7 +113,7 @@ Do NOT create the workspace until a second consumer actually exists.
 - CI (`.github/workflows/ci.yml`): lint, typecheck, test, build and e2e on
   every PR and push to main. Shared steps come from `akhiakl/ci-workflows`
   (private; it must allow access from akhiakl repos), pinned to a release
-  tag (`@v1.3.1`; protect tags in that repo): `setup-pnpm`, `next-cache`,
+  tag (`@v1.4.0`; protect tags in that repo): `setup-pnpm`, `next-cache`,
   `playwright-browsers`, the run-check action around each check, and a sticky **Quality Gate** PR comment that
   lists what failed. PR title, release-please and deploy call its reusable
   workflows. Bump all pins together when `ci-workflows` changes.
