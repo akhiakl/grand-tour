@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/akhiakl/grand-tour/compare/v0.2.0...v0.3.0) (2026-10-26)
+
+
+### Features
+
+* **ai:** turn cities beyond the guest limit into ghost stops ([#87](https://github.com/akhiakl/grand-tour/issues/87)) ([3b420f0](https://github.com/akhiakl/grand-tour/commit/3b420f0effcd7db51cc77e4ede0c60f80b4498bb))
+
 ## [0.2.0](https://github.com/akhiakl/grand-tour/compare/v0.1.0...v0.2.0) (2026-10-26)
 
 
