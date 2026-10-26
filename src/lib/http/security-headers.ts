@@ -19,6 +19,9 @@ export interface SecurityHeaderOptions {
 const OPENFREEMAP = "https://tiles.openfreemap.org";
 const PHOTON = "https://photon.komoot.io";
 const VERCEL_LIVE = "https://vercel.live";
+// The toolbar also loads avatars and icons from these.
+const VERCEL_TOOLBAR_IMAGES = ["https://vercel.com"];
+const VERCEL_TOOLBAR_FONTS = ["https://assets.vercel.com"];
 // Vercel Web Analytics loads its debug script from here in development;
 // in production it is served first-party from /_vercel/insights.
 const VERCEL_SCRIPTS = "https://va.vercel-scripts.com";
@@ -57,8 +60,21 @@ export function contentSecurityPolicy(options: SecurityHeaderOptions): string {
       ...preview,
     ],
     "style-src": ["'self'", "'unsafe-inline'", ...userback],
-    "img-src": ["'self'", "data:", "blob:", ...userback, ...preview],
-    "font-src": ["'self'", "data:", ...userback, ...preview],
+    "img-src": [
+      "'self'",
+      "data:",
+      "blob:",
+      ...userback,
+      ...preview,
+      ...(options.vercelPreview ? VERCEL_TOOLBAR_IMAGES : []),
+    ],
+    "font-src": [
+      "'self'",
+      "data:",
+      ...userback,
+      ...preview,
+      ...(options.vercelPreview ? VERCEL_TOOLBAR_FONTS : []),
+    ],
     "connect-src": connect,
     // MapLibre boots its worker from a blob: wrapper around the bundled file.
     "worker-src": ["'self'", "blob:"],
