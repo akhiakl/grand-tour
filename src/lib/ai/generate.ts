@@ -37,6 +37,14 @@ interface ModelConfig {
   url: string;
   model: string;
   apiKey?: string;
+  /** Optional, sent only when set: not every provider accepts them. */
+  reasoningEffort?: string;
+  maxTokens?: number;
+}
+
+function positiveInt(value: string | undefined): number | undefined {
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
 }
 
 function modelConfig(): ModelConfig | null {
@@ -47,6 +55,8 @@ function modelConfig(): ModelConfig | null {
     url: `${baseUrl.replace(/\/+$/, "")}/chat/completions`,
     model,
     apiKey: process.env.AI_API_KEY || undefined,
+    reasoningEffort: process.env.AI_REASONING_EFFORT || undefined,
+    maxTokens: positiveInt(process.env.AI_MAX_TOKENS),
   };
 }
 
@@ -100,6 +110,8 @@ async function requestCompletion(
         model: config.model,
         response_format: { type: "json_object" },
         temperature: 0.6,
+        ...(config.reasoningEffort && { reasoning_effort: config.reasoningEffort }),
+        ...(config.maxTokens && { max_completion_tokens: config.maxTokens }),
         messages,
       }),
     });

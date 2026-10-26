@@ -10,15 +10,15 @@ const TRIP_JSON_SHAPE = `{
       "name": "string ≤60", "country": "string ≤60", "flag": "emoji ≤8",
       "ll": [latitude, longitude],
       "nights": "integer 0-30",
-      "why": "string ≤500 — why this stop earns its place",
-      "must": ["≤10 strings ≤80 — real headline sights"],
-      "gems": ["≤6 strings ≤80 — real lesser-known finds"],
-      "food": [["dish ≤60", "where/why ≤120"], "… ≤6 pairs"],
-      "days": [["Day 1", "theme ≤60", "plan ≤300"], "… ≤10 triples"],
+      "why": "string ≤200 — why this stop earns its place",
+      "must": ["≤5 strings ≤60 — real headline sights"],
+      "gems": ["≤3 strings ≤60 — real lesser-known finds"],
+      "food": [["dish ≤40", "where/why ≤80"], "… ≤3 pairs"],
+      "days": [["Day 1", "theme ≤40", "plan ≤150"], "… one per day of the stay, ≤10 triples"],
       "budget": [minPerDayUSD, maxPerDayUSD],
-      "transport": "string ≤120 — getting around this city",
-      "stay": "string ≤300 — neighbourhood advice",
-      "tips": ["≤6 strings ≤200"]
+      "transport": "string ≤80 — getting around this city",
+      "stay": "string ≤150 — neighbourhood advice",
+      "tips": ["≤3 strings ≤120"]
     }
   ],
   "legs": [
@@ -44,6 +44,7 @@ export function buildSystemPrompt(): string {
     "- Only real, verifiable attractions, restaurants and neighbourhoods — never invent places.",
     "- budget is a US-dollar-per-day [min, max] range for a mid-range traveller.",
     "- Total nights across cities should match the requested trip length.",
+    "- Be concise: stay well inside every length and count limit above, no filler.",
   ].join("\n");
 }
 

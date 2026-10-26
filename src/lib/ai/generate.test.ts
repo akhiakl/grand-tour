@@ -247,4 +247,27 @@ describe("generateTrip", () => {
       ]);
     });
   });
+
+  describe("optional model parameters", () => {
+    const sentBody = () => JSON.parse(fetchMock.mock.calls[0][1].body);
+
+    it("sends reasoning effort and the token cap only when configured", async () => {
+      vi.stubEnv("AI_REASONING_EFFORT", "low");
+      vi.stubEnv("AI_MAX_TOKENS", "8000");
+      fetchMock.mockResolvedValueOnce(modelResponse(JSON.stringify(validAiOutput)));
+      await generateTrip(request);
+      expect(sentBody()).toMatchObject({
+        reasoning_effort: "low",
+        max_completion_tokens: 8000,
+      });
+    });
+
+    it("leaves both out when unset or invalid", async () => {
+      vi.stubEnv("AI_MAX_TOKENS", "lots");
+      fetchMock.mockResolvedValueOnce(modelResponse(JSON.stringify(validAiOutput)));
+      await generateTrip(request);
+      expect(sentBody()).not.toHaveProperty("reasoning_effort");
+      expect(sentBody()).not.toHaveProperty("max_completion_tokens");
+    });
+  });
 });
