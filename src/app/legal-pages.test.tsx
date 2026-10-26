@@ -17,7 +17,7 @@ describe("PrivacyPage", () => {
     for (const name of [
       "Vercel",
       "Upstash",
-      "Our AI model provider",
+      "Groq",
       "Sentry",
       "Better Stack",
       "Photon by komoot",
