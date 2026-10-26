@@ -15,6 +15,8 @@ export class GenerationError extends Error {
     public readonly reason: GenerationFailure,
     /** HTTP status the model endpoint answered with, when it did. */
     public readonly upstreamStatus?: number,
+    /** The provider's short error code, when it sent one. */
+    public readonly upstreamCode?: string,
   ) {
     super(`trip generation failed: ${reason}`);
     this.name = "GenerationError";
@@ -95,7 +97,7 @@ async function requestCompletion(
       durationMs: Date.now() - startedAt,
       ...(error === undefined ? {} : errorFields(error)),
     });
-    return new GenerationError("upstream", upstreamStatus);
+    return new GenerationError("upstream", upstreamStatus, upstreamCode);
   };
 
   let response: Response;
@@ -214,6 +216,27 @@ export async function generateTrip(
   );
 }
 
+/**
+ * Groq rejects a reply it can't parse as JSON with a 400 instead of returning
+ * it. The model is non-deterministic, so one more identical call usually works.
+ */
+async function callWithJsonRetry(
+  call: (messages: ChatMessage[]) => Promise<string>,
+  messages: ChatMessage[],
+): Promise<string> {
+  try {
+    return await call(messages);
+  } catch (error) {
+    if (
+      error instanceof GenerationError &&
+      error.upstreamCode === "json_validate_failed"
+    ) {
+      return await call(messages);
+    }
+    throw error;
+  }
+}
+
 async function draftWithRetry(
   request: GenerateRequest,
   call: (messages: ChatMessage[]) => Promise<string>,
@@ -223,7 +246,7 @@ async function draftWithRetry(
     { role: "user", content: buildUserPrompt(request) },
   ];
 
-  const first = await call(base);
+  const first = await callWithJsonRetry(call, base);
   const firstResult = tryParse(first);
   if ("trip" in firstResult) return firstResult.trip;
   // Issue paths and messages come from our schema, never the model's text.
