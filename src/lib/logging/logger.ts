@@ -1,6 +1,7 @@
 import "server-only";
 
 import { Logger, LogLevel } from "@logtail/next";
+import { after } from "next/server";
 
 /** Primitives only, so request bodies, trip content and whole errors can't be logged by accident. */
 export type LogFields = Record<string, string | number | boolean | undefined>;
@@ -39,6 +40,20 @@ export function emit(
   });
   write[level](line);
   remote[level](message, fields);
+  flushAfterResponse();
+}
+
+/**
+ * Ship the batch once the response is out, so a function that freezes right
+ * after responding still delivers it. Outside a request after() throws, so
+ * flush directly there.
+ */
+function flushAfterResponse(): void {
+  try {
+    after(() => flushLogs());
+  } catch {
+    void flushLogs();
+  }
 }
 
 /**
