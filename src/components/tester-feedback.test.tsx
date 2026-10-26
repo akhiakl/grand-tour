@@ -1,23 +1,14 @@
 import { render, waitFor } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
-const mocks = vi.hoisted(() => ({ userback: vi.fn(), idle: true, enabled: true }));
+const mocks = vi.hoisted(() => ({ userback: vi.fn(), idle: true }));
 vi.mock("@userback/widget", () => ({ default: mocks.userback }));
 vi.mock("@/hooks/use-page-idle", () => ({ usePageIdle: () => mocks.idle }));
 
-beforeEach(() => {
-  mocks.enabled = true;
-  vi.stubGlobal(
-    "fetch",
-    vi.fn(async () => Response.json({ enabled: mocks.enabled })),
-  );
-});
-
 afterEach(() => {
-  vi.unstubAllGlobals();
   vi.unstubAllEnvs();
   vi.resetModules();
-  mocks.userback.mockClear();
+  mocks.userback.mockReset();
   mocks.idle = true;
 });
 
@@ -34,7 +25,7 @@ describe("TesterFeedback", () => {
     expect(mocks.userback).not.toHaveBeenCalled();
   });
 
-  it("starts the widget when the flag is on and the page is idle", async () => {
+  it("starts the widget when a token is set and the page is idle", async () => {
     vi.stubEnv("NEXT_PUBLIC_USERBACK_TOKEN", "tok_123");
     await mount();
     await waitFor(() => expect(mocks.userback).toHaveBeenCalledWith("tok_123"));
@@ -48,11 +39,14 @@ describe("TesterFeedback", () => {
     expect(mocks.userback).not.toHaveBeenCalled();
   });
 
-  it("stays off while the flag is off", async () => {
+  it("warns instead of throwing when the widget fails", async () => {
     vi.stubEnv("NEXT_PUBLIC_USERBACK_TOKEN", "tok_123");
-    mocks.enabled = false;
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    mocks.userback.mockImplementation(() => {
+      throw new Error("boom");
+    });
     await mount();
-    await new Promise((r) => setTimeout(r, 20));
-    expect(mocks.userback).not.toHaveBeenCalled();
+    await waitFor(() => expect(warn).toHaveBeenCalled());
+    warn.mockRestore();
   });
 });
