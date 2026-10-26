@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/akhiakl/grand-tour/compare/v0.4.0...v0.5.0) (2026-10-26)
+
+
+### Features
+
+* **feedback:** add temporary tester feedback widget ([#95](https://github.com/akhiakl/grand-tour/issues/95)) ([ecdc54c](https://github.com/akhiakl/grand-tour/commit/ecdc54c927a7bca3c6d6858f42e68a9c11512155))
+
 ## [0.4.0](https://github.com/akhiakl/grand-tour/compare/v0.3.1...v0.4.0) (2026-10-26)
 
 
