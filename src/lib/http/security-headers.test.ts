@@ -81,11 +81,22 @@ describe("contentSecurityPolicy", () => {
       "https://*.userback.io",
       "https://vercel.live",
     ]);
+    expect(directive(csp, "img-src")).toContain("https://vercel.com");
+    expect(directive(csp, "font-src")).toContain("https://assets.vercel.com");
     expect(directive(csp, "connect-src")).toContain("ws:");
     expect(directive(csp, "frame-src")).toEqual([
       "https://*.userback.io",
       "https://vercel.live",
     ]);
+  });
+});
+
+describe("toolbar origins", () => {
+  it("stay out of production", () => {
+    const csp = contentSecurityPolicy({ dev: false, vercelPreview: false });
+
+    expect(directive(csp, "img-src")).not.toContain("https://vercel.com");
+    expect(directive(csp, "font-src")).not.toContain("https://assets.vercel.com");
   });
 });
 
