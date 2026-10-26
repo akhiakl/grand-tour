@@ -13,6 +13,9 @@ export const GenerateRequestSchema = z.object({
 
 export type GenerateRequest = z.infer<typeof GenerateRequestSchema>;
 
+const MAX_EXTRA = 10;
+const MAX_EXTRA_NAME = 60;
+
 /**
  * Shape the model must return: trip content plus optional overflow stops.
  * `suggestedExtra` is NOT part of Trip — it feeds the ghost-stop upsell.
@@ -22,16 +25,16 @@ export const AiTripSchema = z
     title: z.string().min(1).max(80),
     cities: z.array(CitySchema).min(2).max(GUEST_MAX_CITIES),
     legs: z.array(LegSchema),
-    suggestedExtra: z.array(z.string().max(60)).max(10).default([]),
+    suggestedExtra: z
+      .array(z.string().max(MAX_EXTRA_NAME))
+      .max(MAX_EXTRA)
+      .default([]),
   })
   .refine((trip) => trip.legs.length === trip.cities.length - 1, {
     message:
       "legs must connect consecutive cities (legs.length === cities.length - 1)",
     path: ["legs"],
   });
-
-const MAX_EXTRA = 10;
-const MAX_EXTRA_NAME = 60;
 
 /**
  * A model that ignores the 5-city rule still gets a useful trip: keep the
