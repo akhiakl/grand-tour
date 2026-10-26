@@ -129,7 +129,7 @@ checked before merging the `1.0.0` release PR.
 ### Launch
 
 - [ ] Merge the `1.0.0` release PR → tag + GitHub Release published
-- [ ] the Deploy workflow runs; production smoke test of the four core
+- [ ] The Deploy workflow runs; production smoke test of the four core
       journeys (manual create→share→open→remix; AI create; 5-city upsell;
       expired link)
 - [ ] README badges green; CHANGELOG reads clean
@@ -208,7 +208,7 @@ live — smoke-test production.
    description and tick every box).
 2. Land a commit with `Release-As: 1.0.0` → release PR becomes
    `chore(main): release 1.0.0`.
-3. Merge it → tag + Release published → deploy hook fires → production
+3. Merge it → tag + Release published → Deploy workflow runs → production
    smoke test of the four core journeys.
 
 ### 6. Hotfix walkthrough
