@@ -20,7 +20,7 @@ vi.mock("@logtail/next", () => ({
   LogLevel: { debug: 0, info: 1, warn: 2, error: 3, off: 100 },
 }));
 
-const { emit, flushLogs } = await import("./logger");
+const { emit, errorFields, flushLogs } = await import("./logger");
 
 describe("server logger", () => {
   beforeEach(() => {
@@ -127,5 +127,21 @@ describe("server logger", () => {
 
     await expect(flushed).resolves.toBeUndefined();
     vi.useRealTimers();
+  });
+});
+
+describe("errorFields", () => {
+  it("keeps the name and system code, drops the message", () => {
+    const error = new TypeError("fetch failed https://x?key=secret", {
+      cause: { code: "ECONNRESET" },
+    });
+    expect(errorFields(error)).toEqual({
+      errorName: "TypeError",
+      errorCode: "ECONNRESET",
+    });
+  });
+
+  it("describes a non-error throw by its type only", () => {
+    expect(errorFields("boom")).toEqual({ errorName: "string" });
   });
 });
