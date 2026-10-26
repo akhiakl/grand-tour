@@ -149,7 +149,11 @@ export function SecondaryActions({
   return (
     <nav
       aria-label={t("tools")}
-      className="grid grid-cols-3 gap-1 sm:flex sm:justify-between sm:[&>*]:flex-1"
+      className={
+        variant === "demo"
+          ? "flex justify-between gap-1 [&>*]:flex-1"
+          : "grid grid-cols-3 gap-1 sm:flex sm:justify-between sm:[&>*]:flex-1"
+      }
     >
       {variant === "demo" && (
         <Tile icon={<Pencil />} label={t("customize")} onClick={onEditRoute} />
