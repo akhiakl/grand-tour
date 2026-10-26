@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.2](https://github.com/akhiakl/grand-tour/compare/v0.5.1...v0.5.2) (2026-10-26)
+
+
+### Bug Fixes
+
+* **feedback:** gate tester widget on env token only ([#99](https://github.com/akhiakl/grand-tour/issues/99)) ([4c82da6](https://github.com/akhiakl/grand-tour/commit/4c82da67dd2dc8a64b0484aedd8cd43e48ea3f98))
+
 ## [0.5.1](https://github.com/akhiakl/grand-tour/compare/v0.5.0...v0.5.1) (2026-10-26)
 
 
