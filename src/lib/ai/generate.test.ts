@@ -112,6 +112,28 @@ describe("generateTrip", () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
+  it("retries once when the provider rejects its own malformed JSON", async () => {
+    fetchMock
+      .mockResolvedValueOnce(
+        Response.json({ error: { code: "json_validate_failed" } }, { status: 400 }),
+      )
+      .mockResolvedValueOnce(modelResponse(JSON.stringify(validAiOutput)));
+
+    const result = await generateTrip(request);
+
+    expect(result.trip.cities).toHaveLength(2);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("does not retry other upstream errors", async () => {
+    fetchMock.mockResolvedValueOnce(new Response("bad", { status: 400 }));
+
+    await expect(generateTrip(request)).rejects.toMatchObject({
+      reason: "upstream",
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
   it("throws upstream on a non-ok model response", async () => {
     fetchMock.mockResolvedValueOnce(new Response("rate limited", { status: 429 }));
 
@@ -195,7 +217,7 @@ describe("generateTrip", () => {
 
   describe("diagnostic logs", () => {
     it("logs the provider's status and error code, never its message", async () => {
-      fetchMock.mockResolvedValueOnce(
+      fetchMock.mockImplementation(async () =>
         Response.json(
           { error: { code: "json_validate_failed", message: "secret prompt echo" } },
           { status: 400 },
