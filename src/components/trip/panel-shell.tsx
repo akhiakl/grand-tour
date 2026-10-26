@@ -138,7 +138,7 @@ export function PanelShell({
       onDragStart={() => (dragged.current = true)}
       onDragEnd={onDragEnd}
       style={{ y }}
-      className="atlas-card fixed inset-x-3 bottom-3 z-40 flex h-[60dvh] flex-col lg:inset-x-auto lg:top-5 lg:bottom-auto lg:left-5 lg:h-auto lg:max-h-[calc(100dvh-2.5rem)] lg:w-(--card-w) lg:transform-none!"
+      className="atlas-card fixed inset-x-3 bottom-3 z-40 flex h-[74dvh] flex-col lg:inset-x-auto lg:top-5 lg:bottom-auto lg:left-5 lg:h-auto lg:max-h-[calc(100dvh-2.5rem)] lg:w-(--card-w) lg:transform-none!"
     >
       <button
         type="button"
