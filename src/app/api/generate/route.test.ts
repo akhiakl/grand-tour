@@ -10,7 +10,10 @@ const mocks = vi.hoisted(() => ({
   emit: vi.fn(),
 }));
 
-vi.mock("@/lib/logging", () => ({ emit: mocks.emit }));
+vi.mock("@/lib/logging", () => ({
+  emit: mocks.emit,
+  errorFields: (error: Error) => ({ errorName: error.name }),
+}));
 
 vi.mock("@/lib/http", () => ({
   getRatelimiter: () => ({ limit: mocks.limit }),
@@ -131,6 +134,7 @@ describe("POST /api/generate", () => {
       route: "/api/generate",
       status: 500,
       reason: "unexpected",
+      errorName: "Error",
     });
   });
 

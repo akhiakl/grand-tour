@@ -11,6 +11,12 @@ vi.mock("@sentry/nextjs", () => ({
 }));
 const spans = () => recorder.spans;
 
+const emit = vi.hoisted(() => vi.fn());
+vi.mock("@/lib/logging", () => ({
+  emit,
+  errorFields: (error: Error) => ({ errorName: error.name }),
+}));
+
 import { GenerationError, generateTrip } from "./generate";
 
 const request = makeGenerateRequest();
@@ -31,6 +37,7 @@ beforeEach(() => {
   vi.stubEnv("AI_API_KEY", "test-key");
   fetchMock.mockReset();
   spans().length = 0;
+  emit.mockClear();
 });
 
 afterEach(() => {
@@ -156,10 +163,12 @@ describe("generateTrip", () => {
       });
     });
 
-    it("records a network failure as an error outcome", async () => {
+    it("records a network failure as an upstream outcome", async () => {
       fetchMock.mockRejectedValueOnce(new TypeError("fetch failed"));
-      await expect(generateTrip(request)).rejects.toThrow("fetch failed");
-      expect(spans()[0].attributes["ai.outcome"]).toBe("error");
+      await expect(generateTrip(request)).rejects.toThrow(
+        "generation failed: upstream",
+      );
+      expect(spans()[0].attributes["ai.outcome"]).toBe("upstream");
     });
 
     it("counts the retry", async () => {
@@ -181,6 +190,61 @@ describe("generateTrip", () => {
           expect(ALLOWED).toContain(key);
         expect(JSON.stringify(span.attributes)).not.toContain(request.destination);
       }
+    });
+  });
+
+  describe("diagnostic logs", () => {
+    it("logs the provider's status and error code, never its message", async () => {
+      fetchMock.mockResolvedValueOnce(
+        Response.json(
+          { error: { code: "json_validate_failed", message: "secret prompt echo" } },
+          { status: 400 },
+        ),
+      );
+      await expect(generateTrip(request)).rejects.toMatchObject({
+        reason: "upstream",
+        upstreamStatus: 400,
+      });
+      expect(emit).toHaveBeenCalledWith(
+        "error",
+        "model call failed",
+        expect.objectContaining({
+          model: "test-model",
+          detail: "http_status",
+          upstreamStatus: 400,
+          upstreamCode: "json_validate_failed",
+          durationMs: expect.any(Number),
+        }),
+      );
+      expect(JSON.stringify(emit.mock.calls)).not.toContain("secret prompt echo");
+    });
+
+    it("logs a network failure with the error name", async () => {
+      fetchMock.mockRejectedValueOnce(new TypeError("fetch failed"));
+      await expect(generateTrip(request)).rejects.toThrow();
+      expect(emit).toHaveBeenCalledWith(
+        "error",
+        "model call failed",
+        expect.objectContaining({ detail: "network", errorName: "TypeError" }),
+      );
+    });
+
+    it("logs an unreadable body and a reply without content", async () => {
+      fetchMock.mockResolvedValueOnce(new Response("<html>", { status: 200 }));
+      await expect(generateTrip(request)).rejects.toThrow();
+      fetchMock.mockResolvedValueOnce(Response.json({ choices: [] }));
+      await expect(generateTrip(request)).rejects.toThrow();
+      const details = emit.mock.calls.map((call) => call[2].detail);
+      expect(details).toEqual(["body_not_json", "no_content"]);
+    });
+
+    it("logs a rejected first output as a warning and a second as an error", async () => {
+      fetchMock.mockImplementation(async () => modelResponse("not json"));
+      await expect(generateTrip(request)).rejects.toThrow();
+      expect(emit.mock.calls.map((call) => [call[0], call[1]])).toEqual([
+        ["warn", "model output rejected, retrying"],
+        ["error", "model output rejected twice"],
+      ]);
     });
   });
 });

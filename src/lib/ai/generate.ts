@@ -2,6 +2,7 @@ import "server-only";
 
 import * as Sentry from "@sentry/nextjs";
 
+import { emit, errorFields } from "@/lib/logging";
 import { TripSchema, type Trip } from "@/lib/trip";
 
 import { buildRetryPrompt, buildSystemPrompt, buildUserPrompt } from "./prompt";
@@ -68,28 +69,70 @@ async function requestCompletion(
   messages: ChatMessage[],
   config: ModelConfig,
 ): Promise<string> {
-  const response = await fetch(config.url, {
-    method: "POST",
-    headers: {
-      ...(config.apiKey && { authorization: `Bearer ${config.apiKey}` }),
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
+  const startedAt = Date.now();
+  const fail = (
+    detail: string,
+    upstreamStatus?: number,
+    error?: unknown,
+    upstreamCode?: string,
+  ) => {
+    emit("error", "model call failed", {
+      route: "/api/generate",
       model: config.model,
-      response_format: { type: "json_object" },
-      temperature: 0.6,
-      messages,
-    }),
-  });
+      detail,
+      upstreamCode,
+      upstreamStatus,
+      durationMs: Date.now() - startedAt,
+      ...(error === undefined ? {} : errorFields(error)),
+    });
+    return new GenerationError("upstream", upstreamStatus);
+  };
 
-  if (!response.ok) throw new GenerationError("upstream", response.status);
+  let response: Response;
+  try {
+    response = await fetch(config.url, {
+      method: "POST",
+      headers: {
+        ...(config.apiKey && { authorization: `Bearer ${config.apiKey}` }),
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        model: config.model,
+        response_format: { type: "json_object" },
+        temperature: 0.6,
+        messages,
+      }),
+    });
+  } catch (error) {
+    throw fail("network", undefined, error);
+  }
 
-  const data: unknown = await response.json();
+  if (!response.ok) {
+    throw fail("http_status", response.status, undefined, await errorCode(response));
+  }
+
+  let data: unknown;
+  try {
+    data = await response.json();
+  } catch (error) {
+    throw fail("body_not_json", response.status, error);
+  }
   const content = (data as { choices?: { message?: { content?: unknown } }[] })
     .choices?.[0]?.message?.content;
 
-  if (typeof content !== "string") throw new GenerationError("upstream");
+  if (typeof content !== "string") throw fail("no_content", response.status);
   return content;
+}
+
+/** The provider's short error code (e.g. json_validate_failed), never its message. */
+async function errorCode(response: Response): Promise<string | undefined> {
+  try {
+    const body = (await response.json()) as { error?: { code?: unknown } };
+    const code = body.error?.code;
+    return typeof code === "string" ? code.slice(0, 60) : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 function tryParse(content: string): { trip: GeneratedTrip } | { issues: string } {
@@ -171,6 +214,11 @@ async function draftWithRetry(
   const first = await call(base);
   const firstResult = tryParse(first);
   if ("trip" in firstResult) return firstResult.trip;
+  // Issue paths and messages come from our schema, never the model's text.
+  emit("warn", "model output rejected, retrying", {
+    route: "/api/generate",
+    issues: firstResult.issues.slice(0, 300),
+  });
 
   const second = await call([
     ...base,
@@ -180,5 +228,9 @@ async function draftWithRetry(
   const secondResult = tryParse(second);
   if ("trip" in secondResult) return secondResult.trip;
 
+  emit("error", "model output rejected twice", {
+    route: "/api/generate",
+    issues: secondResult.issues.slice(0, 300),
+  });
   throw new GenerationError("invalid_output");
 }
