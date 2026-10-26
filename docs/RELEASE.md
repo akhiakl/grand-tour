@@ -14,8 +14,9 @@ Releases are driven by Conventional Commits via
   box in the checklist below is checked.
 
 One-time setup: add a repo PAT as the `RELEASE_PLEASE_TOKEN` secret so
-required CI checks run on release PRs (PRs created by the default
-`GITHUB_TOKEN` don't trigger workflows).
+required CI checks run on release PRs and the published release starts
+the Deploy workflow (events created by the default `GITHUB_TOKEN` don't
+trigger workflows).
 
 ## Deploy policy — deploy only when everything is complete
 
@@ -221,13 +222,14 @@ live — smoke-test production.
 
 ### Troubleshooting
 
-| Symptom                         | Cause / fix                                                                                                         |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| No release PR after merging     | Only non-releasable types landed (`chore`/`docs`/…) — expected; or the Release workflow failed — check Actions.     |
-| Release PR has no CI checks     | Created with the default `GITHUB_TOKEN`; add the `RELEASE_PLEASE_TOKEN` PAT secret and re-run the Release workflow. |
-| Wrong version proposed          | Add a `Release-As: x.y.z` footer commit; the PR retargets on the next workflow run.                                 |
-| Merged release PR but no deploy | `VERCEL_TOKEN` unset (fine pre-launch) or invalid — check the Deploy workflow logs.                                 |
-| Need to unpublish               | Never delete tags; ship a `fix:`/revert commit and cut the next patch instead.                                      |
+| Symptom                          | Cause / fix                                                                                                              |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| No release PR after merging      | Only non-releasable types landed (`chore`/`docs`/…) — expected; or the Release workflow failed — check Actions.          |
+| Release PR has no CI checks      | Created with the default `GITHUB_TOKEN`; add the `RELEASE_PLEASE_TOKEN` PAT secret and re-run the Release workflow.      |
+| Wrong version proposed           | Add a `Release-As: x.y.z` footer commit; the PR retargets on the next workflow run.                                      |
+| Merged release PR but no deploy  | `VERCEL_TOKEN` unset (fine pre-launch) or invalid — check the Deploy workflow logs.                                      |
+| Release merged, Deploy never ran | `RELEASE_PLEASE_TOKEN` unset: releases made with the default `GITHUB_TOKEN` can't trigger workflows. Add the PAT secret. |
+| Need to unpublish                | Never delete tags; ship a `fix:`/revert commit and cut the next patch instead.                                           |
 
 ## After launch
 
