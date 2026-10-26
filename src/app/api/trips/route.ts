@@ -6,13 +6,9 @@ import { saveTrip } from "@/lib/trip/service";
 const ROUTE = "/api/trips";
 
 // Logs the reason only: never the caller's address, the trip or its issues.
-const refuse = (
-  status: number,
-  reason: string,
-  body: object = { error: reason },
-) => {
+const refuse = (status: number, reason: string, body?: object) => {
   emit("warn", "request refused", { route: ROUTE, status, reason });
-  return Response.json(body, { status });
+  return Response.json(body ?? { error: reason }, { status });
 };
 
 export async function POST(request: Request) {
