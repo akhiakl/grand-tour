@@ -90,6 +90,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: akhiakl/ci-workflows/setup-pnpm@v1.1.0
+      - uses: akhiakl/ci-workflows/next-cache@v1.3.1
       - uses: akhiakl/ci-workflows@v1.1.0
         id: build
         continue-on-error: true
@@ -111,7 +112,10 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: akhiakl/ci-workflows/setup-pnpm@v1.1.0
-      - uses: akhiakl/ci-workflows/playwright-browsers@v1.1.0
+      - uses: akhiakl/ci-workflows/playwright-browsers@v1.3.1
+        with:
+          with-deps: "false"
+      - uses: akhiakl/ci-workflows/next-cache@v1.3.1
 
       - run: pnpm build
       # Starts the fake Upstash server and `next start`; API routes, map
