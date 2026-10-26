@@ -6,11 +6,14 @@ const remote = vi.hoisted(() => ({
   error: vi.fn(),
   flush: vi.fn(() => Promise.resolve()),
 }));
+const after = vi.hoisted(() => vi.fn());
 const LoggerConstructor = vi.hoisted(() =>
   vi.fn(function () {
     return remote;
   }),
 );
+
+vi.mock("next/server", () => ({ after }));
 
 vi.mock("@logtail/next", () => ({
   Logger: LoggerConstructor,
@@ -25,6 +28,7 @@ describe("server logger", () => {
     remote.warn.mockClear();
     remote.error.mockClear();
     remote.flush.mockClear();
+    after.mockReset();
   });
 
   it("writes one JSON line to the console with the fields it was given", () => {
@@ -42,6 +46,40 @@ describe("server logger", () => {
     });
     expect(line.dt).toEqual(expect.any(String));
     consoleWarn.mockRestore();
+  });
+
+  it("writes info lines to console.info and Better Stack", () => {
+    const consoleInfo = vi.spyOn(console, "info").mockImplementation(() => {});
+
+    emit("info", "trip shared", { route: "/api/trips" });
+
+    expect(JSON.parse(String(consoleInfo.mock.calls[0]?.[0]))).toMatchObject({
+      level: "info",
+      message: "trip shared",
+      route: "/api/trips",
+    });
+    expect(remote.info).toHaveBeenCalledWith("trip shared", { route: "/api/trips" });
+    consoleInfo.mockRestore();
+  });
+
+  it("schedules a flush after the response so a frozen function still ships it", async () => {
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    emit("warn", "request refused", { route: "/api/trips" });
+
+    expect(after).toHaveBeenCalledTimes(1);
+    await after.mock.calls[0]?.[0]();
+    expect(remote.flush).toHaveBeenCalledTimes(1);
+  });
+
+  it("flushes directly when called outside a request, where after() throws", () => {
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    after.mockImplementation(() => {
+      throw new Error("after was called outside a request scope");
+    });
+
+    expect(() => emit("warn", "request refused")).not.toThrow();
+    expect(remote.flush).toHaveBeenCalledTimes(1);
   });
 
   it("forwards the same message and fields to Better Stack", () => {

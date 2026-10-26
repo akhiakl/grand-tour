@@ -45,7 +45,7 @@ const PROCESSORS = [
   ],
   [
     "Better Stack",
-    "Regularly checks that the site is up, and keeps server error logs (the page type, error type and a reference number) so we can fix problems. No IP addresses or request contents are sent.",
+    "Regularly checks that the site is up, and keeps server logs of what happened (the page type, a status or error type, and events such as a map being shared or opened) so we can fix problems. No IP addresses or request contents are sent.",
     "Logs: 3 days. Uptime checks: no personal data",
   ],
   [

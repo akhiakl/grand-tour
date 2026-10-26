@@ -2,6 +2,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { makeFrankfurterResponse } from "@/test/fixtures/units";
 
+const emit = vi.hoisted(() => vi.fn());
+
+vi.mock("@/lib/logging", () => ({ emit }));
+
 import { GET } from "./route";
 
 const fetchMock = vi.fn();
@@ -58,5 +62,18 @@ describe("GET /api/rates", () => {
     const response = await GET();
     expect(response.status).toBe(503);
     expect(await response.json()).toEqual({ error: "rates_unavailable" });
+  });
+
+  it("logs why the rates were unavailable", async () => {
+    emit.mockClear();
+    fetchMock.mockResolvedValue(upstream({}, 500));
+
+    await GET();
+
+    expect(emit).toHaveBeenCalledWith("warn", "rates unavailable", {
+      route: "/api/rates",
+      status: 503,
+      reason: "rates_500",
+    });
   });
 });
