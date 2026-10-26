@@ -141,7 +141,7 @@ export function SecondaryActions({
   readonly onPoster: () => void;
   /** Present for dated trips: downloads the stops as calendar events. */
   readonly onCalendar?: () => void;
-  /** Downloads the route as GPX for navigation apps. */
+  /** Opens the route in a maps app (Google Maps directions). */
   readonly onNavigate: () => void;
   readonly onEditRoute: () => void;
 }) {
