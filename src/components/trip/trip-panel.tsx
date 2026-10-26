@@ -7,7 +7,7 @@ import { useEffect, useId, useState, type ReactNode } from "react";
 import { LegalLinks } from "@/components/legal/legal-links";
 import { ReportMapLink } from "@/components/legal/report-map-link";
 import { usePageIdle } from "@/hooks/use-page-idle";
-import { stopDates, type Trip, type TripToolsScope } from "@/lib/trip";
+import { stopDates, tripMapsUrl, type Trip, type TripToolsScope } from "@/lib/trip";
 
 import type { MapInsets } from "./fit-padding";
 import {
@@ -168,6 +168,7 @@ export function TripPanel({
               onTool={openTool}
               onPoster={onPoster}
               onCalendar={dates ? () => downloadTripCalendar(trip) : undefined}
+              onNavigate={() => window.open(tripMapsUrl(trip), "_blank", "noopener")}
               onEditRoute={onEditRoute}
             />
             <StatsGrid trip={trip} />

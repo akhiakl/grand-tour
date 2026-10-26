@@ -339,7 +339,8 @@
       "packing": "Packing",
       "notes": "Notes",
       "poster": "Poster",
-      "calendar": "Calendar"
+      "calendar": "Calendar",
+      "navigate": "Navigation"
     },
     "stats": {
       "nights": "Nights",
