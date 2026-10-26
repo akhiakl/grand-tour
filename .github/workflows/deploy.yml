@@ -1,13 +1,22 @@
-# Production deploys ONLY from published releases (tags vX.Y.Z) — never
-# from pushes to main. See docs/RELEASE.md for the policy and the MVP
-# checklist gating v1.0.0. Without DEPLOY_HOOK_URL it logs and exits.
+# Production deploys ONLY from published releases (tags vX.Y.Z), never
+# from pushes to main (Vercel's Ignored Build Step skips those). The Vercel
+# CLI deploy in the shared workflow is not subject to that skip. See
+# docs/RELEASE.md for the policy and the MVP checklist gating v1.0.0.
+# Without VERCEL_TOKEN it logs and exits.
 name: Deploy
 
 on:
   release:
     types: [published]
 
+permissions:
+  contents: read
+
 jobs:
   production:
-    uses: akhiakl/ci-workflows/.github/workflows/deploy-hook.yml@v1.1.0
+    uses: akhiakl/ci-workflows/.github/workflows/deploy-vercel.yml@v1.2.0
+    with:
+      org-id: team_limfPNcBoq9EgLcZU3PIRK8J
+      project-id: prj_s5JbG1NXUZmlPut6nTqrpW4aJE1W
+      node-version: "22"
     secrets: inherit

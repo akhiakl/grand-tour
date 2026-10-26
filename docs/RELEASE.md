@@ -21,12 +21,12 @@ required CI checks run on release PRs (PRs created by the default
 
 - **Production never deploys from `main` pushes.** The only production
   trigger is a _published GitHub Release_: `.github/workflows/deploy.yml`
-  fires on `release: published` and calls the `DEPLOY_HOOK_URL` secret
-  (Vercel/Netlify deploy hook — set it when the host is chosen; until
-  then releases are tags only).
-- If the repo is connected to Vercel, disable its automatic production
-  deploys from `main` (Project → Git → Production Branch behavior) so
-  the release hook stays the single path. PR preview deploys are fine
+  fires on `release: published` and deploys with the Vercel CLI using the
+  `VERCEL_TOKEN` secret (until it is set, releases are tags only).
+- Vercel's Ignored Build Step (Project → Settings → Git) skips
+  production builds of `main` (Hobby has no deployment policy), so the
+  release workflow stays the single path; CLI deploys are not subject to
+  it. PR preview deploys are fine
   and encouraged.
 - The **first production deploy is `v1.0.0`** — after the MVP checklist
   is 100% complete. `0.x` releases are internal milestones (tags +
@@ -129,7 +129,7 @@ checked before merging the `1.0.0` release PR.
 ### Launch
 
 - [ ] Merge the `1.0.0` release PR → tag + GitHub Release published
-- [ ] `DEPLOY_HOOK_URL` fires; production smoke test of the four core
+- [ ] The Deploy workflow runs; production smoke test of the four core
       journeys (manual create→share→open→remix; AI create; 5-city upsell;
       expired link)
 - [ ] README badges green; CHANGELOG reads clean
@@ -177,8 +177,8 @@ or bump it.
 
 `deploy.yml` fires on the published release:
 
-- `DEPLOY_HOOK_URL` secret set → the host's deploy hook is called and
-  production ships this exact tag.
+- `VERCEL_TOKEN` secret set → the workflow builds and deploys this exact
+  tag to production.
 - Not set → nothing deploys; the release is a tag + changelog milestone
   (this is the correct state for all `0.x` releases before launch).
 
@@ -208,7 +208,7 @@ live — smoke-test production.
    description and tick every box).
 2. Land a commit with `Release-As: 1.0.0` → release PR becomes
    `chore(main): release 1.0.0`.
-3. Merge it → tag + Release published → deploy hook fires → production
+3. Merge it → tag + Release published → Deploy workflow runs → production
    smoke test of the four core journeys.
 
 ### 6. Hotfix walkthrough
@@ -226,7 +226,7 @@ live — smoke-test production.
 | No release PR after merging     | Only non-releasable types landed (`chore`/`docs`/…) — expected; or the Release workflow failed — check Actions.     |
 | Release PR has no CI checks     | Created with the default `GITHUB_TOKEN`; add the `RELEASE_PLEASE_TOKEN` PAT secret and re-run the Release workflow. |
 | Wrong version proposed          | Add a `Release-As: x.y.z` footer commit; the PR retargets on the next workflow run.                                 |
-| Merged release PR but no deploy | `DEPLOY_HOOK_URL` unset (fine pre-launch) or the hook URL is invalid — check the Deploy workflow logs.              |
+| Merged release PR but no deploy | `VERCEL_TOKEN` unset (fine pre-launch) or invalid — check the Deploy workflow logs.                                 |
 | Need to unpublish               | Never delete tags; ship a `fix:`/revert commit and cut the next patch instead.                                      |
 
 ## After launch
