@@ -16,7 +16,6 @@ function loadSentry(): Promise<SentryModule | undefined> {
         // would report them twice.
         integrations: (defaults) =>
           defaults.filter((integration) => integration.name !== "GlobalHandlers"),
-        enableLogs: process.env.NODE_ENV === "development",
       });
       return sentry;
     })
