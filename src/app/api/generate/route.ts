@@ -41,6 +41,7 @@ export async function POST(request: Request) {
         route: "/api/generate",
         status,
         reason: error.reason,
+        upstreamStatus: error.upstreamStatus,
       });
       return Response.json({ error: code }, { status });
     }

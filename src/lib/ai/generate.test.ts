@@ -111,6 +111,7 @@ describe("generateTrip", () => {
     const error = await generateTrip(request).catch((e: unknown) => e);
     expect(error).toBeInstanceOf(GenerationError);
     expect((error as GenerationError).reason).toBe("upstream");
+    expect((error as GenerationError).upstreamStatus).toBe(429);
   });
 
   describe("tracing", () => {

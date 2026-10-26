@@ -10,7 +10,11 @@ import { AiTripSchema, type GenerateRequest } from "./schema";
 export type GenerationFailure = "unavailable" | "upstream" | "invalid_output";
 
 export class GenerationError extends Error {
-  constructor(public readonly reason: GenerationFailure) {
+  constructor(
+    public readonly reason: GenerationFailure,
+    /** HTTP status the model endpoint answered with, when it did. */
+    public readonly upstreamStatus?: number,
+  ) {
     super(`trip generation failed: ${reason}`);
     this.name = "GenerationError";
   }
@@ -78,7 +82,7 @@ async function requestCompletion(
     }),
   });
 
-  if (!response.ok) throw new GenerationError("upstream");
+  if (!response.ok) throw new GenerationError("upstream", response.status);
 
   const data: unknown = await response.json();
   const content = (data as { choices?: { message?: { content?: unknown } }[] })

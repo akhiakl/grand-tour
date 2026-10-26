@@ -113,6 +113,17 @@ describe("POST /api/generate", () => {
     });
   });
 
+  it("logs the model endpoint's HTTP status on an upstream failure", async () => {
+    mocks.generateTrip.mockRejectedValue(new GenerationError("upstream", 401));
+    await post(makeGenerateRequest());
+    expect(mocks.emit).toHaveBeenCalledWith("error", "generation failed", {
+      route: "/api/generate",
+      status: 502,
+      reason: "upstream",
+      upstreamStatus: 401,
+    });
+  });
+
   it("logs an unexpected error as unexpected, never its message", async () => {
     mocks.generateTrip.mockRejectedValue(new Error("boom with the user prompt"));
     await post(makeGenerateRequest());
