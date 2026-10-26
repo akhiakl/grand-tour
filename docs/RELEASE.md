@@ -58,7 +58,7 @@ checked before merging the `1.0.0` release PR.
 
 - [x] Server: 6-city POST returns `403 {error:"city_limit",limit:5}`
 - [x] Editor: counter + upsell modal at 5/5 (e2e `limit.spec.ts`)
-- [ ] AI: >5-city request yields 5 cities + `suggestedExtra` ghost stops
+- [x] AI: >5-city request yields 5 cities + `suggestedExtra` ghost stops
 
 ### Quality
 

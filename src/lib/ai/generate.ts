@@ -6,7 +6,7 @@ import { emit, errorFields } from "@/lib/logging";
 import { TripSchema, type Trip } from "@/lib/trip";
 
 import { buildRetryPrompt, buildSystemPrompt, buildUserPrompt } from "./prompt";
-import { AiTripSchema, type GenerateRequest } from "./schema";
+import { AiTripSchema, clampToGuestLimit, type GenerateRequest } from "./schema";
 
 export type GenerationFailure = "unavailable" | "upstream" | "invalid_output";
 
@@ -157,7 +157,7 @@ function tryParse(content: string): { trip: GeneratedTrip } | { issues: string }
     return { issues: "output was not valid JSON" };
   }
 
-  const parsed = AiTripSchema.safeParse(json);
+  const parsed = AiTripSchema.safeParse(clampToGuestLimit(json));
   if (!parsed.success) {
     return {
       issues: parsed.error.issues

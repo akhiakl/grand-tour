@@ -4,7 +4,7 @@ import { GUEST_MAX_CITIES } from "@/lib/trip";
 import { makeAiTrip, makeGenerateRequest } from "@/test/fixtures/ai";
 import { makeLeg } from "@/test/fixtures/trip";
 
-import { AiTripSchema, GenerateRequestSchema } from "./schema";
+import { AiTripSchema, GenerateRequestSchema, clampToGuestLimit } from "./schema";
 
 describe("GenerateRequestSchema", () => {
   it("accepts the guided chat's three answers", () => {
@@ -60,5 +60,29 @@ describe("AiTripSchema", () => {
     expect(
       AiTripSchema.safeParse(makeAiTrip(3, { legs: [makeLeg()] })).success,
     ).toBe(false);
+  });
+});
+
+describe("clampToGuestLimit", () => {
+  it("passes through anything that is not an overflowing trip", () => {
+    const ok = makeAiTrip(5);
+    expect(clampToGuestLimit(ok)).toBe(ok);
+    expect(clampToGuestLimit("text")).toBe("text");
+    expect(clampToGuestLimit(null)).toBeNull();
+    expect(clampToGuestLimit({ cities: "x", legs: [] })).toEqual({
+      cities: "x",
+      legs: [],
+    });
+  });
+
+  it("yields a schema-valid trip from 6+ cities", () => {
+    const clamped = clampToGuestLimit(makeAiTrip(8));
+    expect(AiTripSchema.safeParse(clamped).success).toBe(true);
+  });
+
+  it("tolerates malformed overflow entries", () => {
+    const trip = { ...makeAiTrip(5), suggestedExtra: undefined };
+    trip.cities.push(null as never, { name: 3 } as never);
+    expect(clampToGuestLimit(trip)).toMatchObject({ suggestedExtra: [] });
   });
 });

@@ -85,6 +85,30 @@ describe("generateTrip", () => {
     expect(body.response_format).toEqual({ type: "json_object" });
   });
 
+  it("keeps the first 5 cities and turns the overflow into ghost stops", async () => {
+    const overflow = makeAiTrip(7, { suggestedExtra: ["Innsbruck"] });
+    fetchMock.mockResolvedValueOnce(modelResponse(JSON.stringify(overflow)));
+
+    const result = await generateTrip(request);
+
+    expect(result.trip.cities).toHaveLength(5);
+    expect(result.trip.legs).toHaveLength(4);
+    expect(result.suggestedExtra).toEqual(["Innsbruck", "Stop 6", "Stop 7"]);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("caps ghost stops at 10 and skips overflow names that are unusable", async () => {
+    const overflow = makeAiTrip(20);
+    overflow.cities[5] = { ...overflow.cities[5], name: "x".repeat(61) };
+    fetchMock.mockResolvedValueOnce(modelResponse(JSON.stringify(overflow)));
+
+    const result = await generateTrip(request);
+
+    expect(result.trip.cities).toHaveLength(5);
+    expect(result.suggestedExtra).toHaveLength(10);
+    expect(result.suggestedExtra).not.toContain("x".repeat(61));
+  });
+
   it("retries once, feeding validation errors back to the model", async () => {
     const invalid = JSON.stringify(makeAiTrip(2, { legs: [] }));
     fetchMock
