@@ -23,6 +23,7 @@ describe("PrivacyPage", () => {
       "Photon by komoot",
       "OpenFreeMap",
       "Frankfurter",
+      "Userback",
     ]) {
       expect(screen.getByRole("cell", { name })).toBeInTheDocument();
     }

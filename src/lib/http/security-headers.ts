@@ -62,9 +62,7 @@ export function contentSecurityPolicy(options: SecurityHeaderOptions): string {
     "connect-src": connect,
     // MapLibre boots its worker from a blob: wrapper around the bundled file.
     "worker-src": ["'self'", "blob:"],
-    "frame-src": [...userback, ...preview].length
-      ? [...userback, ...preview]
-      : ["'none'"],
+    "frame-src": [...userback, ...preview],
     "object-src": ["'none'"],
     "base-uri": ["'self'"],
     "form-action": ["'self'"],
