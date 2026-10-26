@@ -12,4 +12,4 @@ permissions:
 jobs:
   title:
     name: Conventional title
-    uses: akhiakl/ci-workflows/.github/workflows/conventional-pr-title.yml@1984db16417cc763ea3e0904bfca2533e0ab0869 # v1.1.0
+    uses: akhiakl/ci-workflows/.github/workflows/conventional-pr-title.yml@v1.1.0

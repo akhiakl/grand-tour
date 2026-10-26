@@ -112,9 +112,9 @@ Do NOT create the workspace until a second consumer actually exists.
   full typecheck. commit-msg: commitlint (Conventional Commits).
 - CI (`.github/workflows/ci.yml`): lint, typecheck, test, build and e2e on
   every PR and push to main. Shared steps come from `akhiakl/ci-workflows`
-  (private; it must allow access from akhiakl repos), pinned to a commit
-  SHA marked `# v1`: `setup-pnpm`, `playwright-browsers`, the run-check
-  action around each check, and a sticky **Quality Gate** PR comment that
+  (private; it must allow access from akhiakl repos), pinned to a release
+  tag (`@v1.1.0`; protect tags in that repo): `setup-pnpm`,
+  `playwright-browsers`, the run-check action around each check, and a sticky **Quality Gate** PR comment that
   lists what failed. PR title, release-please and deploy call its reusable
   workflows. Bump all pins together when `ci-workflows` changes.
 - Node pinned via `.nvmrc` + `engines`; pnpm via `packageManager`.

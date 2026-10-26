@@ -9,8 +9,8 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
-# Shared steps come from akhiakl/ci-workflows, pinned to a commit (v1.1.0) so
-# they can't change under this repo. Each check runs through its run-check
+# Shared steps come from akhiakl/ci-workflows, pinned to a release tag
+# (v1.1.0); keep tags protected in that repo so they can't change. Each check runs through its run-check
 # action, which keeps the log for the Quality Gate PR comment.
 jobs:
   lint:
@@ -18,8 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: akhiakl/ci-workflows/setup-pnpm@1984db16417cc763ea3e0904bfca2533e0ab0869 # v1.1.0
-      - uses: akhiakl/ci-workflows@1984db16417cc763ea3e0904bfca2533e0ab0869 # v1.1.0
+      - uses: akhiakl/ci-workflows/setup-pnpm@v1.1.0
+      - uses: akhiakl/ci-workflows@v1.1.0
         id: lint
         continue-on-error: true
         with:
@@ -39,8 +39,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: akhiakl/ci-workflows/setup-pnpm@1984db16417cc763ea3e0904bfca2533e0ab0869 # v1.1.0
-      - uses: akhiakl/ci-workflows@1984db16417cc763ea3e0904bfca2533e0ab0869 # v1.1.0
+      - uses: akhiakl/ci-workflows/setup-pnpm@v1.1.0
+      - uses: akhiakl/ci-workflows@v1.1.0
         id: typecheck
         continue-on-error: true
         with:
@@ -63,8 +63,8 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v7
-      - uses: akhiakl/ci-workflows/setup-pnpm@1984db16417cc763ea3e0904bfca2533e0ab0869 # v1.1.0
-      - uses: akhiakl/ci-workflows@1984db16417cc763ea3e0904bfca2533e0ab0869 # v1.1.0
+      - uses: akhiakl/ci-workflows/setup-pnpm@v1.1.0
+      - uses: akhiakl/ci-workflows@v1.1.0
         id: test
         continue-on-error: true
         with:
@@ -89,8 +89,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: akhiakl/ci-workflows/setup-pnpm@1984db16417cc763ea3e0904bfca2533e0ab0869 # v1.1.0
-      - uses: akhiakl/ci-workflows@1984db16417cc763ea3e0904bfca2533e0ab0869 # v1.1.0
+      - uses: akhiakl/ci-workflows/setup-pnpm@v1.1.0
+      - uses: akhiakl/ci-workflows@v1.1.0
         id: build
         continue-on-error: true
         with:
@@ -110,14 +110,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: akhiakl/ci-workflows/setup-pnpm@1984db16417cc763ea3e0904bfca2533e0ab0869 # v1.1.0
-      - uses: akhiakl/ci-workflows/playwright-browsers@1984db16417cc763ea3e0904bfca2533e0ab0869 # v1.1.0
+      - uses: akhiakl/ci-workflows/setup-pnpm@v1.1.0
+      - uses: akhiakl/ci-workflows/playwright-browsers@v1.1.0
 
       - run: pnpm build
       # Starts the fake Upstash server and `next start`; API routes, map
       # tiles and the geocoder are mocked at the edge inside each test.
       # Includes axe (WCAG 2.1 AA) and no-sideways-scroll checks.
-      - uses: akhiakl/ci-workflows@1984db16417cc763ea3e0904bfca2533e0ab0869 # v1.1.0
+      - uses: akhiakl/ci-workflows@v1.1.0
         id: e2e
         continue-on-error: true
         env:
@@ -155,7 +155,7 @@ jobs:
       pull-requests: write
     steps:
       # One sticky comment listing what failed and why, per check.
-      - uses: akhiakl/ci-workflows/gate@1984db16417cc763ea3e0904bfca2533e0ab0869 # v1.1.0
+      - uses: akhiakl/ci-workflows/gate@v1.1.0
         with:
           marker: "<!-- grand-tour-quality-gate -->"
           title: Quality Gate
