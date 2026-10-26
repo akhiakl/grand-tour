@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const mail = <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>;
 
-// TODO(legal): name the production AI provider and the regions of Vercel,
+// TODO(legal): name the regions of Vercel,
 // Upstash, Sentry and Better Stack (and whether CERT-In's 180-day log rule
 // also expects the logs to stay in India), then have the policy reviewed by
 // an Indian tech lawyer before v1.0.0.
@@ -34,7 +34,7 @@ const PROCESSORS = [
     "Shared maps: 60 days after the last view. Counters: up to an hour",
   ],
   [
-    "Our AI model provider",
+    "Groq",
     "Turns your destination, trip length and pace into a draft route.",
     "We don't store your answers",
   ],
