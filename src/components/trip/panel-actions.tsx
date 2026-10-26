@@ -8,6 +8,7 @@ import {
   NotebookPen,
   Pencil,
   Plus,
+  Route,
   Share2,
 } from "lucide-react";
 import Link from "next/link";
@@ -131,6 +132,7 @@ export function SecondaryActions({
   onTool,
   onPoster,
   onCalendar,
+  onGpx,
   onEditRoute,
 }: {
   readonly variant: ExperienceVariant;
@@ -139,6 +141,8 @@ export function SecondaryActions({
   readonly onPoster: () => void;
   /** Present for dated trips: downloads the stops as calendar events. */
   readonly onCalendar?: () => void;
+  /** Downloads the route as GPX for navigation apps. */
+  readonly onGpx: () => void;
   readonly onEditRoute: () => void;
 }) {
   const t = useTranslations("Trip.actions");
@@ -165,6 +169,9 @@ export function SecondaryActions({
       <Tile icon={<ImageDown />} label={t("poster")} onClick={onPoster} />
       {onCalendar && (
         <Tile icon={<CalendarPlus />} label={t("calendar")} onClick={onCalendar} />
+      )}
+      {variant !== "demo" && (
+        <Tile icon={<Route />} label={t("gpx")} onClick={onGpx} />
       )}
     </nav>
   );

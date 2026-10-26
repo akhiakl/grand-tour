@@ -63,6 +63,13 @@ test("a dated shared trip shows its days, views and a calendar file", async ({
   expect(file.suggestedFilename()).toBe("danube-days.ics");
   const ics = await readFile((await file.path())!, "utf8");
   expect(ics.match(/BEGIN:VEVENT/g)).toHaveLength(3);
+
+  const gpxDownload = page.waitForEvent("download");
+  await page.getByRole("button", { name: "GPX" }).click();
+  const gpxFile = await gpxDownload;
+  expect(gpxFile.suggestedFilename()).toBe("danube-days.gpx");
+  const gpx = await readFile((await gpxFile.path())!, "utf8");
+  expect(gpx.match(/<wpt /g)).toHaveLength(3);
 });
 
 test("My Maps duplicates a trip and round-trips a backup file", async ({ page }) => {

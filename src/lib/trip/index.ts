@@ -10,6 +10,7 @@ export * from "./draft";
 export * from "./fingerprint";
 export * from "./geo";
 export * from "./history";
+export * from "./gpx";
 export * from "./ics";
 export * from "./leg-estimate";
 export * from "./local-store";

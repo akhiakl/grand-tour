@@ -20,7 +20,7 @@ import { PanelHead } from "./panel-head";
 import { PanelShell } from "./panel-shell";
 import { Itinerary, StatsGrid } from "./route-overview";
 import { SharedLinkNote } from "./shared-link-note";
-import { downloadTripCalendar } from "./trip-calendar";
+import { downloadTripCalendar, downloadTripGpx } from "./trip-calendar";
 
 // Neither is on screen at first paint: a stop's detail opens on demand and
 // the tools wait for idle, so their code stays out of the startup bundle.
@@ -168,6 +168,7 @@ export function TripPanel({
               onTool={openTool}
               onPoster={onPoster}
               onCalendar={dates ? () => downloadTripCalendar(trip) : undefined}
+              onGpx={() => downloadTripGpx(trip)}
               onEditRoute={onEditRoute}
             />
             <StatsGrid trip={trip} />
