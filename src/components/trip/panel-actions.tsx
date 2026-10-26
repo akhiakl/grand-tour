@@ -147,7 +147,10 @@ export function SecondaryActions({
 }) {
   const t = useTranslations("Trip.actions");
   return (
-    <nav aria-label={t("tools")} className="flex justify-between gap-1 [&>*]:flex-1">
+    <nav
+      aria-label={t("tools")}
+      className="grid grid-cols-3 gap-1 sm:flex sm:justify-between sm:[&>*]:flex-1"
+    >
       {variant === "demo" && (
         <Tile icon={<Pencil />} label={t("customize")} onClick={onEditRoute} />
       )}
