@@ -169,21 +169,17 @@ describe("TripExperience", () => {
     click.mockRestore();
   });
 
-  it("downloads the route as GPX for any trip", async () => {
-    const createObjectURL = vi.fn(() => "blob:gpx");
-    vi.stubGlobal(
-      "URL",
-      Object.assign(URL, { createObjectURL, revokeObjectURL: vi.fn() }),
-    );
-    const click = vi
-      .spyOn(HTMLAnchorElement.prototype, "click")
-      .mockImplementation(() => {});
+  it("opens the route in a maps app for any trip", async () => {
+    const open = vi.spyOn(window, "open").mockImplementation(() => null);
 
     render(<TripExperience trip={routeTrip()} actions="shared" />);
-    await userEvent.click(screen.getByRole("button", { name: "GPX" }));
-    expect(createObjectURL).toHaveBeenCalledOnce();
-    expect(click).toHaveBeenCalledOnce();
-    click.mockRestore();
+    await userEvent.click(screen.getByRole("button", { name: "Navigation" }));
+    expect(open).toHaveBeenCalledWith(
+      expect.stringContaining("https://www.google.com/maps/dir/?api=1"),
+      "_blank",
+      "noopener",
+    );
+    open.mockRestore();
   });
 
   it("shared mode: remix also forks a fresh copy (no localId)", async () => {

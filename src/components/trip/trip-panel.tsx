@@ -7,7 +7,7 @@ import { useEffect, useId, useState, type ReactNode } from "react";
 import { LegalLinks } from "@/components/legal/legal-links";
 import { ReportMapLink } from "@/components/legal/report-map-link";
 import { usePageIdle } from "@/hooks/use-page-idle";
-import { stopDates, type Trip, type TripToolsScope } from "@/lib/trip";
+import { stopDates, tripMapsUrl, type Trip, type TripToolsScope } from "@/lib/trip";
 
 import type { MapInsets } from "./fit-padding";
 import {
@@ -20,7 +20,7 @@ import { PanelHead } from "./panel-head";
 import { PanelShell } from "./panel-shell";
 import { Itinerary, StatsGrid } from "./route-overview";
 import { SharedLinkNote } from "./shared-link-note";
-import { downloadTripCalendar, downloadTripGpx } from "./trip-calendar";
+import { downloadTripCalendar } from "./trip-calendar";
 
 // Neither is on screen at first paint: a stop's detail opens on demand and
 // the tools wait for idle, so their code stays out of the startup bundle.
@@ -168,7 +168,7 @@ export function TripPanel({
               onTool={openTool}
               onPoster={onPoster}
               onCalendar={dates ? () => downloadTripCalendar(trip) : undefined}
-              onGpx={() => downloadTripGpx(trip)}
+              onNavigate={() => window.open(tripMapsUrl(trip), "_blank", "noopener")}
               onEditRoute={onEditRoute}
             />
             <StatsGrid trip={trip} />
