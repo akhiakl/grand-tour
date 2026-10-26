@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/akhiakl/grand-tour/compare/v0.3.1...v0.4.0) (2026-10-26)
+
+
+### Features
+
+* **trip:** open the route in Google Maps ([#93](https://github.com/akhiakl/grand-tour/issues/93)) ([8dedfc0](https://github.com/akhiakl/grand-tour/commit/8dedfc0a795f24ca8537fca7635b4f9d667baff0))
+
 ## [0.3.1](https://github.com/akhiakl/grand-tour/compare/v0.3.0...v0.3.1) (2026-10-26)
 
 
