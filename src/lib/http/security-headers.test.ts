@@ -25,6 +25,7 @@ describe("contentSecurityPolicy", () => {
       "https://photon.komoot.io",
       "https://*.userback.io",
     ]);
+    expect(directive(csp, "img-src")).toContain("https://*.basemaps.cartocdn.com");
     expect(directive(csp, "worker-src")).toEqual(["'self'", "blob:"]);
     expect(directive(csp, "frame-ancestors")).toEqual(["'none'"]);
     expect(directive(csp, "frame-src")).toEqual(["https://*.userback.io"]);

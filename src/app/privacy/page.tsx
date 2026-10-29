@@ -64,6 +64,11 @@ const PROCESSORS = [
     "Under OpenFreeMap's own policy",
   ],
   [
+    "CARTO",
+    "Serves fallback map tiles your browser loads only when your device can't run the main map (no WebGL2).",
+    "Under CARTO's own policy",
+  ],
+  [
     "Frankfurter",
     "Supplies exchange rates to our server. No personal data is sent.",
     "Not applicable",

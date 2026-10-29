@@ -37,3 +37,16 @@ export function resolveMapStyle(customUrl: string | undefined): MapStyle {
 
 // Referenced literally so Next.js inlines it into the client bundle.
 export const MAP_STYLE = resolveMapStyle(process.env.NEXT_PUBLIC_MAP_STYLE_URL);
+
+/**
+ * Raster Positron tiles for browsers where MapLibre can't start (no WebGL2,
+ * e.g. Safari with Lockdown Mode or an exhausted GPU context).
+ * shortcut: CARTO's free basemap terms, not cached offline by the service
+ * worker; self-host raster tiles or buy a plan if traffic grows.
+ */
+export const RASTER_FALLBACK = {
+  url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+  subdomains: "abcd",
+  attribution:
+    '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>',
+} as const;

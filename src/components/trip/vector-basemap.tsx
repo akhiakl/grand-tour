@@ -3,6 +3,7 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { maplibreGL } from "@maplibre/maplibre-gl-leaflet";
+import L from "leaflet";
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 import { useMap } from "react-leaflet";
@@ -11,7 +12,7 @@ import { toast } from "sonner";
 import "./maplibre";
 
 import { quietBasemap } from "./basemap-tweaks";
-import { MAP_STYLE } from "./map-style";
+import { MAP_STYLE, RASTER_FALLBACK } from "./map-style";
 
 const OFFLINE_TOAST_ID = "basemap-offline";
 
@@ -20,6 +21,7 @@ const OFFLINE_TOAST_ID = "basemap-offline";
  * pane, so the `--map-filter` theming and Leaflet overlays keep working.
  * When the style or tiles can't load, the paper background stays and one
  * toast offers a retry; the route and markers keep working regardless.
+ * When MapLibre can't start at all (no WebGL2), raster tiles take over.
  */
 export function VectorBasemap() {
   const map = useMap();
@@ -44,7 +46,7 @@ export function VectorBasemap() {
       // MapLibre couldn't start (e.g. no WebGL2). Leaflet already registered
       // the layer, and its stock onRemove would call `remove()` on the
       // missing MapLibre map when the map is torn down, so swap in a safe
-      // one and unregister it. The paper background and overlays stay.
+      // one and unregister it. Raster tiles stand in for the basemap.
       const broken = layer as unknown as {
         _container?: HTMLElement;
         onRemove: () => void;
@@ -53,9 +55,14 @@ export function VectorBasemap() {
         broken._container?.remove();
       };
       map.removeLayer(layer);
-      toast.error(downMessage, { id: OFFLINE_TOAST_ID, duration: Infinity });
+      const raster = L.tileLayer(RASTER_FALLBACK.url, {
+        subdomains: RASTER_FALLBACK.subdomains,
+        attribution: RASTER_FALLBACK.attribution,
+        detectRetina: true,
+        maxZoom: 12,
+      }).addTo(map);
       return () => {
-        toast.dismiss(OFFLINE_TOAST_ID);
+        raster.remove();
       };
     }
 

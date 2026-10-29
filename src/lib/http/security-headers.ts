@@ -17,6 +17,8 @@ export interface SecurityHeaderOptions {
 }
 
 const OPENFREEMAP = "https://tiles.openfreemap.org";
+// Raster fallback basemap for browsers without WebGL2.
+const CARTO_TILES = "https://*.basemaps.cartocdn.com";
 const PHOTON = "https://photon.komoot.io";
 const VERCEL_LIVE = "https://vercel.live";
 // The toolbar also loads avatars and icons from these.
@@ -64,6 +66,7 @@ export function contentSecurityPolicy(options: SecurityHeaderOptions): string {
       "'self'",
       "data:",
       "blob:",
+      CARTO_TILES,
       ...userback,
       ...preview,
       ...(options.vercelPreview ? VERCEL_TOOLBAR_IMAGES : []),

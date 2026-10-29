@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { DEFAULT_MAP_STYLE_URL, resolveMapStyle } from "./map-style";
+import {
+  DEFAULT_MAP_STYLE_URL,
+  RASTER_FALLBACK,
+  resolveMapStyle,
+} from "./map-style";
 
 describe("resolveMapStyle", () => {
   it.each([undefined, "", "   "])("uses public OpenFreeMap for %j", (value) => {
@@ -16,5 +20,12 @@ describe("resolveMapStyle", () => {
     expect(style.attribution).toContain("OpenStreetMap");
     expect(style.attribution).not.toContain("OpenFreeMap");
     expect(style.attributionText).toBe("© OpenStreetMap contributors");
+  });
+});
+
+describe("RASTER_FALLBACK", () => {
+  it("credits OpenStreetMap and CARTO", () => {
+    expect(RASTER_FALLBACK.attribution).toContain("OpenStreetMap");
+    expect(RASTER_FALLBACK.attribution).toContain("CARTO");
   });
 });

@@ -30,13 +30,16 @@ const mocks = vi.hoisted(() => {
     // Mirrors Leaflet: removing a loaded layer calls its onRemove.
     removeLayer: vi.fn((removed: { onRemove?: () => void }) => removed.onRemove?.()),
   };
+  const raster = { addTo: vi.fn(() => raster), remove: vi.fn() };
   return {
     handlers,
     basemap,
     layer,
     leafletMap,
     maplibreGL: vi.fn(() => layer),
+    tileLayer: vi.fn(() => raster),
     toast: { error: vi.fn(), dismiss: vi.fn() },
+    raster,
   };
 });
 
@@ -44,6 +47,9 @@ vi.mock("maplibre-gl/dist/maplibre-gl.css", () => ({}));
 vi.mock("./maplibre", () => ({}));
 vi.mock("@maplibre/maplibre-gl-leaflet", () => ({ maplibreGL: mocks.maplibreGL }));
 vi.mock("react-leaflet", () => ({ useMap: () => mocks.leafletMap }));
+vi.mock("leaflet", () => ({
+  default: { tileLayer: mocks.tileLayer },
+}));
 vi.mock("sonner", () => ({ toast: mocks.toast }));
 
 beforeEach(() => {
@@ -136,15 +142,32 @@ describe("VectorBasemap", () => {
       expect(mocks.leafletMap.removeLayer).toHaveBeenCalledWith(mocks.layer);
       expect(container.isConnected).toBe(false);
       expect(() => mocks.layer.onRemove?.()).not.toThrow();
-      expect(mocks.leafletMap.attributionControl.addAttribution).not.toHaveBeenCalled();
+      expect(
+        mocks.leafletMap.attributionControl.addAttribution,
+      ).not.toHaveBeenCalled();
     });
 
-    it("shows the offline toast without a retry action", () => {
+    it("shows raster tiles instead of an empty map, and removes them on unmount", () => {
+      const { unmount } = render(<VectorBasemap />);
+
+      expect(mocks.tileLayer).toHaveBeenCalledWith(
+        expect.stringContaining("basemaps.cartocdn.com"),
+        expect.objectContaining({ attribution: expect.stringContaining("CARTO") }),
+      );
+      expect(mocks.raster.addTo).toHaveBeenCalledWith(mocks.leafletMap);
+      expect(mocks.toast.error).not.toHaveBeenCalled();
+
+      unmount();
+
+      expect(mocks.raster.remove).toHaveBeenCalled();
+    });
+
+    it("does not add raster tiles when MapLibre starts", () => {
+      mocks.layer.addTo.mockImplementation(() => undefined);
+
       render(<VectorBasemap />);
 
-      expect(mocks.toast.error).toHaveBeenCalledTimes(1);
-      const [, options] = mocks.toast.error.mock.calls[0];
-      expect(options.action).toBeUndefined();
+      expect(mocks.tileLayer).not.toHaveBeenCalled();
     });
 
     it("treats a missing MapLibre map as a failed start", () => {
@@ -154,15 +177,15 @@ describe("VectorBasemap", () => {
       render(<VectorBasemap />);
 
       expect(mocks.leafletMap.removeLayer).toHaveBeenCalledWith(mocks.layer);
-      expect(mocks.toast.error).toHaveBeenCalledTimes(1);
+      expect(mocks.tileLayer).toHaveBeenCalledTimes(1);
     });
 
-    it("only dismisses the toast on unmount", () => {
+    it("only removes the raster layer on unmount", () => {
       const { unmount } = render(<VectorBasemap />);
 
       unmount();
 
-      expect(mocks.toast.dismiss).toHaveBeenCalled();
+      expect(mocks.raster.remove).toHaveBeenCalled();
       expect(mocks.layer.remove).not.toHaveBeenCalled();
       expect(mocks.basemap.off).not.toHaveBeenCalled();
     });
