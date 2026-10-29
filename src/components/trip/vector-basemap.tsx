@@ -8,6 +8,8 @@ import { useEffect } from "react";
 import { useMap } from "react-leaflet";
 import { toast } from "sonner";
 
+import { captureError } from "@/lib/monitoring";
+
 import "./maplibre";
 
 import { quietBasemap } from "./basemap-tweaks";
@@ -32,10 +34,37 @@ export function VectorBasemap() {
       style: MAP_STYLE.url,
       attributionControl: false,
     });
-    layer.addTo(map);
-    map.attributionControl?.addAttribution(MAP_STYLE.attribution);
+    let startupError: unknown;
+    try {
+      layer.addTo(map);
+    } catch (error) {
+      startupError = error;
+    }
 
-    const basemap = layer.getMaplibreMap();
+    const basemap = startupError ? undefined : layer.getMaplibreMap();
+    if (!basemap) {
+      // MapLibre couldn't start (e.g. no WebGL2). Leaflet already registered
+      // the layer, and its stock onRemove would call `remove()` on the
+      // missing MapLibre map when the map is torn down, so swap in a safe
+      // one and unregister it. The paper background and overlays stay.
+      captureError(
+        startupError ?? new Error("MapLibre basemap failed to initialise"),
+      );
+      const broken = layer as unknown as {
+        _container?: HTMLElement;
+        onRemove: () => void;
+      };
+      broken.onRemove = () => {
+        broken._container?.remove();
+      };
+      map.removeLayer(layer);
+      toast.error(downMessage, { id: OFFLINE_TOAST_ID, duration: Infinity });
+      return () => {
+        toast.dismiss(OFFLINE_TOAST_ID);
+      };
+    }
+
+    map.attributionControl?.addAttribution(MAP_STYLE.attribution);
     const onError = () => {
       // Once the style is up, errors are per-tile hiccups the map rides
       // out on its own; only a style that never arrived means an outage.
