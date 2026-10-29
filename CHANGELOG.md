@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.3](https://github.com/akhiakl/grand-tour/compare/v0.5.2...v0.5.3) (2026-10-29)
+
+
+### Bug Fixes
+
+* **map:** fall back to raster tiles when WebGL2 is unavailable ([#101](https://github.com/akhiakl/grand-tour/issues/101)) ([160e111](https://github.com/akhiakl/grand-tour/commit/160e111cc7e7e07172231c2172983668b23bb637))
+
 ## [0.5.2](https://github.com/akhiakl/grand-tour/compare/v0.5.1...v0.5.2) (2026-10-26)
 
 
