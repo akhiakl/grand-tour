@@ -8,8 +8,6 @@ import { useEffect } from "react";
 import { useMap } from "react-leaflet";
 import { toast } from "sonner";
 
-import { captureError } from "@/lib/monitoring";
-
 import "./maplibre";
 
 import { quietBasemap } from "./basemap-tweaks";
@@ -34,22 +32,19 @@ export function VectorBasemap() {
       style: MAP_STYLE.url,
       attributionControl: false,
     });
-    let startupError: unknown;
+    let started = true;
     try {
       layer.addTo(map);
-    } catch (error) {
-      startupError = error;
+    } catch {
+      started = false;
     }
 
-    const basemap = startupError ? undefined : layer.getMaplibreMap();
+    const basemap = started ? layer.getMaplibreMap() : undefined;
     if (!basemap) {
       // MapLibre couldn't start (e.g. no WebGL2). Leaflet already registered
       // the layer, and its stock onRemove would call `remove()` on the
       // missing MapLibre map when the map is torn down, so swap in a safe
       // one and unregister it. The paper background and overlays stay.
-      captureError(
-        startupError ?? new Error("MapLibre basemap failed to initialise"),
-      );
       const broken = layer as unknown as {
         _container?: HTMLElement;
         onRemove: () => void;
