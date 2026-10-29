@@ -152,7 +152,11 @@ describe("VectorBasemap", () => {
 
       expect(mocks.tileLayer).toHaveBeenCalledWith(
         expect.stringContaining("basemaps.cartocdn.com"),
-        expect.objectContaining({ attribution: expect.stringContaining("CARTO") }),
+        expect.objectContaining({
+          attribution: expect.stringContaining("CARTO"),
+          // Retina lowers maxZoom by one; the map itself goes up to 12.
+          maxZoom: 13,
+        }),
       );
       expect(mocks.raster.addTo).toHaveBeenCalledWith(mocks.leafletMap);
       expect(mocks.toast.error).not.toHaveBeenCalled();

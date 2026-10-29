@@ -59,7 +59,8 @@ export function VectorBasemap() {
         subdomains: RASTER_FALLBACK.subdomains,
         attribution: RASTER_FALLBACK.attribution,
         detectRetina: true,
-        maxZoom: 12,
+        // detectRetina lowers maxZoom by one on retina screens; the map goes to 12.
+        maxZoom: 13,
       }).addTo(map);
       return () => {
         raster.remove();
