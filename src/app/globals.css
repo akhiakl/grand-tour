@@ -1,3 +1,8 @@
+/* Hallmark · checked: 2026-10-31 · genre: editorial (inferred) · brand: field atlas (kept)
+ * waive 38i · the italic accent word is the brand's display voice (CLAUDE.md)
+ * waive 29 · .frost is the house surface for the single atlas card
+ * waive 44d · trip views pin the atlas card top-left over a full-bleed map by design
+ * built: the project · redesign: polish · v2.0.0 */
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -37,7 +42,8 @@
   --destructive: #a83a32;
   --destructive-foreground: #fdf9f2;
   --border: var(--line);
-  --input: var(--line);
+  /* Field edges: a 3:1 boundary against the surface (WCAG 1.4.11). */
+  --input: color-mix(in srgb, var(--ink-soft) 65%, var(--paper));
   --ring: var(--brass);
 
   --radius: 1rem;
@@ -113,6 +119,16 @@
   --ease-atlas: var(--ease-atlas);
 }
 
+html,
+body {
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--ink);
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -147,12 +163,10 @@ input[type="range"] {
     box-shadow: var(--shadow-soft);
   }
 
-  /* Eyebrow label — small brass wayfinding caption. */
+  /* Eyebrow label — small brass wayfinding caption, sentence case. */
   .eyebrow {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 600;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
     color: var(--brass-text);
   }
 }
@@ -232,11 +246,12 @@ input[type="range"] {
 .atlas-map .leaflet-control-attribution {
   background: color-mix(in srgb, var(--paper) 78%, transparent);
   color: var(--ink-soft);
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .atlas-map .leaflet-control-attribution a {
-  color: var(--azure);
+  color: var(--ink-soft);
+  text-decoration: underline;
 }
 
 /* The route — brass, dashed, with a marching-ants drift.

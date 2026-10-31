@@ -13,7 +13,7 @@ function Toaster({ ...props }: ToasterProps) {
       toastOptions={{
         classNames: {
           toast:
-            "group toast frost !rounded-2xl !border-line !bg-popover !text-foreground !shadow-soft",
+            "group toast frost outline-none focus-visible:ring-2 focus-visible:ring-ring !rounded-2xl !border-line !bg-popover !text-foreground !shadow-soft",
           description: "!text-muted-foreground",
           // Same pairing as the brass Button: ink on brass passes AA contrast.
           actionButton: "!bg-brass !text-ink dark:!text-paper",

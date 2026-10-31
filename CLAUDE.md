@@ -129,8 +129,8 @@ Follow exactly; tokens live in `src/app/globals.css`:
   other content cards over it.
 - Surfaces: `.frost` (backdrop-blur 18px, 1px `--line` border, radius
   14–20px, soft long shadow) for dialogs; small map overlays use solid
-  `bg-card-solid`. Labels: `.eyebrow` (10px, tracking .28em,
-  uppercase, brass).
+  `bg-card-solid`. Labels: `.eyebrow` (12px, semibold, brass, sentence
+  case, untracked); never tracked capitals for labels, captions or tabs.
 - Motion: Framer Motion with `cubic-bezier(.32,.72,.24,1)` (`--ease-atlas`);
   always respect `prefers-reduced-motion`.
 - Map: OpenFreeMap positron vector tiles (MapLibre in Leaflet; open source,
