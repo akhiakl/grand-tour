@@ -121,7 +121,7 @@ export function EditorHeader({
           value={title}
           maxLength={80}
           onChange={(e) => onTitleChange(e.target.value)}
-          className="-mx-2 h-auto border-none bg-transparent px-2 font-display text-section font-medium tracking-tight shadow-none"
+          className="h-auto rounded-none border-0 border-b-2 border-input bg-transparent px-0 pb-1 font-display text-section font-medium tracking-tight shadow-none focus-visible:border-brass focus-visible:ring-0"
         />
         {titleError && <FieldError id="trip-title-error" message={titleError} />}
         <StartDateField
