@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.1](https://github.com/akhiakl/grand-tour/compare/v0.6.0...v0.6.1) (2026-10-31)
+
+
+### Bug Fixes
+
+* **monitoring:** stop reporting Userback refusals and preview-toolbar errors ([#112](https://github.com/akhiakl/grand-tour/issues/112)) ([86d358e](https://github.com/akhiakl/grand-tour/commit/86d358edb9be260d38211324c4dbfeb9a7a591b8))
+
 ## [0.6.0](https://github.com/akhiakl/grand-tour/compare/v0.5.3...v0.6.0) (2026-10-31)
 
 
