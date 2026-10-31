@@ -1,37 +1,34 @@
-import { MessageSquareText, Route, Share2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-const STEPS = [
-  { icon: MessageSquareText, key: "describe" },
-  { icon: Route, key: "shape" },
-  { icon: Share2, key: "share" },
-] as const;
+const STEPS = ["describe", "shape", "share"] as const;
 
 /** The three steps from idea to shared map, in order. */
 export function HowItWorks() {
   const t = useTranslations("About.how");
   return (
-    <section aria-labelledby="how-title" className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
+    <section aria-labelledby="how-title" className="page-container">
+      <div className="flex max-w-3xl flex-col gap-4">
         <p className="eyebrow">{t("eyebrow")}</p>
         <h2
           id="how-title"
-          className="font-display text-3xl font-medium tracking-tight"
+          className="font-display text-section font-medium tracking-tight text-balance text-ink"
         >
           {t("title")}
         </h2>
       </div>
-      <ol className="grid gap-4 sm:grid-cols-3">
-        {STEPS.map(({ icon: Icon, key }, i) => (
-          <li key={key} className="frost flex flex-col gap-2 rounded-2xl p-5">
-            <span className="flex items-center gap-2 text-brass-text">
-              <Icon aria-hidden className="size-4" />
-              <span className="eyebrow">{t("step", { number: i + 1 })}</span>
+      <ol className="mt-14 grid gap-12 md:grid-cols-3 md:gap-8">
+        {STEPS.map((key, i) => (
+          <li key={key} className="flex flex-col gap-3 border-t border-line pt-6">
+            <span
+              aria-hidden
+              className="font-display text-section text-brass-text italic"
+            >
+              {i + 1}
             </span>
-            <h3 className="font-display text-xl font-medium text-ink">
+            <h3 className="font-display text-title font-medium text-ink">
               {t(`${key}.title`)}
             </h3>
-            <p className="text-sm text-ink-soft">{t(`${key}.body`)}</p>
+            <p className="max-w-[38ch] text-ink-soft">{t(`${key}.body`)}</p>
           </li>
         ))}
       </ol>
