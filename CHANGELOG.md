@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.6.0](https://github.com/akhiakl/grand-tour/compare/v0.5.3...v0.6.0) (2026-10-31)
+
+
+### Features
+
+* **design:** recompose /about and /plan on the page type scale ([#106](https://github.com/akhiakl/grand-tour/issues/106)) ([1c74037](https://github.com/akhiakl/grand-tour/commit/1c740379f38999bec276d750a6a480cc930207c1))
+* **design:** set the legal and contact pages on the page scale ([#108](https://github.com/akhiakl/grand-tour/issues/108)) ([0c46bb7](https://github.com/akhiakl/grand-tour/commit/0c46bb7b64e677a2172b74cc0f3397115ce5d6c2))
+* **design:** widen the editor and My Maps onto the page scale ([#107](https://github.com/akhiakl/grand-tour/issues/107)) ([ea0b13a](https://github.com/akhiakl/grand-tour/commit/ea0b13a20e5ff09b1e3f372c2289768e0db5e619))
+
+
+### Bug Fixes
+
+* **a11y:** give the editor title field a visible 3:1 edge ([#109](https://github.com/akhiakl/grand-tour/issues/109)) ([e5123bc](https://github.com/akhiakl/grand-tour/commit/e5123bc67029f15cce8172bdfba7537cdca5452d))
+* **design:** bring the field-atlas system up to the Hallmark floor ([#105](https://github.com/akhiakl/grand-tour/issues/105)) ([2cccf60](https://github.com/akhiakl/grand-tour/commit/2cccf6045f1b24bd6cff8a3f46f36e43d945c0d2))
+* **design:** clear the remaining Hallmark audit findings ([#110](https://github.com/akhiakl/grand-tour/issues/110)) ([3c1983b](https://github.com/akhiakl/grand-tour/commit/3c1983b3663c6467f5ac1730eb83f5feca9cb947))
+* harden calendar export, trip bounds and CSP ([#103](https://github.com/akhiakl/grand-tour/issues/103)) ([146e0d6](https://github.com/akhiakl/grand-tour/commit/146e0d655b8dce198984eb9119e0ed137e41d734))
+
 ## [0.5.3](https://github.com/akhiakl/grand-tour/compare/v0.5.2...v0.5.3) (2026-10-29)
 
 
