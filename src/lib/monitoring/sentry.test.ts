@@ -56,6 +56,18 @@ describe("captureError", () => {
       { name: "Dedupe" },
     ]);
   });
+
+  it("ignores errors from the Vercel preview toolbar", async () => {
+    vi.stubEnv("NEXT_PUBLIC_SENTRY_DSN", DSN);
+    const { captureError } = await load();
+    captureError(new Error("boom"));
+    await flush();
+    const { denyUrls } = sentry.init.mock.calls[0][0];
+    const denied = (url: string) =>
+      denyUrls.some((pattern: RegExp) => pattern.test(url));
+    expect(denied("https://x.vercel.app/_next-live/feedback/593.js")).toBe(true);
+    expect(denied("https://x.vercel.app/_next/static/chunks/app.js")).toBe(false);
+  });
 });
 
 describe("captureError when the SDK can't download", () => {
