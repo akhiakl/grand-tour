@@ -98,7 +98,7 @@ export function TripCard({
       </Link>
 
       <CardHeader>
-        <CardTitle>{record.trip.title}</CardTitle>
+        <CardTitle className="text-title">{record.trip.title}</CardTitle>
         <p className="text-sm text-muted-foreground">
           {t("summary", {
             stops: stats.cities,

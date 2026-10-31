@@ -17,7 +17,7 @@ export function RoutePreview({ cities }: { readonly cities: City[] }) {
   return (
     <svg
       viewBox={`0 0 ${BOX.width} ${BOX.height}`}
-      className="h-28 w-full rounded-lg bg-secondary"
+      className="aspect-[5/2] h-auto w-full rounded-lg bg-secondary"
       aria-hidden
     >
       <path
