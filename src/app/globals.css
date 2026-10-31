@@ -279,6 +279,8 @@ input[type="range"] {
 }
 
 .atlas-map .leaflet-control-attribution a {
+  display: inline-block;
+  padding-block: 5px;
   color: var(--ink-soft);
   text-decoration: underline;
 }
@@ -313,8 +315,12 @@ input[type="range"] {
   background: transparent;
 }
 
+/* The anchor is a 24px hit target (WCAG 2.5.8) centred on the stop;
+   the dot and label hang from its centre. */
 .marker {
-  position: relative;
+  position: absolute;
+  top: 12px;
+  left: 12px;
 }
 
 .marker-dot {
