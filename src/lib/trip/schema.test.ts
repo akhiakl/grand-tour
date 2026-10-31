@@ -2,7 +2,13 @@ import { describe, expect, it } from "vitest";
 
 import { makeCity, makeLeg, makeTrip } from "@/test/fixtures/trip";
 
-import { CitySchema, GUEST_MAX_CITIES, LegSchema, TripSchema } from "./schema";
+import {
+  CitySchema,
+  GUEST_MAX_CITIES,
+  LegSchema,
+  MAX_DAILY_BUDGET_USD,
+  TripSchema,
+} from "./schema";
 
 describe("CitySchema", () => {
   it("accepts a fully populated city", () => {
@@ -13,6 +19,31 @@ describe("CitySchema", () => {
     expect(CitySchema.safeParse(makeCity({ ll: [48.2] as never })).success).toBe(
       false,
     );
+  });
+
+  it("rejects coordinates off the globe", () => {
+    for (const ll of [
+      [90.1, 0],
+      [-90.1, 0],
+      [0, 180.1],
+      [0, -180.1],
+      [1e300, 0],
+    ] as [number, number][]) {
+      expect(CitySchema.safeParse(makeCity({ ll })).success).toBe(false);
+    }
+    expect(CitySchema.safeParse(makeCity({ ll: [-90, 180] })).success).toBe(true);
+  });
+
+  it("rejects negative or absurd daily budgets", () => {
+    expect(CitySchema.safeParse(makeCity({ budget: [-1, 100] })).success).toBe(
+      false,
+    );
+    expect(CitySchema.safeParse(makeCity({ budget: [0, 1e300] })).success).toBe(
+      false,
+    );
+    expect(
+      CitySchema.safeParse(makeCity({ budget: [0, MAX_DAILY_BUDGET_USD] })).success,
+    ).toBe(true);
   });
 
   it("rejects fractional or out-of-range nights", () => {

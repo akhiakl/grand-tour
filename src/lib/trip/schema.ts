@@ -9,6 +9,11 @@ export const MAX_TRIP_PAYLOAD_BYTES = 50 * 1024;
 /** Shared snapshots stay live this long after their most recent visit. */
 export const SHARE_TTL_DAYS = 60;
 
+/** Upper bound for a per-day budget figure (USD); keeps shared maps renderable. */
+export const MAX_DAILY_BUDGET_USD = 100_000;
+
+const BudgetAmount = z.number().min(0).max(MAX_DAILY_BUDGET_USD);
+
 /** Every trip starts life named after the app itself. */
 export const DEFAULT_TRIP_TITLE = "Grand Tour";
 
@@ -16,7 +21,7 @@ export const CitySchema = z.object({
   name: z.string().trim().min(1).max(60),
   country: z.string().max(60),
   flag: z.string().max(8), // emoji
-  ll: z.tuple([z.number(), z.number()]),
+  ll: z.tuple([z.number().min(-90).max(90), z.number().min(-180).max(180)]), // [lat, lng]
   nights: z.number().int().min(0).max(30),
   why: z.string().max(500),
   must: z.array(z.string().max(80)).max(10),
@@ -25,7 +30,7 @@ export const CitySchema = z.object({
   days: z
     .array(z.tuple([z.string().max(20), z.string().max(60), z.string().max(300)]))
     .max(10),
-  budget: z.tuple([z.number(), z.number()]), // USD/day range (display converts per viewer)
+  budget: z.tuple([BudgetAmount, BudgetAmount]), // USD/day range (display converts per viewer)
   transport: z.string().max(120),
   stay: z.string().max(300),
   tips: z.array(z.string().max(200)).max(6),

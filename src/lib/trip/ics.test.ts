@@ -52,4 +52,14 @@ describe("tripIcs", () => {
     expect(unfolded).toContain(String.raw`DESCRIPTION:Line one\;\nline two — é`);
     expect(unfolded.match(/DESCRIPTION:/g)).toHaveLength(1);
   });
+
+  it("escapes a lone carriage return so it cannot start a new property", () => {
+    const trip = makeTrip(2, {
+      startDate: "2027-05-01",
+      title: "Alps\rURL:https://example.com",
+    });
+    const ics = tripIcs(trip, NOW)!;
+    expect(ics.replace(/\r\n/g, "")).not.toMatch(/\r/);
+    expect(ics).toContain(String.raw`X-WR-CALNAME:Alps\nURL:https://example.com`);
+  });
 });

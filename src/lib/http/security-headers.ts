@@ -14,6 +14,8 @@ export interface SecurityHeaderOptions {
   sentryDsn?: string;
   /** Vercel preview deployments inject the vercel.live toolbar. */
   vercelPreview: boolean;
+  /** `NEXT_PUBLIC_USERBACK_TOKEN` is set; the tester widget needs its hosts. */
+  userback?: boolean;
 }
 
 const OPENFREEMAP = "https://tiles.openfreemap.org";
@@ -39,9 +41,12 @@ function originOf(url: string | undefined): string | null {
   }
 }
 
+/** An empty source list reads as "block everything"; say so explicitly. */
+const orNone = (sources: string[]) => (sources.length ? sources : ["'none'"]);
+
 export function contentSecurityPolicy(options: SecurityHeaderOptions): string {
   const preview = options.vercelPreview ? [VERCEL_LIVE] : [];
-  const userback = [USERBACK];
+  const userback = options.userback ? [USERBACK] : [];
   const connect = [
     "'self'",
     originOf(options.mapStyleUrl) ?? OPENFREEMAP,
@@ -81,7 +86,7 @@ export function contentSecurityPolicy(options: SecurityHeaderOptions): string {
     "connect-src": connect,
     // MapLibre boots its worker from a blob: wrapper around the bundled file.
     "worker-src": ["'self'", "blob:"],
-    "frame-src": [...userback, ...preview],
+    "frame-src": orNone([...userback, ...preview]),
     "object-src": ["'none'"],
     "base-uri": ["'self'"],
     "form-action": ["'self'"],
