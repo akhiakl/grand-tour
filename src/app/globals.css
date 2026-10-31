@@ -52,6 +52,7 @@
   --shadow-soft: 0 20px 60px -20px rgba(22, 35, 58, 0.25);
   --ease-atlas: cubic-bezier(0.32, 0.72, 0.24, 1);
   --map-filter: saturate(0.55) contrast(1.02) brightness(1.02);
+  --page-gutter: 1rem;
 }
 
 .dark {
@@ -138,10 +139,6 @@
   width: 100%;
   max-width: 1440px;
   padding-inline: var(--page-gutter);
-}
-
-:root {
-  --page-gutter: 1rem;
 }
 
 @media (width >= 40rem) {
