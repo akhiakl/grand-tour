@@ -9,7 +9,7 @@ import { usePageIdle } from "@/hooks/use-page-idle";
 // Matches the dialog trigger's look; importing that file would pull the
 // dialog (Radix Select, Dialog, the currency list) into the startup bundle.
 const TRIGGER_CLASS =
-  "grid size-9 shrink-0 place-items-center rounded-full border border-line text-ink-soft [&_svg]:size-4";
+  "grid size-10 shrink-0 place-items-center rounded-full border border-line text-ink-soft [&_svg]:size-4";
 
 function Placeholder() {
   const t = useTranslations("Units");

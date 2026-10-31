@@ -58,7 +58,7 @@ function StartDateField({
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? "trip-start-error" : "trip-start-hint"}
           onChange={(e) => onChange(e.target.value)}
-          className="h-8 w-auto"
+          className="h-10 w-auto"
         />
         {!error && (
           <span id="trip-start-hint" className="text-xs">
