@@ -250,7 +250,7 @@ function EditorWorkspace() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="page-container py-8 lg:py-12">
       <EditorHeader
         title={draft.title}
         onTitleChange={(title) => update((d) => updateTitle(d, title), "title")}
@@ -267,7 +267,7 @@ function EditorWorkspace() {
         startDateError={issues.startDate && t(`issues.${issues.startDate}`)}
       />
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_26rem]">
+      <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-10">
         <StopList
           cities={draft.cities}
           keys={draft.keys}
@@ -297,7 +297,7 @@ function EditorWorkspace() {
         {/* On mobile this column dissolves into the grid: the map leads,
             the redraft card follows the stops. */}
         <div className="contents lg:sticky lg:top-8 lg:flex lg:flex-col lg:gap-4 lg:self-start">
-          <div className="relative isolate order-first h-64 overflow-hidden rounded-2xl border border-line lg:order-none lg:h-[32rem]">
+          <div className="relative isolate order-first h-64 overflow-hidden rounded-2xl border border-line lg:order-none lg:h-[min(40rem,calc(100dvh-6rem))]">
             <EditorMapPreview
               draft={draft}
               ghostNames={ghostNames}
