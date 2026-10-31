@@ -21,7 +21,9 @@ export function TesterFeedback() {
     void (async () => {
       try {
         const { default: Userback } = await import("@userback/widget");
-        if (!cancelled) void Userback(TOKEN);
+        // Awaited so a refused token (wrong token, or a domain Userback
+        // doesn't allow) lands in the catch, not in error reporting.
+        if (!cancelled) await Userback(TOKEN);
       } catch (error) {
         console.warn("Userback widget failed to load", error);
       }

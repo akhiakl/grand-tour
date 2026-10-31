@@ -49,4 +49,19 @@ describe("TesterFeedback", () => {
     await waitFor(() => expect(warn).toHaveBeenCalled());
     warn.mockRestore();
   });
+
+  it("warns instead of rejecting when Userback refuses the token", async () => {
+    vi.stubEnv("NEXT_PUBLIC_USERBACK_TOKEN", "tok_123");
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const rejections: unknown[] = [];
+    const onRejection = (reason: unknown) => rejections.push(reason);
+    process.on("unhandledRejection", onRejection);
+    mocks.userback.mockRejectedValue(new Error("Invalid server response"));
+    await mount();
+    await waitFor(() => expect(warn).toHaveBeenCalled());
+    await new Promise((r) => setTimeout(r, 20));
+    process.off("unhandledRejection", onRejection);
+    expect(rejections).toEqual([]);
+    warn.mockRestore();
+  });
 });

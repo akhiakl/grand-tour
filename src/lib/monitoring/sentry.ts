@@ -16,6 +16,8 @@ function loadSentry(): Promise<SentryModule | undefined> {
         // would report them twice.
         integrations: (defaults) =>
           defaults.filter((integration) => integration.name !== "GlobalHandlers"),
+        // Vercel's preview comment toolbar is not our code.
+        denyUrls: [/\/_next-live\//],
       });
       return sentry;
     })
