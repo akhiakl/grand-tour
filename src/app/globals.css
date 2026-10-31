@@ -2,6 +2,8 @@
  * waive 38i · the italic accent word is the brand's display voice (CLAUDE.md)
  * waive 29 · .frost is the house surface for the single atlas card
  * waive 44d · trip views pin the atlas card top-left over a full-bleed map by design
+ * redesign: full on /about (hero: Stage, steps, showcase, rows, band) and /plan (app scope, split)
+ * dropped "Field notes" over the /about hero · 58 names it; other copy kept, 58 reads as a note
  * built: the project · redesign: polish · v2.0.0 */
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -117,6 +119,33 @@
   --shadow-soft: var(--shadow-soft);
 
   --ease-atlas: var(--ease-atlas);
+
+  /* Page type scale (scrolling pages): sizes at 1440, fluid below. */
+  --text-display: clamp(3rem, 2rem + 3.6vw, 5.25rem);
+  --text-display--line-height: 1.02;
+  --text-section: clamp(2.25rem, 1.5rem + 2vw, 3.25rem);
+  --text-section--line-height: 1.08;
+  --text-title: clamp(1.25rem, 1rem + 0.6vw, 1.5625rem);
+  --text-title--line-height: 1.2;
+  --text-lead: clamp(1.125rem, 1rem + 0.35vw, 1.3125rem);
+  --text-lead--line-height: 1.5;
+}
+
+/* One centred, capped container for the scrolling pages: the gutters grow
+   past 1440, the measure does not. */
+@utility page-container {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 1440px;
+  padding-inline: 1rem;
+
+  @media (width >= 40rem) {
+    padding-inline: 2rem;
+  }
+
+  @media (width >= 64rem) {
+    padding-inline: 4rem;
+  }
 }
 
 html,

@@ -518,7 +518,6 @@
     }
   },
   "About": {
-    "eyebrow": "Field notes",
     "title": "Every journey deserves a map <em>worth sharing</em>",
     "lede": "Grand Tour turns a trip idea into an interactive route map: cities, nights, trains and flights, drawn by AI or by hand. Free, and no account needed.",
     "planWithAi": "Plan with AI",
@@ -535,7 +534,6 @@
     "how": {
       "eyebrow": "How it works",
       "title": "From a hunch to a shared map in minutes",
-      "step": "Step {number}",
       "describe": {
         "title": "Describe",
         "body": "Tell the AI planner where, how long and what pace, or add cities by hand."

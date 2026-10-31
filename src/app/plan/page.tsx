@@ -21,20 +21,28 @@ export default async function PlanPage({
   const t = await getTranslations("Plan");
   const common = await getTranslations("Common");
   return (
-    <main className="mx-auto flex min-h-dvh max-w-xl flex-col gap-8 px-4 py-10 sm:px-6">
-      <header className="flex flex-col gap-2">
-        <Link
-          href="/"
-          className="eyebrow inline-flex w-fit items-center gap-1 text-muted-foreground transition-colors hover:text-brass-text"
-        >
-          <ArrowLeft className="size-3" /> {common("backToAtlas")}
-        </Link>
-        <h1 className="font-display text-4xl font-medium tracking-tight text-ink">
-          {t.rich("title", { em: accent })}
-        </h1>
-        <p className="text-sm text-ink-soft">{t("lede")}</p>
-      </header>
-      <AiChat initialDestination={destinationFromParam(destination)} />
-    </main>
+    <div className="flex min-h-dvh flex-col">
+      <nav aria-label={common("backToAtlas")} className="page-container">
+        <div className="flex h-16 items-center">
+          <Link
+            href="/"
+            className="eyebrow inline-flex items-center gap-1.5 rounded-sm text-muted-foreground transition-colors outline-none hover:text-brass-text focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <ArrowLeft aria-hidden className="size-3.5" /> {common("backToAtlas")}
+          </Link>
+        </div>
+      </nav>
+      <main className="page-container grid flex-1 content-start gap-10 py-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16 lg:py-16">
+        <header className="flex flex-col gap-4 lg:sticky lg:top-16 lg:self-start">
+          <h1 className="font-display text-section font-medium tracking-tight text-balance text-ink">
+            {t.rich("title", { em: accent })}
+          </h1>
+          <p className="max-w-[40ch] text-lead text-ink-soft">{t("lede")}</p>
+        </header>
+        <div className="min-w-0">
+          <AiChat initialDestination={destinationFromParam(destination)} />
+        </div>
+      </main>
+    </div>
   );
 }
