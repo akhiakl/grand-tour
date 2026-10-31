@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.2](https://github.com/akhiakl/grand-tour/compare/v0.6.1...v0.6.2) (2026-10-31)
+
+
+### Bug Fixes
+
+* **e2e:** answer the fake Upstash in raw form unless base64 is asked for ([#114](https://github.com/akhiakl/grand-tour/issues/114)) ([c2e4cc9](https://github.com/akhiakl/grand-tour/commit/c2e4cc982ff4b83bf5edddaf9f8888816148266c))
+
 ## [0.6.1](https://github.com/akhiakl/grand-tour/compare/v0.6.0...v0.6.1) (2026-10-31)
 
 
