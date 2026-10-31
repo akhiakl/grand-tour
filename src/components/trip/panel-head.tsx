@@ -25,7 +25,7 @@ function ThemeToggle() {
       type="button"
       aria-label={isDark ? t("toLight") : t("toDark")}
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="grid size-9 shrink-0 place-items-center rounded-full border border-line text-ink-soft transition-colors outline-none hover:bg-accent hover:text-ink focus-visible:ring-2 focus-visible:ring-ring [&_svg]:size-4"
+      className="grid size-10 shrink-0 place-items-center rounded-full border border-line text-ink-soft transition-colors outline-none hover:bg-accent hover:text-ink focus-visible:ring-2 focus-visible:ring-ring [&_svg]:size-4"
     >
       {isDark ? <Sun /> : <Moon />}
     </button>
@@ -51,7 +51,7 @@ function CollapseToggle({
       aria-label={collapsed ? t("expandCard") : t("collapseCard")}
       title={collapsed ? t("expandHint") : t("collapseHint")}
       onClick={onToggle}
-      className="hidden size-9 shrink-0 place-items-center rounded-full border border-line text-ink-soft transition-colors outline-none hover:bg-accent hover:text-ink focus-visible:ring-2 focus-visible:ring-ring lg:grid [&_svg]:size-4"
+      className="hidden size-10 shrink-0 place-items-center rounded-full border border-line text-ink-soft transition-colors outline-none hover:bg-accent hover:text-ink focus-visible:ring-2 focus-visible:ring-ring lg:grid [&_svg]:size-4"
     >
       <ChevronUp
         aria-hidden

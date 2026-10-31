@@ -53,6 +53,8 @@
   --ease-atlas: cubic-bezier(0.32, 0.72, 0.24, 1);
   --map-filter: saturate(0.55) contrast(1.02) brightness(1.02);
   --page-gutter: 1rem;
+  --shadow-marker-dot: 0 4px 10px rgba(0, 0, 0, 0.25);
+  --shadow-marker-lbl: 0 2px 8px rgba(22, 35, 58, 0.12);
 }
 
 .dark {
@@ -285,7 +287,8 @@ input[type="range"] {
 
 .atlas-map .leaflet-control-attribution a {
   display: inline-block;
-  padding-block: 5px;
+  padding-block: 4px;
+  line-height: 16px;
   color: var(--ink-soft);
   text-decoration: underline;
 }
@@ -339,7 +342,7 @@ input[type="range"] {
   background: var(--brass);
   box-shadow:
     0 0 0 2px var(--brass),
-    0 4px 10px rgba(0, 0, 0, 0.25);
+    var(--shadow-marker-dot);
   transition: transform 0.25s var(--ease-atlas);
 }
 
@@ -347,11 +350,11 @@ input[type="range"] {
   position: absolute;
   top: 0;
   left: 13px;
-  padding: 2px 9px;
+  padding: 2px 8px;
   border: 1px solid var(--line);
   border-radius: 99px;
   background: var(--card-solid);
-  box-shadow: 0 2px 8px rgba(22, 35, 58, 0.12);
+  box-shadow: var(--shadow-marker-lbl);
   color: var(--ink);
   font-family: var(--font-fraunces), ui-serif, Georgia, serif;
   font-size: 12px;
@@ -459,7 +462,7 @@ input[type="range"] {
 .leg-badge {
   display: inline-grid;
   place-items: center;
-  padding: 0 6px;
+  padding: 0 8px;
   border: 1px solid var(--line);
   border-radius: 999px;
   background: var(--card-solid);

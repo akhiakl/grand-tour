@@ -29,7 +29,7 @@ export function CopyEmail({ email }: { readonly email: string }) {
       >
         {email}
       </a>
-      <Button type="button" variant="outline" size="sm" onClick={copy}>
+      <Button type="button" variant="outline" onClick={copy}>
         {copied ? <Check /> : <Copy />}
         {copied ? t("copied") : t("copy")}
       </Button>

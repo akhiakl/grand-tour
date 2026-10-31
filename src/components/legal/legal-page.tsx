@@ -46,8 +46,8 @@ export function LegalPage({
           </Link>
         </div>
       </nav>
-      <main className="page-container grid flex-1 gap-12 py-12 lg:grid-cols-[minmax(0,3fr)_minmax(0,9fr)] lg:gap-8 lg:py-20">
-        <header className="flex flex-col gap-4 border-b border-line pb-12 lg:col-span-2 lg:pb-16">
+      <main className="page-container grid flex-1 gap-12 py-10 lg:grid-cols-[minmax(0,3fr)_minmax(0,9fr)] lg:gap-x-8 lg:gap-y-14 lg:py-16">
+        <header className="flex flex-col gap-4 border-b border-line pb-10 lg:col-span-2 lg:pb-12">
           <p className="eyebrow">{eyebrow}</p>
           <h1 className="font-display text-display font-medium tracking-tight text-balance text-ink">
             {title}
@@ -74,7 +74,7 @@ export function LegalPage({
           </ol>
         </nav>
 
-        <article className="flex max-w-[68ch] min-w-0 flex-col gap-14 leading-relaxed text-ink-soft [&_a]:text-ink [&_a]:underline [&_a]:underline-offset-2 [&_li]:mt-1.5 [&_section>*+*]:mt-3 [&_strong]:font-medium [&_strong]:text-ink [&_ul]:list-disc [&_ul]:pl-5">
+        <article className="flex max-w-[36rem] min-w-0 flex-col gap-20 leading-relaxed text-ink-soft [&_a]:text-ink [&_a]:underline [&_a]:underline-offset-2 [&_li]:mt-1.5 [&_section>*+*]:mt-3 [&_strong]:font-medium [&_strong]:text-ink [&_ul]:list-disc [&_ul]:pl-5">
           <div className="rounded-2xl border border-line bg-card-solid p-6 text-lead text-ink sm:p-8">
             {summary}
           </div>
