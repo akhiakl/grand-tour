@@ -23,12 +23,11 @@ describe("contentSecurityPolicy", () => {
       "'self'",
       "https://tiles.openfreemap.org",
       "https://photon.komoot.io",
-      "https://*.userback.io",
     ]);
     expect(directive(csp, "img-src")).toContain("https://*.basemaps.cartocdn.com");
     expect(directive(csp, "worker-src")).toEqual(["'self'", "blob:"]);
     expect(directive(csp, "frame-ancestors")).toEqual(["'none'"]);
-    expect(directive(csp, "frame-src")).toEqual(["https://*.userback.io"]);
+    expect(directive(csp, "frame-src")).toEqual(["'none'"]);
     expect(directive(csp, "script-src")).not.toContain("'unsafe-eval'");
   });
 
@@ -44,15 +43,16 @@ describe("contentSecurityPolicy", () => {
       "https://maps.example.com",
       "https://photon.komoot.io",
       "https://o1.ingest.sentry.io",
-      "https://*.userback.io",
     ]);
   });
 
-  it("allows the Userback hosts for the tester widget", () => {
-    const csp = contentSecurityPolicy(base);
+  it("allows the Userback hosts only when the tester widget is on", () => {
+    const on = contentSecurityPolicy({ ...base, userback: true });
+    const off = contentSecurityPolicy(base);
 
     for (const name of ["script-src", "connect-src", "img-src", "frame-src"]) {
-      expect(directive(csp, name)).toContain("https://*.userback.io");
+      expect(directive(on, name)).toContain("https://*.userback.io");
+      expect(directive(off, name)).not.toContain("https://*.userback.io");
     }
   });
 
@@ -67,12 +67,15 @@ describe("contentSecurityPolicy", () => {
       "'self'",
       "https://tiles.openfreemap.org",
       "https://photon.komoot.io",
-      "https://*.userback.io",
     ]);
   });
 
   it("loosens only what dev and Vercel previews need", () => {
-    const csp = contentSecurityPolicy({ dev: true, vercelPreview: true });
+    const csp = contentSecurityPolicy({
+      dev: true,
+      vercelPreview: true,
+      userback: true,
+    });
 
     expect(directive(csp, "script-src")).toEqual([
       "'self'",
