@@ -1,5 +1,6 @@
 "use client";
 
+import { UtensilsCrossed } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
@@ -37,7 +38,7 @@ function DayRow({
   title,
   body,
 }: {
-  readonly lead: string;
+  readonly lead: React.ReactNode;
   readonly title: string;
   readonly body: string;
 }) {
@@ -106,7 +107,12 @@ export function FoodSection({ city }: { readonly city: City }) {
     <div>
       <SectionHeading>{t("eatLocal")}</SectionHeading>
       {city.food.map(([dish, where]) => (
-        <DayRow key={dish} lead="🍽" title={dish} body={where} />
+        <DayRow
+          key={dish}
+          lead={<UtensilsCrossed aria-hidden className="size-4" />}
+          title={dish}
+          body={where}
+        />
       ))}
     </div>
   );
@@ -128,9 +134,7 @@ function InfoCard({
         wide && "col-span-full",
       )}
     >
-      <div className="mb-1 text-[10px] tracking-[0.16em] text-muted-foreground uppercase">
-        {label}
-      </div>
+      <div className="mb-1 text-xs text-muted-foreground">{label}</div>
       <div className="text-sm leading-snug font-medium">{value}</div>
     </div>
   );
@@ -152,17 +156,16 @@ export function PracticalSection({ city }: { readonly city: City }) {
       {city.tips.length > 0 && (
         <div>
           <SectionHeading>{t("city.localTips")}</SectionHeading>
-          {city.tips.map((tip) => (
-            <p
-              key={tip}
-              className="flex gap-2.5 py-1.5 text-[13.5px] leading-relaxed text-muted-foreground"
-            >
-              <span aria-hidden className="shrink-0 text-brass-text">
-                —
-              </span>
-              {tip}
-            </p>
-          ))}
+          <ul className="list-disc pl-4 marker:text-brass-text">
+            {city.tips.map((tip) => (
+              <li
+                key={tip}
+                className="py-1.5 text-[13.5px] leading-relaxed text-muted-foreground"
+              >
+                {tip}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </div>

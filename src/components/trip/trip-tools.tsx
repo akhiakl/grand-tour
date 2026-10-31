@@ -222,7 +222,7 @@ function ToolsBody({ trip, scope, active, onBack }: ToolsProps) {
           aria-label={t("packed")}
           value={progress}
           max={100}
-          className="h-1 w-full appearance-none overflow-hidden rounded-full bg-secondary [&::-moz-progress-bar]:rounded-full [&::-moz-progress-bar]:bg-brass [&::-webkit-progress-bar]:bg-secondary [&::-webkit-progress-value]:rounded-full [&::-webkit-progress-value]:bg-brass [&::-webkit-progress-value]:transition-[width]"
+          className="h-1 w-full appearance-none overflow-hidden rounded-full bg-secondary [&::-moz-progress-bar]:rounded-full [&::-moz-progress-bar]:bg-brass [&::-webkit-progress-bar]:bg-secondary [&::-webkit-progress-value]:rounded-full [&::-webkit-progress-value]:bg-brass"
         />
         <ul className="space-y-2.5">
           {items.map((item, index) => (
