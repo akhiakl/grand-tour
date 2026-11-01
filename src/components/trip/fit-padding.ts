@@ -55,6 +55,14 @@ export function fitPadding(
   };
 }
 
+/**
+ * Whether the map has a real on-screen size. Leaflet's `flyTo` divides by
+ * the map's width, so animating a hidden (0×0) map yields NaN coordinates.
+ */
+export function isMapSized(size: ScreenPoint): boolean {
+  return size.x > 0 && size.y > 0;
+}
+
 /** Distance to move `value` into `[min, max]` (0 when already inside). */
 function shortfall(value: number, min: number, max: number): number {
   if (value < min) return value - min;

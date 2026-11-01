@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import { useMap } from "react-leaflet";
 
-import { fitPadding, type MapInsets } from "./fit-padding";
+import { fitPadding, isMapSized, type MapInsets } from "./fit-padding";
 import { MapOverlay } from "./map-overlay";
 
 function ControlButton({
@@ -52,12 +52,14 @@ export function MapControls({
       </ControlButton>
       <ControlButton
         label={t("fitRoute")}
-        onClick={() =>
+        onClick={() => {
+          // Leaflet's fly animation yields NaN on a hidden (0×0) map.
+          if (!isMapSized(map.getSize())) return;
           map.flyToBounds(bounds, {
             ...fitPadding(insets, map.getSize().y),
             duration: 0.8,
-          })
-        }
+          });
+        }}
       >
         <Maximize />
       </ControlButton>

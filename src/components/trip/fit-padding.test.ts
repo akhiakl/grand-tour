@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { clearPanOffset, fitPadding, isPointObscured } from "./fit-padding";
+import {
+  clearPanOffset,
+  fitPadding,
+  isMapSized,
+  isPointObscured,
+} from "./fit-padding";
 
 describe("fitPadding", () => {
   it("keeps a margin, wider where labels sit, when nothing covers the map", () => {
@@ -81,5 +86,20 @@ describe("clearPanOffset / isPointObscured", () => {
     expect(isPointObscured({ x: 30, y: 30 }, { left: -100, top: -5 }, map)).toBe(
       false,
     );
+  });
+});
+
+describe("isMapSized", () => {
+  it("is false for a hidden (0×0) map", () => {
+    expect(isMapSized({ x: 0, y: 0 })).toBe(false);
+  });
+
+  it("is false when either dimension collapses", () => {
+    expect(isMapSized({ x: 800, y: 0 })).toBe(false);
+    expect(isMapSized({ x: 0, y: 600 })).toBe(false);
+  });
+
+  it("is true for a laid-out map", () => {
+    expect(isMapSized({ x: 800, y: 600 })).toBe(true);
   });
 });
