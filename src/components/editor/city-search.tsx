@@ -71,6 +71,7 @@ export function CitySearch({
       <div className="relative">
         <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
+          name="city"
           value={query}
           onChange={(e) => {
             const next = e.target.value;

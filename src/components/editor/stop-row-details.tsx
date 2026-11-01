@@ -106,6 +106,7 @@ export function StopRowDetails({
         onChange={(must) => onChange({ must })}
         renderRow={(item, change) => (
           <Input
+            name="item"
             value={item}
             maxLength={80}
             onChange={(e) => change(e.target.value)}
@@ -121,6 +122,7 @@ export function StopRowDetails({
         onChange={(gems) => onChange({ gems })}
         renderRow={(item, change) => (
           <Input
+            name="item"
             value={item}
             maxLength={80}
             onChange={(e) => change(e.target.value)}
@@ -138,12 +140,14 @@ export function StopRowDetails({
         renderRow={([dish, note], change) => (
           <div className="flex flex-col gap-2 sm:flex-row">
             <Input
+              name="dish"
               value={dish}
               maxLength={60}
               placeholder={t("dish")}
               onChange={(e) => change([e.target.value, note])}
             />
             <Input
+              name="dish-where"
               value={note}
               maxLength={120}
               placeholder={t("dishWhere")}
@@ -164,6 +168,7 @@ export function StopRowDetails({
           <div className="flex flex-col gap-2">
             <div className="flex gap-2">
               <Input
+                name="day"
                 value={day}
                 maxLength={20}
                 placeholder={t("dayPlaceholder")}
@@ -171,6 +176,7 @@ export function StopRowDetails({
                 onChange={(e) => change([e.target.value, title, description])}
               />
               <Input
+                name="day-title"
                 value={title}
                 maxLength={60}
                 placeholder={t("dayTitlePlaceholder")}
@@ -178,6 +184,7 @@ export function StopRowDetails({
               />
             </div>
             <Textarea
+              name="day-description"
               value={description}
               maxLength={300}
               placeholder={t("dayBodyPlaceholder")}
@@ -195,6 +202,7 @@ export function StopRowDetails({
         onChange={(tips) => onChange({ tips })}
         renderRow={(item, change) => (
           <Input
+            name="item"
             value={item}
             maxLength={200}
             onChange={(e) => change(e.target.value)}

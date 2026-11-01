@@ -28,6 +28,7 @@ export function ImportTripButton({
       <input
         ref={input}
         type="file"
+        name="backup"
         accept="application/json,.json"
         aria-label={t("fileLabel")}
         className="sr-only"

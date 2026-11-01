@@ -72,7 +72,12 @@ export function ShareDialog({
         </DialogHeader>
 
         <div className="flex gap-2">
-          <Input readOnly value={url} onFocus={(e) => e.target.select()} />
+          <Input
+            readOnly
+            name="share-url"
+            value={url}
+            onFocus={(e) => e.target.select()}
+          />
           <Button type="button" variant="brass" onClick={copy}>
             {copied ? <Check /> : <Copy />}
             {copied ? t("copied") : t("copy")}
