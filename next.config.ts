@@ -1,4 +1,4 @@
-import { withSentryConfig } from "@sentry/nextjs";
+import { withSentryConfig } from "@sentry/nextjs/config";
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
           mapStyleUrl: process.env.NEXT_PUBLIC_MAP_STYLE_URL,
           sentryDsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
           vercelPreview: process.env.VERCEL_ENV === "preview",
+          userback: Boolean(process.env.NEXT_PUBLIC_USERBACK_TOKEN),
         }),
       },
       {

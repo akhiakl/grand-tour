@@ -8,7 +8,7 @@ export function SiteFooter() {
   const t = useTranslations("Legal");
   return (
     <footer className="border-t border-line">
-      <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-6 text-xs text-muted-foreground sm:px-6">
+      <div className="page-container flex flex-wrap items-center justify-between gap-3 py-8 text-sm text-muted-foreground">
         <span>{t("footerCredit")}</span>
         <LegalLinks>
           <Link

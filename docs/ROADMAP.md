@@ -1,7 +1,9 @@
 # Phase 1 roadmap — build order for agents
 
 Execution plan for the remaining Phase 1 work. Each step is one PR on a
-`feature/*` branch off `main`, reviewed before the next step starts.
+`<type>/<name>` branch off `main` (see `docs/BRANCHING.md`), reviewed
+before the next step starts. The per-step `Branch:` lines below are the
+original plan names.
 
 **Before starting any step, read:** `CLAUDE.md` (hard rules),
 `docs/ARCHITECTURE.md` (module boundaries, testing conventions),
@@ -43,7 +45,7 @@ in `docs/RELEASE.md`. Do not wire any host to auto-deploy `main`.
 | 6    | AI chat UI + ghost-stops upsell                    | ✅ done |
 | 7    | Landing page + polish pass                         | ✅ done |
 | 8    | Playwright e2e                                     | ✅ done |
-| 9    | UX & a11y hardening (design-review follow-ups)     | 🟨 wip  |
+| 9    | UX & a11y hardening (design-review follow-ups)     | ✅ done |
 | 10   | Legal pages, report link, AI notice, analytics     | ✅ done |
 | 11   | `/about` story page, motion limits on the map      | ✅ done |
 | 12   | Landing: destination search, returning visitors    | ✅ done |
@@ -249,8 +251,8 @@ desktop and mobile; Lighthouse a11y ≥ 95 on `/`, `/new`, `/maps/[id]`.
 - [ ] Optional: allowlist `ui.shadcn.com` in the remote environment's
       network policy so `shadcn add` works in cloud sessions.
 - [ ] `RELEASE_PLEASE_TOKEN` repo secret (PAT) so CI runs on release PRs.
-- [ ] `DEPLOY_HOOK_URL` repo secret once a host is chosen; disable the
-      host's auto-deploy of `main` (see `docs/RELEASE.md`).
+- [ ] `VERCEL_TOKEN` repo secret for the release deploy; `main` auto-deploy is
+      skipped by Vercel's Ignored Build Step (see `docs/RELEASE.md`).
 
 ## Phase 2 parking lot (do NOT build in Phase 1)
 

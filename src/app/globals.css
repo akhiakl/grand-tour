@@ -1,3 +1,10 @@
+/* Hallmark · checked: 2026-10-31 · genre: editorial (inferred) · brand: field atlas (kept)
+ * waive 38i · the italic accent word is the brand's display voice (CLAUDE.md)
+ * waive 29 · .frost is the house surface for the single atlas card
+ * waive 44d · trip views pin the atlas card top-left over a full-bleed map by design
+ * redesign: full on /about (hero: Stage, steps, showcase, rows, band) and /plan (app scope, split)
+ * dropped "Field notes" over the /about hero · 58 names it; other copy kept, 58 reads as a note
+ * built: the project · redesign: polish · v2.0.0 */
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -37,13 +44,17 @@
   --destructive: #a83a32;
   --destructive-foreground: #fdf9f2;
   --border: var(--line);
-  --input: var(--line);
+  /* Field edges: a 3:1 boundary against the surface (WCAG 1.4.11). */
+  --input: color-mix(in srgb, var(--ink-soft) 65%, var(--paper));
   --ring: var(--brass);
 
   --radius: 1rem;
   --shadow-soft: 0 20px 60px -20px rgba(22, 35, 58, 0.25);
   --ease-atlas: cubic-bezier(0.32, 0.72, 0.24, 1);
   --map-filter: saturate(0.55) contrast(1.02) brightness(1.02);
+  --page-gutter: 1rem;
+  --shadow-marker-dot: 0 4px 10px rgba(0, 0, 0, 0.25);
+  --shadow-marker-lbl: 0 2px 8px rgba(22, 35, 58, 0.12);
 }
 
 .dark {
@@ -111,6 +122,47 @@
   --shadow-soft: var(--shadow-soft);
 
   --ease-atlas: var(--ease-atlas);
+
+  /* Page type scale (scrolling pages): sizes at 1440, fluid below. */
+  --text-display: clamp(3rem, 2rem + 3.6vw, 5.25rem);
+  --text-display--line-height: 1.02;
+  --text-section: clamp(2.25rem, 1.5rem + 2vw, 3.25rem);
+  --text-section--line-height: 1.08;
+  --text-title: clamp(1.25rem, 1rem + 0.6vw, 1.5625rem);
+  --text-title--line-height: 1.2;
+  --text-lead: clamp(1.125rem, 1rem + 0.35vw, 1.3125rem);
+  --text-lead--line-height: 1.5;
+}
+
+/* One centred, capped container for the scrolling pages: the gutters grow
+   past 1440, the measure does not. */
+@utility page-container {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 1440px;
+  padding-inline: var(--page-gutter);
+}
+
+@media (width >= 40rem) {
+  :root {
+    --page-gutter: 2rem;
+  }
+}
+
+@media (width >= 64rem) {
+  :root {
+    --page-gutter: 4rem;
+  }
+}
+
+html,
+body {
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--ink);
 }
 
 body {
@@ -147,12 +199,10 @@ input[type="range"] {
     box-shadow: var(--shadow-soft);
   }
 
-  /* Eyebrow label — small brass wayfinding caption. */
+  /* Eyebrow label — small brass wayfinding caption, sentence case. */
   .eyebrow {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 600;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
     color: var(--brass-text);
   }
 }
@@ -232,11 +282,15 @@ input[type="range"] {
 .atlas-map .leaflet-control-attribution {
   background: color-mix(in srgb, var(--paper) 78%, transparent);
   color: var(--ink-soft);
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .atlas-map .leaflet-control-attribution a {
-  color: var(--azure);
+  display: inline-block;
+  padding-block: 4px;
+  line-height: 16px;
+  color: var(--ink-soft);
+  text-decoration: underline;
 }
 
 /* The route — brass, dashed, with a marching-ants drift.
@@ -269,8 +323,12 @@ input[type="range"] {
   background: transparent;
 }
 
+/* The anchor is a 24px hit target (WCAG 2.5.8) centred on the stop;
+   the dot and label hang from its centre. */
 .marker {
-  position: relative;
+  position: absolute;
+  top: 12px;
+  left: 12px;
 }
 
 .marker-dot {
@@ -284,7 +342,7 @@ input[type="range"] {
   background: var(--brass);
   box-shadow:
     0 0 0 2px var(--brass),
-    0 4px 10px rgba(0, 0, 0, 0.25);
+    var(--shadow-marker-dot);
   transition: transform 0.25s var(--ease-atlas);
 }
 
@@ -292,11 +350,11 @@ input[type="range"] {
   position: absolute;
   top: 0;
   left: 13px;
-  padding: 2px 9px;
+  padding: 2px 8px;
   border: 1px solid var(--line);
   border-radius: 99px;
   background: var(--card-solid);
-  box-shadow: 0 2px 8px rgba(22, 35, 58, 0.12);
+  box-shadow: var(--shadow-marker-lbl);
   color: var(--ink);
   font-family: var(--font-fraunces), ui-serif, Georgia, serif;
   font-size: 12px;
@@ -404,7 +462,7 @@ input[type="range"] {
 .leg-badge {
   display: inline-grid;
   place-items: center;
-  padding: 0 6px;
+  padding: 0 8px;
   border: 1px solid var(--line);
   border-radius: 999px;
   background: var(--card-solid);

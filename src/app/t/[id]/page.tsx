@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { cache } from "react";
 
 import { TripExperience } from "@/components/trip/trip-experience";
+import { emit } from "@/lib/logging";
 import { tripStats } from "@/lib/trip";
 import { getTrip, incrViews } from "@/lib/trip/service";
 
@@ -43,9 +44,13 @@ export default async function SharedTripPage({
 }) {
   const { id } = await params;
   const trip = await loadTrip(id);
-  if (!trip) notFound();
+  if (!trip) {
+    emit("warn", "trip not found", { route: "/t/[id]", status: 404 });
+    notFound();
+  }
 
   const views = await incrViews(id);
+  emit("info", "trip viewed", { route: "/t/[id]" });
 
   return <TripExperience trip={trip} actions="shared" shareId={id} views={views} />;
 }

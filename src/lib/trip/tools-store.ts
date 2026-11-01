@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod";
 
 /**
  * A viewer's own packing ticks, extra items and notes for one trip,

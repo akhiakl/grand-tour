@@ -32,10 +32,10 @@ beforeEach(() => {
 });
 
 describe("MapViewPage", () => {
-  it("renders nothing before the client has mounted", () => {
+  it("shows the loading state before the client has mounted", () => {
     mocks.useMounted.mockReturnValue(false);
-    const { container } = render(<MapViewPage />);
-    expect(container).toBeEmptyDOMElement();
+    render(<MapViewPage />);
+    expect(screen.getByRole("status")).toHaveTextContent("Unfolding the map…");
     expect(mocks.getLocalTrip).not.toHaveBeenCalled();
   });
 

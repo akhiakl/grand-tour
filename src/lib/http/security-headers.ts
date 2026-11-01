@@ -14,14 +14,23 @@ export interface SecurityHeaderOptions {
   sentryDsn?: string;
   /** Vercel preview deployments inject the vercel.live toolbar. */
   vercelPreview: boolean;
+  /** `NEXT_PUBLIC_USERBACK_TOKEN` is set; the tester widget needs its hosts. */
+  userback?: boolean;
 }
 
 const OPENFREEMAP = "https://tiles.openfreemap.org";
+// Raster fallback basemap for browsers without WebGL2.
+const CARTO_TILES = "https://*.basemaps.cartocdn.com";
 const PHOTON = "https://photon.komoot.io";
 const VERCEL_LIVE = "https://vercel.live";
+// The toolbar also loads avatars and icons from these.
+const VERCEL_TOOLBAR_IMAGES = ["https://vercel.com"];
+const VERCEL_TOOLBAR_FONTS = ["https://assets.vercel.com"];
 // Vercel Web Analytics loads its debug script from here in development;
 // in production it is served first-party from /_vercel/insights.
 const VERCEL_SCRIPTS = "https://va.vercel-scripts.com";
+
+const USERBACK = "https://*.userback.io";
 
 function originOf(url: string | undefined): string | null {
   if (!url?.trim()) return null;
@@ -32,13 +41,18 @@ function originOf(url: string | undefined): string | null {
   }
 }
 
+/** An empty source list reads as "block everything"; say so explicitly. */
+const orNone = (sources: string[]) => (sources.length ? sources : ["'none'"]);
+
 export function contentSecurityPolicy(options: SecurityHeaderOptions): string {
   const preview = options.vercelPreview ? [VERCEL_LIVE] : [];
+  const userback = options.userback ? [USERBACK] : [];
   const connect = [
     "'self'",
     originOf(options.mapStyleUrl) ?? OPENFREEMAP,
     PHOTON,
     originOf(options.sentryDsn),
+    ...userback,
     ...preview,
     ...(options.dev ? ["ws:"] : []),
   ].filter((source): source is string => source !== null);
@@ -49,15 +63,30 @@ export function contentSecurityPolicy(options: SecurityHeaderOptions): string {
       "'self'",
       "'unsafe-inline'",
       ...(options.dev ? ["'unsafe-eval'", VERCEL_SCRIPTS] : []),
+      ...userback,
       ...preview,
     ],
-    "style-src": ["'self'", "'unsafe-inline'"],
-    "img-src": ["'self'", "data:", "blob:", ...preview],
-    "font-src": ["'self'", "data:", ...preview],
+    "style-src": ["'self'", "'unsafe-inline'", ...userback],
+    "img-src": [
+      "'self'",
+      "data:",
+      "blob:",
+      CARTO_TILES,
+      ...userback,
+      ...preview,
+      ...(options.vercelPreview ? VERCEL_TOOLBAR_IMAGES : []),
+    ],
+    "font-src": [
+      "'self'",
+      "data:",
+      ...userback,
+      ...preview,
+      ...(options.vercelPreview ? VERCEL_TOOLBAR_FONTS : []),
+    ],
     "connect-src": connect,
     // MapLibre boots its worker from a blob: wrapper around the bundled file.
     "worker-src": ["'self'", "blob:"],
-    "frame-src": preview.length ? preview : ["'none'"],
+    "frame-src": orNone([...userback, ...preview]),
     "object-src": ["'none'"],
     "base-uri": ["'self'"],
     "form-action": ["'self'"],

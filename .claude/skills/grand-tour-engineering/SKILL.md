@@ -1,6 +1,6 @@
 ---
 name: grand-tour-engineering
-description: How code is designed, placed and split in this repo — SOLID applied pragmatically, YAGNI enforced, module boundaries, file-splitting strategy. Use this whenever you write, move or refactor ANY source file in Grand Tour — new features, new utilities, new components, API routes, or when a file nears the 300-line limit and needs splitting, or when deciding WHERE new code should live.
+description: How to work and how code is designed, placed and split in this repo — smallest complete change, surgical edits, surfaced assumptions, verifiable goals, pragmatic SOLID, enforced YAGNI, module boundaries, file splitting. Use on EVERY coding task in Grand Tour (writing, fixing, refactoring, choosing a dependency, deciding where code lives, splitting a file near the 300-line limit), and whenever the user asks for the simplest solution or complains about over-engineering.
 ---
 
 # Grand Tour engineering principles
@@ -10,6 +10,51 @@ with zero speculative machinery. Two forces in tension — SOLID pulls
 toward separation, YAGNI pulls against building what nothing needs yet.
 When they conflict, YAGNI wins until the roadmap step in front of you
 needs the abstraction.
+
+## How to work (every task, no command needed)
+
+The best code is the code never written: solve the whole problem with the
+least new code, and reply so a busy human gets it in one read.
+
+**Before writing**
+
+- Read the task and the code it touches. List every place the change must
+  reach: callers, tests, fixtures, exports, docs. That is scope; extra
+  features are not.
+- State assumptions. If a requirement is ambiguous or has several readings,
+  ask (CLAUDE.md: "Do not assume"). If a simpler approach exists, say so.
+- Turn the task into a check: "fix the bug" → a test that reproduces it,
+  then passes; "refactor" → tests green before and after. Multi-step work
+  gets a short plan with a verify step each.
+
+**The smallest complete change** — take the first option that fully works:
+
+1. Does it need to exist? Skip options and flexibility nobody asked for;
+   name them in one line.
+2. Already in the repo (helper, component, hook, pattern)? Use it the way
+   the surrounding code does.
+3. The platform or standard library does it? Use it.
+4. An installed dependency does it? Use it. Never add one for a few lines.
+5. Otherwise the minimum code that works, correct on edge cases.
+
+**Surgical edits**
+
+- Every changed line traces to the request. Don't reformat, rename or
+  "improve" adjacent code; mention unrelated dead code instead of deleting
+  it. Do remove imports and helpers your own change orphaned.
+- Bug fix: grep every caller first, then fix the root cause once in the
+  shared code.
+- Moved or merged code keeps its validation and error handling.
+- Lazy about the solution, never about finishing: callers, tests, fixtures,
+  docs and copy keys the change breaks are part of the change.
+- Mark a deliberate limit with a comment:
+  `shortcut: <limit>, <when to upgrade>`. `grand-tour-review` lists them
+  as a debt ledger.
+- Never cut: validation at trust boundaries, error handling that prevents
+  data loss, security, accessibility, anything the user asked for.
+
+**Reply** ends with one or two lines: what was skipped or not checked, and
+any risk the user must know.
 
 ## Where code goes (decide BEFORE writing)
 

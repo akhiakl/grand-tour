@@ -2,6 +2,8 @@
 
 [![CI](https://github.com/akhiakl/grand-tour/actions/workflows/ci.yml/badge.svg)](https://github.com/akhiakl/grand-tour/actions/workflows/ci.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=akhiakl_grand-tour&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=akhiakl_grand-tour)
+[![Better Stack Badge](https://incidents.betterstack.com/status-badges/v1/monitor/31vg1.svg)](https://incidents.betterstack.com/?utm_source=status_badge)
+[![Better Stack Badge](https://incidents.betterstack.com/status-badges/v1/monitor/31vg0.svg)](https://incidents.betterstack.com/?utm_source=status_badge)
 
 Craft a beautiful, interactive travel route map — drawn by AI or by hand —
 and share it with a single link. Guest-first: no accounts, no user database.
@@ -58,7 +60,8 @@ typecheck; commit messages must follow
 - [docs/RELEASE.md](./docs/RELEASE.md) — versioning, deploy policy and
   the MVP launch checklist
 - `.claude/skills/` — project skills (grand-tour, grand-tour-engineering,
-  grand-tour-testing, nextjs, tailwind, shadcn)
+  grand-tour-testing, grand-tour-review, nextjs, tailwind, shadcn); they
+  apply automatically, see CLAUDE.md → Workflow skills
 
 ## Environment variables
 
@@ -67,6 +70,8 @@ typecheck; commit messages must follow
 | `AI_BASE_URL`               | OpenAI-compatible endpoint (server only)  |
 | `AI_MODEL`                  | Model id for trip generation              |
 | `AI_API_KEY`                | Endpoint key, optional (server only)      |
+| `AI_REASONING_EFFORT`       | low, medium or high; optional             |
+| `AI_MAX_TOKENS`             | Output token cap; optional                |
 | `UPSTASH_REDIS_REST_URL`    | Shared trip snapshots                     |
 | `UPSTASH_REDIS_REST_TOKEN`  | Shared trip snapshots                     |
 | `NEXT_PUBLIC_MAP_STYLE_URL` | Self-hosted map style (optional)          |

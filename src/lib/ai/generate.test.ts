@@ -1,6 +1,21 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { makeAiTrip, makeGenerateRequest } from "@/test/fixtures/ai";
+import { makeSpanRecorder } from "@/test/fixtures/sentry";
+
+const recorder = makeSpanRecorder();
+// The factory runs lazily, so it can close over the recorder defined above.
+vi.mock("@sentry/nextjs", () => ({
+  startSpan: (...args: Parameters<typeof recorder.startSpan>) =>
+    recorder.startSpan(...args),
+}));
+const spans = () => recorder.spans;
+
+const emit = vi.hoisted(() => vi.fn());
+vi.mock("@/lib/logging", () => ({
+  emit,
+  errorFields: (error: Error) => ({ errorName: error.name }),
+}));
 
 import { GenerationError, generateTrip } from "./generate";
 
@@ -21,6 +36,8 @@ beforeEach(() => {
   vi.stubEnv("AI_MODEL", "test-model");
   vi.stubEnv("AI_API_KEY", "test-key");
   fetchMock.mockReset();
+  spans().length = 0;
+  emit.mockClear();
 });
 
 afterEach(() => {
@@ -68,6 +85,30 @@ describe("generateTrip", () => {
     expect(body.response_format).toEqual({ type: "json_object" });
   });
 
+  it("keeps the first 5 cities and turns the overflow into ghost stops", async () => {
+    const overflow = makeAiTrip(7, { suggestedExtra: ["Innsbruck"] });
+    fetchMock.mockResolvedValueOnce(modelResponse(JSON.stringify(overflow)));
+
+    const result = await generateTrip(request);
+
+    expect(result.trip.cities).toHaveLength(5);
+    expect(result.trip.legs).toHaveLength(4);
+    expect(result.suggestedExtra).toEqual(["Innsbruck", "Stop 6", "Stop 7"]);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("caps ghost stops at 10 and skips overflow names that are unusable", async () => {
+    const overflow = makeAiTrip(20);
+    overflow.cities[5] = { ...overflow.cities[5], name: "x".repeat(61) };
+    fetchMock.mockResolvedValueOnce(modelResponse(JSON.stringify(overflow)));
+
+    const result = await generateTrip(request);
+
+    expect(result.trip.cities).toHaveLength(5);
+    expect(result.suggestedExtra).toHaveLength(10);
+    expect(result.suggestedExtra).not.toContain("x".repeat(61));
+  });
+
   it("retries once, feeding validation errors back to the model", async () => {
     const invalid = JSON.stringify(makeAiTrip(2, { legs: [] }));
     fetchMock
@@ -95,11 +136,184 @@ describe("generateTrip", () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
+  it("retries once when the provider rejects its own malformed JSON", async () => {
+    fetchMock
+      .mockResolvedValueOnce(
+        Response.json({ error: { code: "json_validate_failed" } }, { status: 400 }),
+      )
+      .mockResolvedValueOnce(modelResponse(JSON.stringify(validAiOutput)));
+
+    const result = await generateTrip(request);
+
+    expect(result.trip.cities).toHaveLength(2);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("does not retry other upstream errors", async () => {
+    fetchMock.mockResolvedValueOnce(new Response("bad", { status: 400 }));
+
+    await expect(generateTrip(request)).rejects.toMatchObject({
+      reason: "upstream",
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
   it("throws upstream on a non-ok model response", async () => {
     fetchMock.mockResolvedValueOnce(new Response("rate limited", { status: 429 }));
 
     const error = await generateTrip(request).catch((e: unknown) => e);
     expect(error).toBeInstanceOf(GenerationError);
     expect((error as GenerationError).reason).toBe("upstream");
+    expect((error as GenerationError).upstreamStatus).toBe(429);
+  });
+
+  describe("tracing", () => {
+    // Prompts, destinations and model output are guest content: never span data.
+    const ALLOWED = [
+      "ai.model",
+      "trip.days",
+      "ai.attempts",
+      "ai.outcome",
+      "trip.cities",
+      "ai.attempt",
+    ];
+
+    it("records one generation span with model, attempts and outcome", async () => {
+      fetchMock.mockResolvedValueOnce(modelResponse(JSON.stringify(validAiOutput)));
+      await generateTrip(request);
+
+      const [generation, ...calls] = spans();
+      expect(generation).toMatchObject({
+        name: "ai.generate_trip",
+        attributes: {
+          "ai.model": "test-model",
+          "trip.days": request.days,
+          "ai.attempts": 1,
+          "ai.outcome": "ok",
+          "trip.cities": 2,
+        },
+      });
+      expect(calls).toHaveLength(1);
+      expect(calls[0]).toMatchObject({
+        name: "ai.chat_completion",
+        attributes: { "ai.attempt": 1 },
+      });
+    });
+
+    it("records the failure reason and still throws it", async () => {
+      fetchMock.mockResolvedValueOnce(new Response("nope", { status: 502 }));
+      await expect(generateTrip(request)).rejects.toBeInstanceOf(GenerationError);
+      expect(spans()[0].attributes).toMatchObject({
+        "ai.outcome": "upstream",
+        "ai.attempts": 1,
+      });
+    });
+
+    it("records a network failure as an upstream outcome", async () => {
+      fetchMock.mockRejectedValueOnce(new TypeError("fetch failed"));
+      await expect(generateTrip(request)).rejects.toThrow(
+        "generation failed: upstream",
+      );
+      expect(spans()[0].attributes["ai.outcome"]).toBe("upstream");
+    });
+
+    it("counts the retry", async () => {
+      fetchMock
+        .mockResolvedValueOnce(modelResponse("not json"))
+        .mockResolvedValueOnce(modelResponse(JSON.stringify(validAiOutput)));
+      await generateTrip(request);
+      expect(spans()[0].attributes["ai.attempts"]).toBe(2);
+      expect(
+        spans().filter((span) => span.name === "ai.chat_completion"),
+      ).toHaveLength(2);
+    });
+
+    it("sends only allowlisted attributes, never guest content", async () => {
+      fetchMock.mockResolvedValueOnce(modelResponse(JSON.stringify(validAiOutput)));
+      await generateTrip(request);
+      for (const span of spans()) {
+        for (const key of Object.keys(span.attributes))
+          expect(ALLOWED).toContain(key);
+        expect(JSON.stringify(span.attributes)).not.toContain(request.destination);
+      }
+    });
+  });
+
+  describe("diagnostic logs", () => {
+    it("logs the provider's status and error code, never its message", async () => {
+      fetchMock.mockImplementation(async () =>
+        Response.json(
+          { error: { code: "json_validate_failed", message: "secret prompt echo" } },
+          { status: 400 },
+        ),
+      );
+      await expect(generateTrip(request)).rejects.toMatchObject({
+        reason: "upstream",
+        upstreamStatus: 400,
+      });
+      expect(emit).toHaveBeenCalledWith(
+        "error",
+        "model call failed",
+        expect.objectContaining({
+          model: "test-model",
+          detail: "http_status",
+          upstreamStatus: 400,
+          upstreamCode: "json_validate_failed",
+          durationMs: expect.any(Number),
+        }),
+      );
+      expect(JSON.stringify(emit.mock.calls)).not.toContain("secret prompt echo");
+    });
+
+    it("logs a network failure with the error name", async () => {
+      fetchMock.mockRejectedValueOnce(new TypeError("fetch failed"));
+      await expect(generateTrip(request)).rejects.toThrow();
+      expect(emit).toHaveBeenCalledWith(
+        "error",
+        "model call failed",
+        expect.objectContaining({ detail: "network", errorName: "TypeError" }),
+      );
+    });
+
+    it("logs an unreadable body and a reply without content", async () => {
+      fetchMock.mockResolvedValueOnce(new Response("<html>", { status: 200 }));
+      await expect(generateTrip(request)).rejects.toThrow();
+      fetchMock.mockResolvedValueOnce(Response.json({ choices: [] }));
+      await expect(generateTrip(request)).rejects.toThrow();
+      const details = emit.mock.calls.map((call) => call[2].detail);
+      expect(details).toEqual(["body_not_json", "no_content"]);
+    });
+
+    it("logs a rejected first output as a warning and a second as an error", async () => {
+      fetchMock.mockImplementation(async () => modelResponse("not json"));
+      await expect(generateTrip(request)).rejects.toThrow();
+      expect(emit.mock.calls.map((call) => [call[0], call[1]])).toEqual([
+        ["warn", "model output rejected, retrying"],
+        ["error", "model output rejected twice"],
+      ]);
+    });
+  });
+
+  describe("optional model parameters", () => {
+    const sentBody = () => JSON.parse(fetchMock.mock.calls[0][1].body);
+
+    it("sends reasoning effort and the token cap only when configured", async () => {
+      vi.stubEnv("AI_REASONING_EFFORT", "low");
+      vi.stubEnv("AI_MAX_TOKENS", "8000");
+      fetchMock.mockResolvedValueOnce(modelResponse(JSON.stringify(validAiOutput)));
+      await generateTrip(request);
+      expect(sentBody()).toMatchObject({
+        reasoning_effort: "low",
+        max_completion_tokens: 8000,
+      });
+    });
+
+    it("leaves both out when unset or invalid", async () => {
+      vi.stubEnv("AI_MAX_TOKENS", "lots");
+      fetchMock.mockResolvedValueOnce(modelResponse(JSON.stringify(validAiOutput)));
+      await generateTrip(request);
+      expect(sentBody()).not.toHaveProperty("reasoning_effort");
+      expect(sentBody()).not.toHaveProperty("max_completion_tokens");
+    });
   });
 });

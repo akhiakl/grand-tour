@@ -58,7 +58,7 @@ function StartDateField({
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? "trip-start-error" : "trip-start-hint"}
           onChange={(e) => onChange(e.target.value)}
-          className="h-8 w-auto"
+          className="h-10 w-auto"
         />
         {!error && (
           <span id="trip-start-hint" className="text-xs">
@@ -105,13 +105,13 @@ export function EditorHeader({
   const t = useTranslations("Editor");
   const common = useTranslations("Common");
   return (
-    <header className="flex flex-wrap items-start justify-between gap-4 border-b border-line pb-5">
+    <header className="flex flex-wrap items-end justify-between gap-6 border-b border-line pb-8">
       <div className="flex min-w-64 flex-1 flex-col gap-2">
         <Link
           href="/"
-          className="eyebrow inline-flex w-fit items-center gap-1 text-muted-foreground transition-colors hover:text-brass-text"
+          className="eyebrow inline-flex w-fit items-center gap-1.5 rounded-sm text-muted-foreground transition-colors outline-none hover:text-brass-text focus-visible:ring-2 focus-visible:ring-ring"
         >
-          <ArrowLeft className="size-3" /> {common("backToAtlas")}
+          <ArrowLeft aria-hidden className="size-3.5" /> {common("backToAtlas")}
         </Link>
         <Input
           id={TRIP_TITLE_INPUT_ID}
@@ -121,7 +121,7 @@ export function EditorHeader({
           value={title}
           maxLength={80}
           onChange={(e) => onTitleChange(e.target.value)}
-          className="h-auto border-none bg-transparent px-0 font-display text-3xl font-medium tracking-tight shadow-none focus-visible:ring-0"
+          className="h-auto rounded-none border-0 border-b-2 border-input bg-transparent px-0 pb-1 font-display text-section font-medium tracking-tight shadow-none focus-visible:border-brass focus-visible:ring-0"
         />
         {titleError && <FieldError id="trip-title-error" message={titleError} />}
         <StartDateField

@@ -2,7 +2,7 @@
 
 import {
   animate,
-  motion,
+  m,
   useDragControls,
   useMotionValue,
   useReducedMotion,
@@ -126,7 +126,7 @@ export function PanelShell({
   };
 
   return (
-    <motion.section
+    <m.section
       ref={sheetRef}
       aria-label={label}
       drag={isDesktop ? false : "y"}
@@ -138,7 +138,7 @@ export function PanelShell({
       onDragStart={() => (dragged.current = true)}
       onDragEnd={onDragEnd}
       style={{ y }}
-      className="atlas-card fixed inset-x-3 bottom-3 z-40 flex h-[60dvh] flex-col lg:inset-x-auto lg:top-5 lg:bottom-auto lg:left-5 lg:h-auto lg:max-h-[calc(100dvh-2.5rem)] lg:w-(--card-w) lg:transform-none!"
+      className="atlas-card fixed inset-x-3 bottom-3 z-40 flex h-[74dvh] flex-col lg:inset-x-auto lg:top-5 lg:bottom-auto lg:left-5 lg:h-auto lg:max-h-[calc(100dvh-2.5rem)] lg:w-(--card-w) lg:transform-none!"
     >
       <button
         type="button"
@@ -159,7 +159,7 @@ export function PanelShell({
       <div ref={headRef} className="shrink-0">
         {head}
       </div>
-      <motion.div
+      <m.div
         id={bodyId}
         inert={isDesktop ? collapsed : !expanded}
         initial={false}
@@ -170,7 +170,7 @@ export function PanelShell({
         className="min-h-0 flex-1 overflow-y-auto overscroll-contain lg:flex-initial"
       >
         {children}
-      </motion.div>
-    </motion.section>
+      </m.div>
+    </m.section>
   );
 }

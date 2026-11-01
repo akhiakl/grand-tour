@@ -18,14 +18,15 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const mail = <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>;
 
-// TODO(legal): name the production AI provider and the regions of Vercel,
-// Upstash and Sentry, then have the policy reviewed by an Indian tech
-// lawyer before v1.0.0.
+// TODO(legal): name the regions of Vercel,
+// Upstash, Sentry and Better Stack (and whether CERT-In's 180-day log rule
+// also expects the logs to stay in India), then have the policy reviewed by
+// an Indian tech lawyer before v1.0.0.
 const PROCESSORS = [
   [
     "Vercel",
-    "Hosts the app; keeps short-lived request logs (IP address, browser) and counts page views without cookies.",
-    "Logs: short-lived. Analytics: aggregate counts only",
+    "Hosts the app; keeps short-lived request logs (IP address, browser), counts page views and measures page speed (load and response times, device type) without cookies.",
+    "Logs: short-lived. Analytics and speed: aggregate figures only",
   ],
   [
     "Upstash",
@@ -33,7 +34,7 @@ const PROCESSORS = [
     "Shared maps: 60 days after the last view. Counters: up to an hour",
   ],
   [
-    "Our AI model provider",
+    "Groq",
     "Turns your destination, trip length and pace into a draft route.",
     "We don't store your answers",
   ],
@@ -41,6 +42,16 @@ const PROCESSORS = [
     "Sentry",
     "Receives error reports (what broke, browser and page) so we can fix bugs. IP addresses and request bodies are switched off.",
     "Per Sentry's retention, typically 30 to 90 days",
+  ],
+  [
+    "Better Stack",
+    "Regularly checks that the site is up, and keeps server logs of what happened (the page type, a status or error type, and events such as a map being shared or opened) so we can fix problems. No IP addresses or request contents are sent.",
+    "Logs: 3 days. Uptime checks: no personal data",
+  ],
+  [
+    "Userback",
+    "Only while we run a public test: if you press the feedback button, it sends the screenshot or screen recording you choose to capture, your note, and the page's console and network details.",
+    "Per Userback's retention; nothing is sent unless you press the button",
   ],
   [
     "Photon by komoot",
@@ -51,6 +62,11 @@ const PROCESSORS = [
     "OpenFreeMap",
     "Serves the map tiles your browser loads.",
     "Under OpenFreeMap's own policy",
+  ],
+  [
+    "CARTO",
+    "Serves fallback map tiles your browser loads only when your device can't run the main map (no WebGL2).",
+    "Under CARTO's own policy",
   ],
   [
     "Frankfurter",
@@ -93,7 +109,8 @@ const SECTIONS: readonly LegalSection[] = [
           <li>
             <strong>Technical data.</strong> Like any website, our host sees your IP
             address and browser details with each request. We use them to keep the
-            service running, block abuse and count visits by country.
+            service running, block abuse and count visits by country, and keep server
+            logs for a few days.
           </li>
           <li>
             <strong>Error reports</strong> when something breaks, without your IP

@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { m, useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
@@ -18,7 +18,7 @@ export function ChatBubble({
   const reducedMotion = useReducedMotion();
 
   return (
-    <motion.div
+    <m.div
       initial={reducedMotion ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: EASE_ATLAS }}
@@ -30,6 +30,6 @@ export function ChatBubble({
       )}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }

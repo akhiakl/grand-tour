@@ -9,32 +9,51 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# Shared steps come from akhiakl/ci-workflows, pinned to a release tag
+# (v1.4.0); keep tags protected in that repo so they can't change. Each check runs through its run-check
+# action, which keeps the log for the Quality Gate PR comment.
 jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v7
+      - uses: akhiakl/ci-workflows/setup-pnpm@v1.4.0
+      - uses: akhiakl/ci-workflows@v1.4.0
+        id: lint
+        continue-on-error: true
         with:
-          node-version-file: .nvmrc
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
+          name: lint
+          run: pnpm lint
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: ci-results-lint
+          path: ci-results/
+          if-no-files-found: warn
+      - if: steps.lint.outcome == 'failure'
+        run: exit 1
 
   typecheck:
     name: Typecheck
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v7
+      - uses: akhiakl/ci-workflows/setup-pnpm@v1.4.0
+      - uses: akhiakl/ci-workflows@v1.4.0
+        id: typecheck
+        continue-on-error: true
         with:
-          node-version-file: .nvmrc
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm typecheck
+          name: typecheck
+          run: pnpm typecheck
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: ci-results-typecheck
+          path: ci-results/
+          if-no-files-found: warn
+      - if: steps.typecheck.outcome == 'failure'
+        run: exit 1
 
   test:
     name: Unit tests & coverage
@@ -44,69 +63,76 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v7
+      - uses: akhiakl/ci-workflows/setup-pnpm@v1.4.0
+      - uses: akhiakl/ci-workflows@v1.4.0
+        id: test
+        continue-on-error: true
         with:
-          node-version-file: .nvmrc
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm test:coverage
+          name: test
+          run: pnpm test:coverage --reporter=default --reporter=json --outputFile.json=ci-results/test-results.json
 
       - name: Report coverage
         if: always() && github.event_name == 'pull_request'
         uses: davelosert/vitest-coverage-report-action@v2
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: ci-results-test
+          path: ci-results/
+          if-no-files-found: warn
+      - if: steps.test.outcome == 'failure'
+        run: exit 1
 
   build:
     name: Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v7
+      - uses: akhiakl/ci-workflows/setup-pnpm@v1.4.0
+      - uses: akhiakl/ci-workflows/next-cache@v1.4.0
+      - uses: akhiakl/ci-workflows@v1.4.0
+        id: build
+        continue-on-error: true
         with:
-          node-version-file: .nvmrc
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm build
+          name: build
+          run: pnpm build
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: ci-results-build
+          path: ci-results/
+          if-no-files-found: warn
+      - if: steps.build.outcome == 'failure'
+        run: exit 1
 
   e2e:
     name: E2E (Playwright)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v7
+      - uses: akhiakl/ci-workflows/setup-pnpm@v1.4.0
+      - uses: akhiakl/ci-workflows/playwright-browsers@v1.4.0
         with:
-          node-version-file: .nvmrc
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-
-      - name: Resolve Playwright version
-        id: playwright
-        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
-
-      - name: Cache Playwright browsers
-        id: browsers
-        uses: actions/cache@v6
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
-
-      - name: Install Chromium
-        if: steps.browsers.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install --with-deps chromium
-
-      - name: Install Chromium system deps
-        if: steps.browsers.outputs.cache-hit == 'true'
-        run: pnpm exec playwright install-deps chromium
+          with-deps: "false"
+      - uses: akhiakl/ci-workflows/next-cache@v1.4.0
 
       - run: pnpm build
       # Starts the fake Upstash server and `next start`; API routes, map
       # tiles and the geocoder are mocked at the edge inside each test.
-      - run: pnpm test:e2e
+      # Includes axe (WCAG 2.1 AA) and no-sideways-scroll checks.
+      - uses: akhiakl/ci-workflows@v1.4.0
+        id: e2e
+        continue-on-error: true
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: ci-results/playwright-results.json
+          PLAYWRIGHT_JSON_OUTPUT_NAME: ci-results/playwright-results.json
+        with:
+          name: e2e
+          run: pnpm test:e2e --reporter=github,html,json
 
       - name: Upload Playwright report
-        if: failure()
+        if: steps.e2e.outcome == 'failure'
         uses: actions/upload-artifact@v7
         with:
           name: playwright-report
@@ -114,3 +140,32 @@ jobs:
             playwright-report/
             test-results/
           retention-days: 7
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: ci-results-e2e
+          path: ci-results/
+          if-no-files-found: warn
+      - if: steps.e2e.outcome == 'failure'
+        run: exit 1
+
+  quality-gate:
+    name: Quality Gate
+    needs: [lint, typecheck, test, build, e2e]
+    if: always() && github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      # One sticky comment listing what failed and why, per check.
+      - uses: akhiakl/ci-workflows/gate@v1.4.0
+        with:
+          marker: "<!-- grand-tour-quality-gate -->"
+          title: Quality Gate
+          status: |
+            Lint=${{ needs.lint.result }}
+            Typecheck=${{ needs.typecheck.result }}
+            Unit tests & coverage=${{ needs.test.result }}
+            Build=${{ needs.build.result }}
+            E2E (Playwright)=${{ needs.e2e.result }}

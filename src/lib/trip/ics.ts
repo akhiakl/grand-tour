@@ -2,13 +2,13 @@ import { stopDates } from "./dates";
 import { tripFingerprint } from "./fingerprint";
 import type { Trip } from "./schema";
 
-/** RFC 5545 TEXT escaping: backslash, semicolon, comma and newlines. */
+/** RFC 5545 TEXT escaping: backslash, semicolon, comma and line breaks (CRLF, CR or LF). */
 const escapeText = (text: string) =>
   text
     .replaceAll("\\", String.raw`\\`)
     .replaceAll(";", String.raw`\;`)
     .replaceAll(",", String.raw`\,`)
-    .replaceAll(/\r?\n/g, String.raw`\n`);
+    .replaceAll(/\r\n|\r|\n/g, String.raw`\n`);
 
 /** Fold content lines longer than 75 octets (RFC 5545 §3.1). */
 function fold(line: string): string {

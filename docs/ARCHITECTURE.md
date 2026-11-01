@@ -50,7 +50,7 @@ src/
     units/              Display units: km/mi, currency formatting, live rates.
     geo-search/         City search (Photon) behind `searchCities`.
     legal/              Operator and contact facts, report-a-map link.
-    analytics/          Cookieless Vercel Web Analytics behind `trackEvent`.
+    analytics/          Cookieless Vercel Web Analytics + Speed Insights helpers.
     utils.ts            cn() — kept at this path for shadcn compatibility.
   test/
     fixtures/           ALL reused mock data/builders. Never define shared
@@ -96,17 +96,27 @@ Do NOT create the workspace until a second consumer actually exists.
   hoists them — but the data they return comes from fixtures.
 - Schema, service layer and utils always have coverage; route handlers are
   tested through their exported `POST`/`GET` with lib modules mocked.
-- Playwright e2e lands last, in `e2e/` (exempt from max-lines).
+- Playwright e2e lands last, in `e2e/` (exempt from max-lines). It also
+  guards accessibility and layout: `a11y.spec.ts` runs axe (WCAG 2.1 AA)
+  on every page in both themes, `responsive.spec.ts` fails any page that
+  scrolls sideways at 360 / 768 / 1280, and `motion-theme.spec.ts` checks
+  reduced motion and that a theme switch moves nothing.
 
 ## Tooling standard
 
-- ESLint: `max-lines` 300 (tests/e2e exempt), `import/order`,
+- ESLint: `jsx-a11y` recommended rules as errors, `max-lines` 300
+  (tests/e2e exempt), `import/order`,
   `consistent-type-imports`, `eqeqeq`, `no-console` (warn/error allowed),
   domain-boundary `no-restricted-imports`, Prettier last.
 - Husky pre-commit: lint-staged (eslint --fix, related vitest, prettier) +
   full typecheck. commit-msg: commitlint (Conventional Commits).
-- CI (`.github/workflows/ci.yml`): lint → typecheck → test → build on every
-  PR and push to main.
+- CI (`.github/workflows/ci.yml`): lint, typecheck, test, build and e2e on
+  every PR and push to main. Shared steps come from `akhiakl/ci-workflows`
+  (private; it must allow access from akhiakl repos), pinned to a release
+  tag (`@v1.4.0`; protect tags in that repo): `setup-pnpm`, `next-cache`,
+  `playwright-browsers`, the run-check action around each check, and a sticky **Quality Gate** PR comment that
+  lists what failed. PR title, release-please and deploy call its reusable
+  workflows. Bump all pins together when `ci-workflows` changes.
 - Node pinned via `.nvmrc` + `engines`; pnpm via `packageManager`.
 - Coverage: `pnpm test:coverage` (v8) over `src/lib/**` + `src/app/api/**`
   with enforced thresholds; UI components are covered by e2e instead.
@@ -149,12 +159,52 @@ host there. No nonces, so pages stay static (inline scripts allowed).
 
 ## Observability
 
-- Sentry via `@sentry/nextjs`, wired in `src/instrumentation.ts`
-  (server/edge + `onRequestError`), `src/instrumentation-client.ts`
-  (browser + router transitions) and `src/app/global-error.tsx`
+- Sentry via `@sentry/nextjs`, wired in `instrumentation.ts`
+  (server/edge + `onRequestError`), `instrumentation-client.ts`
+  (uncaught browser errors and rejections) and `src/app/global-error.tsx`
   (last-resort boundary, in-voice copy, inline styles only — it replaces
   the root layout so globals.css is unavailable).
+- In the browser, Sentry goes through `@/lib/monitoring`
+  (`captureError`, `watchGlobalErrors`), which downloads the SDK only when
+  an error is reported. It is never in the startup bundle, so there is no
+  client performance tracing; page speed comes from Vercel Speed Insights.
 - Everything is gated on `NEXT_PUBLIC_SENTRY_DSN`: unset → total no-op.
   Source-map upload happens only when `SENTRY_AUTH_TOKEN` exists (CI).
-- Keep sample rates conservative (`tracesSampleRate: 0.1`) to stay inside
-  the free tier; raise deliberately, never by default.
+- Named server spans show where request time goes: `ai.generate_trip`
+  (attributes: model, days, attempts, outcome, city count) with one
+  `ai.chat_completion` per model call, and `redis.save_trip`,
+  `redis.get_trip`, `redis.incr_views`. Attributes are a fixed allowlist:
+  never destinations, prompts, model output, trip contents or IPs. They
+  appear in the sampled share of transactions only.
+- Better Stack watches uptime (monitors on `/`, a share link and
+  `/api/health`) and receives server logs from `src/lib/logging` (console
+  plus Better Stack): errors (`onRequestError` and handled 5xx), warnings
+  (refused requests, missing share links) and info events (trip generated,
+  shared, viewed). Fields are primitives only: route, status, a fixed
+  reason or event, never IPs, ids, prompts or trip contents. Kept 3 days
+  on the current plan. It is a processor: listed on `/privacy`.
+- Log every failure path with enough to diagnose it: where (route, `detail`),
+  what the dependency answered (`upstreamStatus`, `upstreamCode`), how long
+  (`durationMs`) and `errorFields(error)` (name and system code, never the
+  message, which can echo URLs or prompts).
+- `GET /api/health` is the uptime probe: 200 `{status:"ok"}` or 503 when
+  Redis does not answer within 2 s. Not rate limited; a healthy answer is
+  cached 15 s at the CDN (so Redis sees only a few pings a minute however
+  hard it is hit), a failure is never cached.
+- Keep server sample rates conservative (`tracesSampleRate: 0.1`) to stay
+  inside the free tier; raise deliberately, never by default.
+
+## Performance budget
+
+The release gate is real-user Core Web Vitals from Vercel Speed Insights
+(good at p75 on mobile, see `docs/RELEASE.md`); Lighthouse is a diagnostic.
+Script that runs before first paint hurts both, so keep it out of the
+startup bundle:
+
+- The map engine (MapLibre + Leaflet), dialogs, the print itinerary,
+  packing/notes tools and the units dialog mount once the page is idle
+  (`usePageIdle`); a stop's detail loads when it is opened.
+- Framer Motion features load lazily (`MotionProvider` + `m.*`;
+  `motion.*` is lint-rejected).
+- Import Zod as `import * as z from "zod"`; the named `z` drags every
+  locale into the client (lint-rejected).

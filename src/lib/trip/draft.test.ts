@@ -11,6 +11,7 @@ import {
   draftIssues,
   indexAfterMove,
   indexAfterRemove,
+  insertCityAt,
   draftToTrip,
   isShareable,
   moveCity,
@@ -29,6 +30,7 @@ describe("createBlankDraft", () => {
       title: DEFAULT_TRIP_TITLE,
       cities: [],
       legs: [],
+      keys: [],
     });
   });
 });
@@ -40,7 +42,32 @@ describe("draftFromTrip", () => {
       title: "Old Roads",
       cities: trip.cities,
       legs: trip.legs,
+      keys: [expect.any(String), expect.any(String), expect.any(String)],
     });
+  });
+
+  it("gives every stop a distinct key", () => {
+    const { keys } = draftFromTrip(makeTrip(3));
+    expect(new Set(keys).size).toBe(3);
+  });
+});
+
+describe("stop keys", () => {
+  it("follow their stop through add, insert, move and remove", () => {
+    let draft = addCity(createBlankDraft(), makeCity({ name: "A" }));
+    draft = addCity(draft, makeCity({ name: "C" }));
+    draft = insertCityAt(draft, 1, makeCity({ name: "B" }));
+    const [a, b, c] = draft.keys;
+    expect(new Set([a, b, c]).size).toBe(3);
+
+    draft = moveCity(draft, 0, 2);
+    expect(draft.cities.map((city) => city.name)).toEqual(["B", "C", "A"]);
+    expect(draft.keys).toEqual([b, c, a]);
+
+    draft = removeCityAt(draft, 1);
+    expect(draft.keys).toEqual([b, a]);
+    expect(updateStartDate(draft, "2026-05-01").keys).toEqual([b, a]);
+    expect(updateStartDate(draft, "").keys).toEqual([b, a]);
   });
 });
 
@@ -94,9 +121,44 @@ describe("removeCityAt", () => {
         makeCity({ name: "C" }),
       ],
       legs: [makeLeg({ label: "A to B" }), makeLeg({ label: "B to C" })],
+      keys: ["a", "b", "c"],
     };
     const result = removeCityAt(draft, 2);
     expect(result.legs).toEqual([makeLeg({ label: "A to B" })]);
+  });
+});
+
+describe("insertCityAt", () => {
+  const abc = (): DraftTrip => ({
+    title: "T",
+    cities: [makeCity({ name: "A" }), makeCity({ name: "C" })],
+    legs: [makeLeg({ label: "A to C" })],
+    keys: ["a", "c"],
+  });
+
+  it("puts the stop back between its neighbours, keeping legs by position", () => {
+    const result = insertCityAt(abc(), 1, makeCity({ name: "B" }));
+    expect(result.cities.map((c) => c.name)).toEqual(["A", "B", "C"]);
+    // Same positional reuse as removeCityAt, so undoing a removal keeps
+    // the first leg and adds a blank one after it.
+    expect(result.legs).toEqual([
+      makeLeg({ label: "A to C" }),
+      expect.objectContaining({ label: "" }),
+    ]);
+  });
+
+  it("clamps the position into the list", () => {
+    expect(insertCityAt(abc(), 9, makeCity({ name: "Z" })).cities.at(-1)?.name).toBe(
+      "Z",
+    );
+    expect(insertCityAt(abc(), -2, makeCity({ name: "Z" })).cities[0].name).toBe(
+      "Z",
+    );
+  });
+
+  it("refuses to pass the guest stop limit", () => {
+    const full = draftFromTrip(makeTrip(GUEST_MAX_CITIES));
+    expect(insertCityAt(full, 0, makeCity())).toBe(full);
   });
 });
 

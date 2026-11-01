@@ -169,6 +169,19 @@ describe("TripExperience", () => {
     click.mockRestore();
   });
 
+  it("opens the route in a maps app for any trip", async () => {
+    const open = vi.spyOn(window, "open").mockImplementation(() => null);
+
+    render(<TripExperience trip={routeTrip()} actions="shared" />);
+    await userEvent.click(screen.getByRole("button", { name: "Navigation" }));
+    expect(open).toHaveBeenCalledWith(
+      expect.stringContaining("https://www.google.com/maps/dir/?api=1"),
+      "_blank",
+      "noopener",
+    );
+    open.mockRestore();
+  });
+
   it("shared mode: remix also forks a fresh copy (no localId)", async () => {
     render(<TripExperience trip={routeTrip()} actions="shared" />);
 
@@ -198,8 +211,9 @@ describe("TripExperience", () => {
 
     const itinerary = screen.getByRole("list", { name: "Itinerary" });
     await userEvent.click(within(itinerary).getByRole("button", { name: /Stop 2/ }));
+    // The detail's code loads on demand.
     expect(
-      screen.getByRole("heading", { level: 2, name: "Stop 2" }),
+      await screen.findByRole("heading", { level: 2, name: "Stop 2" }),
     ).toBeInTheDocument();
     expect(screen.queryByRole("list", { name: "Itinerary" })).toBeNull();
 
@@ -211,8 +225,9 @@ describe("TripExperience", () => {
     render(<TripExperience trip={routeTrip()} actions="shared" />);
 
     await userEvent.click(screen.getByRole("button", { name: "map marker" }));
+    // The detail's code loads on demand.
     expect(
-      screen.getByRole("heading", { level: 2, name: "Stop 2" }),
+      await screen.findByRole("heading", { level: 2, name: "Stop 2" }),
     ).toBeInTheDocument();
   });
 

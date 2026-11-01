@@ -5,6 +5,7 @@ import {
   CalendarPlus,
   ImageDown,
   Map,
+  Navigation,
   NotebookPen,
   Pencil,
   Plus,
@@ -131,6 +132,7 @@ export function SecondaryActions({
   onTool,
   onPoster,
   onCalendar,
+  onNavigate,
   onEditRoute,
 }: {
   readonly variant: ExperienceVariant;
@@ -139,11 +141,20 @@ export function SecondaryActions({
   readonly onPoster: () => void;
   /** Present for dated trips: downloads the stops as calendar events. */
   readonly onCalendar?: () => void;
+  /** Opens the route in a maps app (Google Maps directions). */
+  readonly onNavigate: () => void;
   readonly onEditRoute: () => void;
 }) {
   const t = useTranslations("Trip.actions");
   return (
-    <nav aria-label={t("tools")} className="flex justify-between gap-1 [&>*]:flex-1">
+    <nav
+      aria-label={t("tools")}
+      className={
+        variant === "demo"
+          ? "flex justify-between gap-1 [&>*]:flex-1"
+          : "grid grid-cols-3 gap-1 sm:flex sm:justify-between sm:[&>*]:flex-1"
+      }
+    >
       {variant === "demo" && (
         <Tile icon={<Pencil />} label={t("customize")} onClick={onEditRoute} />
       )}
@@ -165,6 +176,9 @@ export function SecondaryActions({
       <Tile icon={<ImageDown />} label={t("poster")} onClick={onPoster} />
       {onCalendar && (
         <Tile icon={<CalendarPlus />} label={t("calendar")} onClick={onCalendar} />
+      )}
+      {variant !== "demo" && (
+        <Tile icon={<Navigation />} label={t("navigate")} onClick={onNavigate} />
       )}
     </nav>
   );

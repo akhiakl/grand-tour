@@ -1,7 +1,7 @@
 allowBuilds:
-  '@parcel/watcher': false
+  "@parcel/watcher": false
   "@sentry/cli": true
-  '@swc/core': false
+  "@swc/core": false
   sharp: true
   unrs-resolver: true
 minimumReleaseAgeExclude:

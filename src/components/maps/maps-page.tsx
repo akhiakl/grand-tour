@@ -76,16 +76,16 @@ export function MapsPage() {
   };
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-line pb-5">
+    <div className="page-container py-8 lg:py-12">
+      <header className="flex flex-wrap items-end justify-between gap-6 border-b border-line pb-8">
         <div>
           <Link
             href="/"
-            className="eyebrow inline-flex w-fit items-center gap-1 text-muted-foreground transition-colors hover:text-brass-text"
+            className="eyebrow inline-flex w-fit items-center gap-1.5 rounded-sm text-muted-foreground transition-colors outline-none hover:text-brass-text focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <ArrowLeft className="size-3" /> {common("backToAtlas")}
+            <ArrowLeft aria-hidden className="size-3.5" /> {common("backToAtlas")}
           </Link>
-          <h1 className="font-display text-3xl font-medium tracking-tight">
+          <h1 className="mt-3 font-display text-section font-medium tracking-tight">
             {t.rich("title", { em: accent })}
           </h1>
         </div>
@@ -100,9 +100,9 @@ export function MapsPage() {
       </header>
 
       {mounted && records.length === 0 && (
-        <div className="mt-16 flex flex-col items-center gap-3 text-center">
-          <Compass className="size-10 text-muted-foreground" />
-          <p className="text-muted-foreground">{t("empty")}</p>
+        <div className="mt-24 flex flex-col items-center gap-5 text-center">
+          <Compass aria-hidden className="size-12 text-brass-text" />
+          <p className="max-w-[40ch] text-lead text-ink-soft">{t("empty")}</p>
           <div className="flex flex-wrap justify-center gap-2">
             <Button asChild variant="brass">
               <Link href="/plan">
@@ -116,7 +116,7 @@ export function MapsPage() {
         </div>
       )}
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+      <div className="mt-10 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
         {records.map((record) => (
           <TripCard
             key={record.id}

@@ -24,6 +24,7 @@ describe("contentSecurityPolicy", () => {
       "https://tiles.openfreemap.org",
       "https://photon.komoot.io",
     ]);
+    expect(directive(csp, "img-src")).toContain("https://*.basemaps.cartocdn.com");
     expect(directive(csp, "worker-src")).toEqual(["'self'", "blob:"]);
     expect(directive(csp, "frame-ancestors")).toEqual(["'none'"]);
     expect(directive(csp, "frame-src")).toEqual(["'none'"]);
@@ -45,6 +46,16 @@ describe("contentSecurityPolicy", () => {
     ]);
   });
 
+  it("allows the Userback hosts only when the tester widget is on", () => {
+    const on = contentSecurityPolicy({ ...base, userback: true });
+    const off = contentSecurityPolicy(base);
+
+    for (const name of ["script-src", "connect-src", "img-src", "frame-src"]) {
+      expect(directive(on, name)).toContain("https://*.userback.io");
+      expect(directive(off, name)).not.toContain("https://*.userback.io");
+    }
+  });
+
   it("ignores malformed or blank URLs", () => {
     const csp = contentSecurityPolicy({
       ...base,
@@ -60,17 +71,36 @@ describe("contentSecurityPolicy", () => {
   });
 
   it("loosens only what dev and Vercel previews need", () => {
-    const csp = contentSecurityPolicy({ dev: true, vercelPreview: true });
+    const csp = contentSecurityPolicy({
+      dev: true,
+      vercelPreview: true,
+      userback: true,
+    });
 
     expect(directive(csp, "script-src")).toEqual([
       "'self'",
       "'unsafe-inline'",
       "'unsafe-eval'",
       "https://va.vercel-scripts.com",
+      "https://*.userback.io",
       "https://vercel.live",
     ]);
+    expect(directive(csp, "img-src")).toContain("https://vercel.com");
+    expect(directive(csp, "font-src")).toContain("https://assets.vercel.com");
     expect(directive(csp, "connect-src")).toContain("ws:");
-    expect(directive(csp, "frame-src")).toEqual(["https://vercel.live"]);
+    expect(directive(csp, "frame-src")).toEqual([
+      "https://*.userback.io",
+      "https://vercel.live",
+    ]);
+  });
+});
+
+describe("toolbar origins", () => {
+  it("stay out of production", () => {
+    const csp = contentSecurityPolicy({ dev: false, vercelPreview: false });
+
+    expect(directive(csp, "img-src")).not.toContain("https://vercel.com");
+    expect(directive(csp, "font-src")).not.toContain("https://assets.vercel.com");
   });
 });
 

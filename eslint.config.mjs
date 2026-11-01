@@ -2,10 +2,17 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 import prettier from "eslint-config-prettier/flat";
+import jsxA11y from "eslint-plugin-jsx-a11y";
 
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
+  {
+    // Next registers jsx-a11y but enables only a handful of its rules (as
+    // warnings); turn on the full recommended set as errors.
+    files: ["**/*.{jsx,tsx}"],
+    rules: jsxA11y.flatConfigs.recommended.rules,
+  },
   {
     rules: {
       // Hard ceiling: files must be split by responsibility, not grown.
@@ -13,7 +20,7 @@ const eslintConfig = defineConfig([
 
       // Correctness & hygiene.
       eqeqeq: ["error", "always", { null: "ignore" }],
-      "no-console": ["warn", { allow: ["warn", "error"] }],
+      "no-console": ["warn", { allow: ["info", "warn", "error"] }],
       "prefer-const": "error",
       "object-shorthand": "error",
       "no-nested-ternary": "error",
@@ -35,6 +42,23 @@ const eslintConfig = defineConfig([
           pathGroups: [{ pattern: "@/**", group: "internal" }],
           "newlines-between": "always",
           alphabetize: { order: "asc", caseInsensitive: true },
+        },
+      ],
+
+      // Bundle size: named imports that defeat tree-shaking on the client.
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "ImportDeclaration[source.value='zod'] > ImportSpecifier[imported.name='z']",
+          message:
+            'Use `import * as z from "zod"`: the named `z` keeps every Zod locale (~200KB) in the client bundle.',
+        },
+        {
+          selector:
+            "ImportDeclaration[source.value='framer-motion'] > ImportSpecifier[imported.name='motion']",
+          message:
+            "Use `m` from framer-motion: MotionProvider loads animation features lazily.",
         },
       ],
 
@@ -65,6 +89,8 @@ const eslintConfig = defineConfig([
     files: ["src/components/ui/**"],
     rules: {
       "react/prefer-read-only-props": "off",
+      // Headings get their text through spread `children`.
+      "jsx-a11y/heading-has-content": "off",
     },
   },
   prettier,

@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 
 import { EditorPage } from "@/components/editor/editor-page";
+import { PageLoading } from "@/components/page-loading";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("Metadata.new");
@@ -15,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function NewPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<PageLoading />}>
       <EditorPage />
     </Suspense>
   );

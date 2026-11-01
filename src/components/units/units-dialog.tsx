@@ -45,7 +45,7 @@ export function UnitsDialog() {
       <DialogTrigger
         aria-label={t("trigger")}
         title={t("trigger")}
-        className="grid size-9 shrink-0 place-items-center rounded-full border border-line text-ink-soft transition-colors outline-none hover:bg-accent hover:text-ink focus-visible:ring-2 focus-visible:ring-ring [&_svg]:size-4"
+        className="grid size-10 shrink-0 place-items-center rounded-full border border-line text-ink-soft transition-colors outline-none hover:bg-accent hover:text-ink focus-visible:ring-2 focus-visible:ring-ring [&_svg]:size-4"
       >
         <Ruler />
       </DialogTrigger>

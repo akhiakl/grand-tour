@@ -31,7 +31,6 @@ export function DestinationStep({
   return (
     <form onSubmit={submit} className="flex gap-2">
       <Input
-        autoFocus
         name="destination"
         aria-label={t("destinationLabel")}
         placeholder={t("destinationPlaceholder")}
@@ -65,6 +64,9 @@ export function DaysStep({
   return (
     <form onSubmit={submit} className="flex items-center gap-2">
       <Input
+        // Focus follows the conversation: this field appears because the
+        // guest just answered the previous question.
+        // eslint-disable-next-line jsx-a11y/no-autofocus
         autoFocus
         name="days"
         aria-label={t("daysLabel")}
@@ -73,6 +75,8 @@ export function DaysStep({
         min={MIN_DAYS}
         max={MAX_DAYS}
         value={value}
+        // Typing replaces the suggested 7 rather than appending to it.
+        onFocus={(e) => e.target.select()}
         onChange={(e) => setValue(e.target.value)}
         className="w-28"
       />
@@ -99,6 +103,8 @@ export function VibeStep({
         <button
           key={vibe}
           type="button"
+          // Same as the days step: shown in response to the guest's answer.
+          // eslint-disable-next-line jsx-a11y/no-autofocus
           autoFocus={i === 0}
           onClick={() => onAnswer(vibe)}
           className="frost flex flex-col items-start gap-1 rounded-2xl px-4 py-3 text-left transition-colors hover:border-brass focus-visible:border-brass focus-visible:outline-none"

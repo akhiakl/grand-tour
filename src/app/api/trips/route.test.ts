@@ -6,6 +6,12 @@ import { makeTrip } from "@/test/fixtures/trip";
 const mocks = vi.hoisted(() => ({
   limit: vi.fn(),
   saveTrip: vi.fn(),
+  emit: vi.fn(),
+}));
+
+vi.mock("@/lib/logging", () => ({
+  emit: mocks.emit,
+  errorFields: (error: Error) => ({ errorName: error.name }),
 }));
 
 vi.mock("@/lib/http", () => ({
@@ -40,6 +46,32 @@ describe("POST /api/trips", () => {
     expect(res.status).toBe(201);
     expect(await res.json()).toEqual({ id: "abc12345" });
     expect(mocks.saveTrip).toHaveBeenCalledOnce();
+  });
+
+  it("logs a shared trip without its id or contents", async () => {
+    await post(makeTrip());
+    expect(mocks.emit).toHaveBeenCalledWith("info", "trip shared", {
+      route: "/api/trips",
+    });
+  });
+
+  it("logs a rate-limited request without the caller's address", async () => {
+    mocks.limit.mockResolvedValue({ success: false });
+    await post(makeTrip());
+    expect(mocks.emit).toHaveBeenCalledWith("warn", "request refused", {
+      route: "/api/trips",
+      status: 429,
+      reason: "rate_limited",
+    });
+  });
+
+  it("logs an invalid trip by reason only", async () => {
+    await post({ ...makeTrip(), title: "" });
+    expect(mocks.emit).toHaveBeenCalledWith("warn", "request refused", {
+      route: "/api/trips",
+      status: 400,
+      reason: "invalid_trip",
+    });
   });
 
   it("returns 429 when the rate limit is exhausted", async () => {
@@ -88,5 +120,15 @@ describe("POST /api/trips", () => {
     const res = await post(makeTrip());
     expect(res.status).toBe(500);
     expect(await res.json()).toEqual({ error: "save_failed" });
+  });
+
+  it("logs a failed save without the trip or the store's message", async () => {
+    mocks.saveTrip.mockRejectedValue(new Error("redis down"));
+    await post(makeTrip());
+    expect(mocks.emit).toHaveBeenCalledWith("error", "save failed", {
+      route: "/api/trips",
+      status: 500,
+      errorName: "Error",
+    });
   });
 });

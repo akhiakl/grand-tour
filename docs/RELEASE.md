@@ -14,19 +14,20 @@ Releases are driven by Conventional Commits via
   box in the checklist below is checked.
 
 One-time setup: add a repo PAT as the `RELEASE_PLEASE_TOKEN` secret so
-required CI checks run on release PRs (PRs created by the default
-`GITHUB_TOKEN` don't trigger workflows).
+required CI checks run on release PRs and the published release starts
+the Deploy workflow (events created by the default `GITHUB_TOKEN` don't
+trigger workflows).
 
 ## Deploy policy — deploy only when everything is complete
 
 - **Production never deploys from `main` pushes.** The only production
   trigger is a _published GitHub Release_: `.github/workflows/deploy.yml`
-  fires on `release: published` and calls the `DEPLOY_HOOK_URL` secret
-  (Vercel/Netlify deploy hook — set it when the host is chosen; until
-  then releases are tags only).
-- If the repo is connected to Vercel, disable its automatic production
-  deploys from `main` (Project → Git → Production Branch behavior) so
-  the release hook stays the single path. PR preview deploys are fine
+  fires on `release: published` and deploys with the Vercel CLI using the
+  `VERCEL_TOKEN` secret (until it is set, releases are tags only).
+- Vercel's Ignored Build Step (Project → Settings → Git) skips
+  production builds of `main` (Hobby has no deployment policy), so the
+  release workflow stays the single path; CLI deploys are not subject to
+  it. PR preview deploys are fine
   and encouraged.
 - The **first production deploy is `v1.0.0`** — after the MVP checklist
   is 100% complete. `0.x` releases are internal milestones (tags +
@@ -48,29 +49,42 @@ checked before merging the `1.0.0` release PR.
 - [x] Step 6 — AI chat, ghost-stops upsell
 - [x] Step 7 — landing page with both CTAs, polish pass
 - [x] Step 8 — Playwright e2e: all four journeys green in CI
-- [ ] Step 9 — UX & a11y hardening (design-review follow-ups)
+- [x] Step 9 — UX & a11y hardening (design-review follow-ups)
 - [x] Step 10 — legal pages, report link, AI notice, analytics
 - [x] Step 11 — `/about` story page, map motion under 5s
 - [x] Step 12 — landing destination search, returning visitors
 
 ### Guest limit verified at all three layers
 
-- [ ] Server: 6-city POST returns `403 {error:"city_limit",limit:5}`
-- [ ] Editor: counter + upsell modal at 5/5
-- [ ] AI: >5-city request yields 5 cities + `suggestedExtra` ghost stops
+- [x] Server: 6-city POST returns `403 {error:"city_limit",limit:5}`
+- [x] Editor: counter + upsell modal at 5/5 (e2e `limit.spec.ts`)
+- [x] AI: >5-city request yields 5 cities + `suggestedExtra` ghost stops
 
 ### Quality
 
-- [ ] All CI checks green on `main` (Lint, Typecheck, Tests & coverage,
+- [x] All CI checks green on `main` (Lint, Typecheck, Tests & coverage,
       Build, e2e) and SonarQube quality gate passing
-- [ ] Coverage ≥ 85% overall
-- [ ] Keyboard audit: ESC closes drawer/modals, focus trapped & restored,
-      full tab-through of editor and chat
-- [ ] Lighthouse: a11y ≥ 95, performance ≥ 85 on `/`, `/new`, `/t/[id]`
-- [ ] Both themes checked on every page; no layout shift on toggle
-- [ ] `prefers-reduced-motion` honored everywhere (splash, route, drawers)
-- [ ] Responsive at 360 / 768 / 1280; no horizontal scroll
-- [ ] Loading, error, empty and expired states designed in-voice
+- [x] Coverage ≥ 85% overall
+- [x] Keyboard audit: ESC closes drawer/modals, focus trapped & restored,
+      full tab-through of editor and chat (focus now lands on the next
+      stop after a removal, on a new blank stop, and on Retry when a
+      draft fails; Sonner returns focus to the last control when tabbing
+      out of a toast, by design)
+- [x] Lighthouse a11y ≥ 95 on `/`, `/new`, `/t/[id]` (96–100 everywhere)
+- [ ] Core Web Vitals "good" at the 75th percentile on mobile in Vercel
+      Speed Insights for `/`, `/new` and `/t/[id]`: LCP ≤ 2.5 s, INP ≤
+      200 ms, CLS ≤ 0.1, over at least 7 days of real traffic. Lighthouse
+      performance is a diagnostic only (desktop 98; simulated mobile
+      ~70 / 74 / 71, held back by React hydration and the map engine)
+- [x] Both themes checked on every page; no layout shift on toggle
+      (e2e: axe in light and dark, `motion-theme.spec.ts`)
+- [x] `prefers-reduced-motion` honored everywhere (splash, route, drawers)
+- [x] Responsive at 360 / 768 / 1280; no horizontal scroll
+      (e2e `responsive.spec.ts`)
+- [x] Loading, error, empty and expired states designed in-voice
+      (`PageLoading` while local maps load; `app/error.tsx` keeps the
+      layout with Retry; `/t/[id]` has no `loading.tsx` on purpose, so
+      expired links keep their 404 status)
 
 ### Infrastructure (production values)
 
@@ -96,16 +110,27 @@ checked before merging the `1.0.0` release PR.
 - [ ] Terms name the city whose courts have jurisdiction
 - [ ] Sentry verified to send no IPs or request bodies and to write
       nothing to the visitor's device (the notice promises no cookies)
-- [ ] Vercel and Sentry log retention checked against CERT-In's 180 days
+- [ ] Better Stack set up: uptime monitors (email alerts) on `/` and
+      `/api/health`, plus one on a live `/t/{id}` once a real share exists;
+      the `Grand Tour server` source and the `BETTER_STACK_SOURCE_TOKEN` /
+      `BETTER_STACK_INGESTING_URL` Production env vars are in place (done)
+- [ ] Log retention: the current Better Stack plan keeps logs 3 days, and
+      `/privacy` says so. If CERT-In's 180-day log rule applies, upgrade the
+      plan, set the source to 180 days and update `/privacy`
+- [ ] CERT-In's 180-day log rule checked with the lawyer, including
+      whether logs must stay in India (Better Stack's region)
+- [ ] Sentry alert rules created (new issue, error spike)
 - [ ] Vercel Web Analytics enabled on the project; custom events need
       Pro, otherwise only page views are recorded
+- [ ] Vercel Speed Insights enabled on the project (feeds the Core Web
+      Vitals gate above)
 - [ ] Search the code for `TODO(legal)` / `TODO(analytics)`; each is
       resolved or consciously deferred
 
 ### Launch
 
 - [ ] Merge the `1.0.0` release PR → tag + GitHub Release published
-- [ ] `DEPLOY_HOOK_URL` fires; production smoke test of the four core
+- [ ] The Deploy workflow runs; production smoke test of the four core
       journeys (manual create→share→open→remix; AI create; 5-city upsell;
       expired link)
 - [ ] README badges green; CHANGELOG reads clean
@@ -153,8 +178,8 @@ or bump it.
 
 `deploy.yml` fires on the published release:
 
-- `DEPLOY_HOOK_URL` secret set → the host's deploy hook is called and
-  production ships this exact tag.
+- `VERCEL_TOKEN` secret set → the workflow builds and deploys this exact
+  tag to production.
 - Not set → nothing deploys; the release is a tag + changelog milestone
   (this is the correct state for all `0.x` releases before launch).
 
@@ -184,7 +209,7 @@ live — smoke-test production.
    description and tick every box).
 2. Land a commit with `Release-As: 1.0.0` → release PR becomes
    `chore(main): release 1.0.0`.
-3. Merge it → tag + Release published → deploy hook fires → production
+3. Merge it → tag + Release published → Deploy workflow runs → production
    smoke test of the four core journeys.
 
 ### 6. Hotfix walkthrough
@@ -197,13 +222,14 @@ live — smoke-test production.
 
 ### Troubleshooting
 
-| Symptom                         | Cause / fix                                                                                                         |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| No release PR after merging     | Only non-releasable types landed (`chore`/`docs`/…) — expected; or the Release workflow failed — check Actions.     |
-| Release PR has no CI checks     | Created with the default `GITHUB_TOKEN`; add the `RELEASE_PLEASE_TOKEN` PAT secret and re-run the Release workflow. |
-| Wrong version proposed          | Add a `Release-As: x.y.z` footer commit; the PR retargets on the next workflow run.                                 |
-| Merged release PR but no deploy | `DEPLOY_HOOK_URL` unset (fine pre-launch) or the hook URL is invalid — check the Deploy workflow logs.              |
-| Need to unpublish               | Never delete tags; ship a `fix:`/revert commit and cut the next patch instead.                                      |
+| Symptom                          | Cause / fix                                                                                                              |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| No release PR after merging      | Only non-releasable types landed (`chore`/`docs`/…) — expected; or the Release workflow failed — check Actions.          |
+| Release PR has no CI checks      | Created with the default `GITHUB_TOKEN`; add the `RELEASE_PLEASE_TOKEN` PAT secret and re-run the Release workflow.      |
+| Wrong version proposed           | Add a `Release-As: x.y.z` footer commit; the PR retargets on the next workflow run.                                      |
+| Merged release PR but no deploy  | `VERCEL_TOKEN` unset (fine pre-launch) or invalid — check the Deploy workflow logs.                                      |
+| Release merged, Deploy never ran | `RELEASE_PLEASE_TOKEN` unset: releases made with the default `GITHUB_TOKEN` can't trigger workflows. Add the PAT secret. |
+| Need to unpublish                | Never delete tags; ship a `fix:`/revert commit and cut the next patch instead.                                           |
 
 ## After launch
 

@@ -36,30 +36,37 @@ export function LegalPage({
   const common = useTranslations("Common");
   return (
     <div className="flex min-h-dvh flex-col">
-      <main className="mx-auto grid w-full max-w-5xl flex-1 gap-10 px-4 py-10 sm:px-6 lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-14 lg:py-16">
-        <header className="flex flex-col gap-3 lg:col-span-2">
+      <nav aria-label={common("backToAtlas")} className="page-container">
+        <div className="flex h-16 items-center">
           <Link
             href="/"
-            className="eyebrow inline-flex w-fit items-center gap-1 text-muted-foreground transition-colors hover:text-brass-text"
+            className="eyebrow inline-flex items-center gap-1.5 rounded-sm text-muted-foreground transition-colors outline-none hover:text-brass-text focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <ArrowLeft className="size-3" /> {common("backToAtlas")}
+            <ArrowLeft aria-hidden className="size-3.5" /> {common("backToAtlas")}
           </Link>
+        </div>
+      </nav>
+      <main className="page-container grid flex-1 gap-12 py-10 lg:grid-cols-[minmax(0,3fr)_minmax(0,9fr)] lg:gap-x-8 lg:gap-y-14 lg:py-16">
+        <header className="flex flex-col gap-4 border-b border-line pb-10 lg:col-span-2 lg:pb-12">
           <p className="eyebrow">{eyebrow}</p>
-          <h1 className="font-display text-4xl font-medium tracking-tight text-ink sm:text-5xl">
+          <h1 className="font-display text-display font-medium tracking-tight text-balance text-ink">
             {title}
           </h1>
           {updated && (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground">
               {t("lastUpdated", { date: LEGAL_LAST_UPDATED })}
             </p>
           )}
         </header>
 
         <nav aria-label={t("onThisPage")} className="hidden lg:block">
-          <ol className="sticky top-8 flex flex-col gap-2 text-sm text-ink-soft">
+          <ol className="sticky top-12 flex flex-col gap-3 border-l border-line pl-5 text-ink-soft">
             {sections.map(({ id, title: label }) => (
               <li key={id}>
-                <a href={`#${id}`} className="transition-colors hover:text-ink">
+                <a
+                  href={`#${id}`}
+                  className="rounded-sm transition-colors outline-none hover:text-ink focus-visible:ring-2 focus-visible:ring-ring"
+                >
                   {label}
                 </a>
               </li>
@@ -67,8 +74,8 @@ export function LegalPage({
           </ol>
         </nav>
 
-        <article className="flex max-w-prose min-w-0 flex-col gap-10 text-[15px] leading-relaxed text-ink-soft [&_a]:text-ink [&_a]:underline [&_a]:underline-offset-2 [&_li]:mt-1.5 [&_section>*+*]:mt-3 [&_strong]:font-medium [&_strong]:text-ink [&_ul]:list-disc [&_ul]:pl-5">
-          <div className="rounded-2xl border border-line bg-card-solid p-5 text-ink">
+        <article className="flex max-w-[36rem] min-w-0 flex-col gap-20 leading-relaxed text-ink-soft [&_a]:text-ink [&_a]:underline [&_a]:underline-offset-2 [&_li]:mt-1.5 [&_section>*+*]:mt-3 [&_strong]:font-medium [&_strong]:text-ink [&_ul]:list-disc [&_ul]:pl-5">
+          <div className="rounded-2xl border border-line bg-card-solid p-6 text-lead text-ink sm:p-8">
             {summary}
           </div>
           {sections.map(({ id, title: heading, body }) => (
@@ -76,11 +83,11 @@ export function LegalPage({
               key={id}
               id={id}
               aria-labelledby={`${id}-title`}
-              className="scroll-mt-8"
+              className="scroll-mt-12"
             >
               <h2
                 id={`${id}-title`}
-                className="font-display text-2xl font-medium tracking-tight text-ink"
+                className="font-display text-title font-medium tracking-tight text-ink"
               >
                 {heading}
               </h2>

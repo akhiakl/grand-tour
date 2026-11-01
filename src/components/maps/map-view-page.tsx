@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 import { OffTheMap } from "@/components/off-the-map";
+import { PageLoading } from "@/components/page-loading";
 import { TripExperience } from "@/components/trip/trip-experience";
 import { useMounted } from "@/hooks/use-mounted";
 import { getLocalTrip } from "@/lib/trip";
@@ -28,7 +29,7 @@ export function MapViewPage() {
   const { id } = useParams<{ id: string }>();
   const mounted = useMounted();
 
-  if (!mounted) return null;
+  if (!mounted) return <PageLoading />;
 
   const record = getLocalTrip(id);
   if (!record) return <NotFoundOnThisDevice />;

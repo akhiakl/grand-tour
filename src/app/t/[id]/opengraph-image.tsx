@@ -140,6 +140,7 @@ export default async function Image({
         }}
       >
         <svg
+          aria-hidden
           width={box.width}
           height={box.height}
           style={{ position: "absolute", left: 0, top: 0 }}

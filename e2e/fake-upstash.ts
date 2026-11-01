@@ -1,8 +1,9 @@
 /**
  * In-memory stand-in for the Upstash Redis REST API, so the server-rendered
  * share page (`/t/{id}`) reads snapshots without a real database. Speaks
- * only the commands the trip service sends (SET/SETEX/GETEX/INCR/EXPIRE),
- * with the client's default base64 response encoding.
+ * only the commands the trip service sends (SET/SETEX/GETEX/INCR/EXPIRE).
+ * String replies are base64 only when the client asks for it with the
+ * `Upstash-Encoding: base64` header (older clients); newer ones read raw.
  *
  * Run with `node e2e/fake-upstash.ts` (Node strips the types natively).
  */
@@ -11,9 +12,10 @@ import { createServer } from "node:http";
 const PORT = Number(process.env.FAKE_UPSTASH_PORT ?? 8079);
 const store = new Map<string, string>();
 
-const encode = (value: string) => Buffer.from(value, "utf8").toString("base64");
-
-function run([command, key, ...args]: string[]): unknown {
+function run(
+  [command, key, ...args]: string[],
+  encode: (value: string) => string,
+): unknown {
   switch (command.toUpperCase()) {
     case "SET":
       store.set(key, args[0]);
@@ -43,12 +45,17 @@ createServer((request, response) => {
   request.on("data", (chunk) => (body += chunk));
   request.on("end", () => {
     response.setHeader("Content-Type", "application/json");
+    const base64 = request.headers["upstash-encoding"] === "base64";
+    const encode = (value: string) =>
+      base64 ? Buffer.from(value, "utf8").toString("base64") : value;
     try {
       // Auto-pipelining batches commands as `[[cmd, ...], ...]` on /pipeline.
       const parsed = JSON.parse(body) as string[] | string[][];
       const payload = Array.isArray(parsed[0])
-        ? (parsed as string[][]).map((command) => ({ result: run(command) }))
-        : { result: run(parsed as string[]) };
+        ? (parsed as string[][]).map((command) => ({
+            result: run(command, encode),
+          }))
+        : { result: run(parsed as string[], encode) };
       response.end(JSON.stringify(payload));
     } catch (error) {
       response.statusCode = 400;

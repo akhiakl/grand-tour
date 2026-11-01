@@ -1,5 +1,6 @@
 "use client";
 
+import { BedDouble, CalendarDays, Wallet } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useId } from "react";
 
@@ -62,21 +63,30 @@ export function CityDetail({
           </h2>
           <p className="flex flex-wrap gap-x-4 text-[12.5px] text-ink-soft">
             <span>
-              🛏{" "}
+              <BedDouble
+                aria-hidden
+                className="mr-1 inline size-3.5 align-[-2px] text-brass-text"
+              />
               <b className="font-semibold text-ink">
                 {t("nights", { count: city.nights })}
               </b>
             </span>
             {dates && (
               <span>
-                📅{" "}
+                <CalendarDays
+                  aria-hidden
+                  className="mr-1 inline size-3.5 align-[-2px] text-brass-text"
+                />
                 <b className="font-semibold text-ink">
                   {formatDateSpan(dates, locale)}
                 </b>
               </span>
             )}
             <span>
-              💰{" "}
+              <Wallet
+                aria-hidden
+                className="mr-1 inline size-3.5 align-[-2px] text-brass-text"
+              />
               <b className="font-semibold text-ink">
                 {t("perDay", { amount: money(city.budget) })}
               </b>

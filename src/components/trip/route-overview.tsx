@@ -34,9 +34,7 @@ function Stat({
           </span>
         )}
       </b>
-      <span className="block text-[10px] tracking-[0.16em] text-ink-soft uppercase wrap-break-word">
-        {caption}
-      </span>
+      <span className="block text-xs text-ink-soft wrap-break-word">{caption}</span>
     </div>
   );
 }

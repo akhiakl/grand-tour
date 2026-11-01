@@ -24,8 +24,8 @@ function GhostMarker({
       L.divIcon({
         className: "marker-anchor",
         html: `<div class="marker marker-ghost"><span class="marker-dot"></span><span class="marker-lbl">${LOCK_SVG} ${escapeHtml(ghost.name)}</span></div>`,
-        iconSize: [0, 0],
-        iconAnchor: [0, 0],
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
       }),
     [ghost.name],
   );

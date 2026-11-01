@@ -36,6 +36,28 @@ route maps — populated by AI chat or manually — shared via short links
   fixtures.
 - Playwright e2e is the LAST build step only.
 
+## Workflow skills (apply automatically, no slash command)
+
+Skills in `.claude/skills` are part of the rules; load them by task:
+
+- **Every coding task:** `grand-tour-engineering` (smallest complete
+  change, surgical edits, ask instead of assuming, where code lives).
+- **Before writing implementation code:** `grand-tour-testing` (test
+  first at the lowest layer; light and dark screenshots of any new or
+  changed screen, checked before sharing).
+- **Before every push or PR, and when asked to review or audit:**
+  `grand-tour-review` on the diff; fix its Must-fix findings first.
+  Mark deliberate limits `shortcut: <limit>, <when to upgrade>`.
+- **Product and stack rules:** `grand-tour` (features, limits, design
+  recipes), `nextjs`, `shadcn`, `tailwind`.
+
+## Model Assignment Rules
+
+- Architecture decisions and reviews: Use Opus
+- Implementation tasks (new features, refactors): Use Sonnet
+- Simple edits, formatting, renaming: Use Haiku
+- Security-sensitive changes: Always escalate to Opus for review
+
 ## Architecture
 
 - Next.js App Router, TypeScript strict, Tailwind v4, shadcn/ui,
@@ -63,10 +85,18 @@ route maps — populated by AI chat or manually — shared via short links
   `km` in UI copy.
 - **Monitoring**: Sentry (`@sentry/nextjs`) via the instrumentation hooks;
   fully gated on `NEXT_PUBLIC_SENTRY_DSN` — never add monitoring calls in
-  components; error boundaries and `onRequestError` cover capture.
-- **Analytics**: cookieless Vercel Web Analytics behind `@/lib/analytics`
-  (`trackEvent`, query strings stripped). No cookies or trackers: adding
-  one means updating `/privacy` and likely a consent banner.
+  components; error boundaries and `onRequestError` cover capture. In the
+  browser, Sentry loads only when an error is reported (`@/lib/monitoring`);
+  never import `@sentry/nextjs` in client code.
+- **Performance**: gated on real-user Core Web Vitals; keep script out of
+  the startup bundle (map, dialogs and print view wait for `usePageIdle`;
+  `m.*` not `motion.*`; `import * as z from "zod"`). See `docs/ARCHITECTURE.md` → Performance
+  budget.
+- **Analytics**: cookieless Vercel Web Analytics and Speed Insights
+  (`SiteAnalytics`, helpers in `@/lib/analytics`: `trackEvent`, query
+  strings stripped). Speed Insights' real-user Core Web Vitals are the
+  release performance gate. No cookies or trackers: adding one means
+  updating `/privacy` and likely a consent banner.
 - **Legal**: `/privacy`, `/terms`, `/contact` read operator facts from
   `@/lib/legal`. Open `TODO(legal)` items gate `v1.0.0` (`docs/RELEASE.md`);
   new data flows to third parties must be added to the Privacy processor list.
@@ -99,8 +129,8 @@ Follow exactly; tokens live in `src/app/globals.css`:
   other content cards over it.
 - Surfaces: `.frost` (backdrop-blur 18px, 1px `--line` border, radius
   14–20px, soft long shadow) for dialogs; small map overlays use solid
-  `bg-card-solid`. Labels: `.eyebrow` (10px, tracking .28em,
-  uppercase, brass).
+  `bg-card-solid`. Labels: `.eyebrow` (12px, semibold, brass, sentence
+  case, untracked); never tracked capitals for labels, captions or tabs.
 - Motion: Framer Motion with `cubic-bezier(.32,.72,.24,1)` (`--ease-atlas`);
   always respect `prefers-reduced-motion`.
 - Map: OpenFreeMap positron vector tiles (MapLibre in Leaflet; open source,
@@ -130,7 +160,7 @@ another transport can wrap it later.
 ## Build order
 
 `docs/ROADMAP.md` is the authoritative step-by-step plan (deliverables,
-contracts, definition of done per step). One step = one `feature/*` PR,
+contracts, definition of done per step). One step = one `feat/*` PR,
 reviewed before the next starts. Releases are semver via release-please;
 production deploys only from published releases, and `v1.0.0` is gated on
 the MVP checklist in `docs/RELEASE.md` — never wire deploys to `main`.
@@ -138,5 +168,6 @@ the MVP checklist in `docs/RELEASE.md` — never wire deploys to `main`.
 ## Git
 
 See `docs/BRANCHING.md` for branching and `docs/ARCHITECTURE.md` for the
-folder structure, module boundaries and portability rules. Work happens on `feature/*` branches off `main`;
-Conventional Commits only.
+folder structure, module boundaries and portability rules. Work happens on `<type>/<kebab-description>` branches off `main`
+(`feat/share-links`, `fix/focus-after-remove`; the type matches the PR
+title type); Conventional Commits only.

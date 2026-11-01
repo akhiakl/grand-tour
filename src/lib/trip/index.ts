@@ -13,6 +13,7 @@ export * from "./history";
 export * from "./ics";
 export * from "./leg-estimate";
 export * from "./local-store";
+export * from "./maps-url";
 export * from "./packing";
 export * from "./poster-layout";
 export * from "./sample";

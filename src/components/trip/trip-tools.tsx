@@ -2,7 +2,7 @@
 
 import { ArrowLeft, Plus, X } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -27,6 +27,9 @@ export function BackToRoute({ onBack }: { readonly onBack: () => void }) {
   return (
     <button
       type="button"
+      // Shown when the guest opens a stop or tool in place of the
+      // itinerary; focus moves into the view they just opened.
+      // eslint-disable-next-line jsx-a11y/no-autofocus
       autoFocus
       onClick={onBack}
       className="-ml-1 flex w-fit items-center gap-1.5 rounded-full px-1 text-sm text-ink-soft transition-colors outline-none hover:text-ink focus-visible:ring-2 focus-visible:ring-ring [&_svg]:size-4"
@@ -57,22 +60,28 @@ function ToolSection({
 }
 
 function PackingItem({
-  id,
   item,
   checked,
   onToggle,
   onRemove,
 }: {
-  readonly id: string;
   readonly item: string;
   readonly checked: boolean;
   readonly onToggle: () => void;
   readonly onRemove: () => void;
 }) {
   const t = useTranslations("Trip.tools");
+  // useId, not the list index: the tools render in more than one place, and
+  // a repeated id would leave every copy's checkbox without its label.
+  const id = useId();
   return (
     <li className="flex items-center gap-3 text-sm">
-      <Checkbox id={id} checked={checked} onCheckedChange={onToggle} />
+      <Checkbox
+        id={id}
+        aria-label={item}
+        checked={checked}
+        onCheckedChange={onToggle}
+      />
       <label
         htmlFor={id}
         className={cn(
@@ -86,7 +95,7 @@ function PackingItem({
         type="button"
         onClick={onRemove}
         aria-label={t("removeItem", { item })}
-        className="rounded-full p-1 text-ink-soft outline-none hover:text-ink focus-visible:ring-2 focus-visible:ring-ring [&_svg]:size-3.5"
+        className="rounded-full p-1.5 text-ink-soft outline-none hover:text-ink focus-visible:ring-2 focus-visible:ring-ring [&_svg]:size-3.5"
       >
         <X />
       </button>
@@ -220,13 +229,12 @@ function ToolsBody({ trip, scope, active, onBack }: ToolsProps) {
           aria-label={t("packed")}
           value={progress}
           max={100}
-          className="h-1 w-full appearance-none overflow-hidden rounded-full bg-secondary [&::-moz-progress-bar]:rounded-full [&::-moz-progress-bar]:bg-brass [&::-webkit-progress-bar]:bg-secondary [&::-webkit-progress-value]:rounded-full [&::-webkit-progress-value]:bg-brass [&::-webkit-progress-value]:transition-[width]"
+          className="h-1 w-full appearance-none overflow-hidden rounded-full bg-secondary [&::-moz-progress-bar]:rounded-full [&::-moz-progress-bar]:bg-brass [&::-webkit-progress-bar]:bg-secondary [&::-webkit-progress-value]:rounded-full [&::-webkit-progress-value]:bg-brass"
         />
         <ul className="space-y-2.5">
-          {items.map((item, index) => (
+          {items.map((item) => (
             <PackingItem
               key={item.id}
-              id={`packing-${index}`}
               item={item.label}
               checked={checked.has(item.id)}
               onToggle={() => toggle(item.id)}
@@ -254,7 +262,7 @@ function ToolsBody({ trip, scope, active, onBack }: ToolsProps) {
           maxLength={TRIP_TOOLS_LIMITS.notesLength}
           onChange={(event) => update({ notes: event.target.value })}
           placeholder={t("notesPlaceholder")}
-          className="min-h-48 w-full resize-y rounded-lg border border-line bg-transparent p-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="min-h-48 w-full resize-y rounded-lg border border-input bg-transparent p-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
         />
         <p className="text-xs text-ink-soft">{t("notesPrivacy")}</p>
       </ToolSection>
