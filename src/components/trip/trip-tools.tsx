@@ -107,6 +107,7 @@ function AddItemForm({ onAdd }: { readonly onAdd: (item: string) => void }) {
       }}
     >
       <Input
+        name="item"
         aria-label={t("addItem")}
         placeholder={t("addItemPlaceholder")}
         maxLength={80}
@@ -247,6 +248,7 @@ function ToolsBody({ trip, scope, active, onBack }: ToolsProps) {
 
       <ToolSection open={active === "notes"} title={t("notesTitle")} onBack={onBack}>
         <textarea
+          name="notes"
           aria-label={t("notesTitle")}
           value={state.notes}
           maxLength={TRIP_TOOLS_LIMITS.notesLength}

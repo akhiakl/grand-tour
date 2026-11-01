@@ -1,4 +1,9 @@
 import * as Sentry from "@sentry/nextjs";
+import { z } from "zod";
+
+// Our CSP forbids 'unsafe-eval'; zod's JIT probe (`new Function`) would be
+// reported as a violation in DevTools even though zod falls back on its own.
+z.config({ jitless: true });
 
 const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
 

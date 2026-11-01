@@ -32,6 +32,7 @@ export function DestinationStep({
     <form onSubmit={submit} className="flex gap-2">
       <Input
         autoFocus
+        name="destination"
         aria-label={t("destinationLabel")}
         placeholder={t("destinationPlaceholder")}
         maxLength={120}
@@ -65,6 +66,7 @@ export function DaysStep({
     <form onSubmit={submit} className="flex items-center gap-2">
       <Input
         autoFocus
+        name="days"
         aria-label={t("daysLabel")}
         type="number"
         inputMode="numeric"
