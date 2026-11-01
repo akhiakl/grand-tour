@@ -10,6 +10,7 @@ import type { City, LatLng } from "@/lib/trip";
 import {
   clearPanOffset,
   fitPadding,
+  isMapSized,
   isPointObscured,
   type MapInsets,
 } from "./fit-padding";
@@ -60,18 +61,39 @@ export function MapFocus({
   }, [map, bottom, left]);
 
   useEffect(() => {
-    if (selectedIndex === null) {
-      map.flyToBounds(bounds, {
-        ...fitPadding({ top, bottom, left }, map.getSize().y),
-        duration: 1,
-      });
-    } else {
-      // Centre the stop in the part of the map the card leaves visible.
-      const point = map
-        .project(cities[selectedIndex].ll as LatLng, CITY_ZOOM)
-        .add([-left / 2, (bottom - top) / 2]);
-      map.flyTo(map.unproject(point, CITY_ZOOM), CITY_ZOOM, { duration: 1.2 });
+    const focus = () => {
+      if (selectedIndex === null) {
+        map.flyToBounds(bounds, {
+          ...fitPadding({ top, bottom, left }, map.getSize().y),
+          duration: 1,
+        });
+      } else {
+        // Centre the stop in the part of the map the card leaves visible.
+        const point = map
+          .project(cities[selectedIndex].ll as LatLng, CITY_ZOOM)
+          .add([-left / 2, (bottom - top) / 2]);
+        map.flyTo(map.unproject(point, CITY_ZOOM), CITY_ZOOM, {
+          duration: 1.2,
+        });
+      }
+    };
+
+    if (isMapSized(map.getSize())) {
+      focus();
+      return;
     }
+    // A hidden (0×0) map can't be flown over: Leaflet's fly animation
+    // divides by the map's width and throws on NaN coordinates. Focus once
+    // the container has a size instead.
+    const onResize = () => {
+      if (!isMapSized(map.getSize())) return;
+      map.off("resize", onResize);
+      focus();
+    };
+    map.on("resize", onResize);
+    return () => {
+      map.off("resize", onResize);
+    };
   }, [map, bounds, cities, selectedIndex, top, bottom, left]);
 
   return null;
