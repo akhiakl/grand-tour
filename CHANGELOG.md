@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.3](https://github.com/akhiakl/grand-tour/compare/v0.6.2...v0.6.3) (2026-11-01)
+
+
+### Bug Fixes
+
+* silence CSP eval report and name form fields ([#116](https://github.com/akhiakl/grand-tour/issues/116)) ([426c859](https://github.com/akhiakl/grand-tour/commit/426c859f4de141d3088a6f4aace3ad7cae01d1f0))
+
 ## [0.6.2](https://github.com/akhiakl/grand-tour/compare/v0.6.1...v0.6.2) (2026-10-31)
 
 
